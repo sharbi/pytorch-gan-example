@@ -157,7 +157,7 @@ for epoch in range(num_epochs):
         real_cpu = data[0].to(device)
         b_size = real_cpu.size(0)
         label = torch.full((b_size, ), real_label, device=device)
-        output = netD(real_cpu).view(-1)
+        output = netD(real_cpu)
         errD_real = criterion(output, label)
         errD_real.backward()
         D_x = output.mean().item()
@@ -168,7 +168,7 @@ for epoch in range(num_epochs):
         fake = netG(noise)
         label.fill_(fake_label)
         # Classify all fake batch with D
-        output = netD(fake.detach()).view(-1)
+        output = netD(fake.detach())
         # Calculate loss on fake batch
         errD_fake = criterion(output, label)
         # Calculate gradients for this batch
@@ -191,7 +191,7 @@ for epoch in range(num_epochs):
         fake = netG(noise)
 
         # Check output from D
-        output = netD(fake).view(-1)
+        output = netD(fake)
 
         # Calculate G's loss
         errG = criterion(output, label)
