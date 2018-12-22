@@ -56,7 +56,7 @@ device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else 
 # Initialize weights for NN
 # As per DCGAN paper, normal distribution mean=0, std_dev=0.2
 def weights_init(m):
-    classnname = m.__class__.__name__
+    classname = m.__class__.__name__
     if classname.find('Conv') != -1:
         nn.init.normal_(m.weight.data, 0.0, 0.02)
     elif classname.find('BatchNorm') != -1:
