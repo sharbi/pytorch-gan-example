@@ -91,7 +91,10 @@ class Generator(nn.Module):
         )
 
         def forward(self, input):
-            return self.main(input)
+            out = self.main(input)
+            out = out.view(out.shape[0], -1)
+            validity = self.adv_layer(out)
+            return validity
 
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
@@ -119,7 +122,10 @@ class Discriminator(nn.Module):
         )
 
         def forward(self, input):
-            return self.main(input)
+            out = self.main(input)
+            out = out.view(out.shape[0], -1)
+            validity = self.adv_layer(out)
+            return validity
 
 
 netD = Discriminator(ngpu).to(device)
