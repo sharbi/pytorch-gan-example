@@ -24,6 +24,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 dataroot = "./.gitignore/data/"
+workers = 2
 batch_size = 128
 image_size = 64
 nc = 1
