@@ -90,8 +90,8 @@ class Generator(nn.Module):
         # state size. (nc) x 64 x 64
         )
 
-        def forward(self, input):
-            return self.main(input)
+    def forward(self, input):
+        return self.main(input)
 
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
@@ -118,8 +118,8 @@ class Discriminator(nn.Module):
             nn.Sigmoid()
         )
 
-        def forward(self, input):
-            return self.main(input)
+    def forward(self, input):
+        return self.main(input)
 
 
 netD = Discriminator(ngpu).to(device)
