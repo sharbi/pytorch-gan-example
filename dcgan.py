@@ -23,7 +23,7 @@ random.seed(manual_seed)
 torch.manual_seed(manual_seed)
 
 # Set initial paramaters
-dataroot = "/images"
+dataroot = "images"
 batch_size = 128
 image_size = 64
 nc = 1
