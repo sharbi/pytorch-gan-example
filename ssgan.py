@@ -272,7 +272,7 @@ for epoch in range(num_epochs):
                   format(epoch, num_epochs,
                          unsupervised_loss.data[0], supervised_loss.data[0],
                          g_loss.data[0], i + 1,
-                         data.size[0]))
+                         data[0].size()))
         vutils.save_image(real_cpu,
                 './.gitignore/output/real_samples.png',
                 normalize=True)
