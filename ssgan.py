@@ -95,7 +95,7 @@ class _ganLogits(nn.Module):
         real_class_logits, fake_class_logits = torch.split(class_logits, num_classes, dim=1)
         fake_class_logits = torch.squeeze(fake_class_logits)
 
-        max_val, _ = torch.max(real_class_logits, 1, keepdim=True)
+        max_val, _ = torch.max(real_class_logits, 0, keepdim=True)
         stable_class_logits = real_class_logits - max_val
         max_val = torch.squeeze(max_val)
         gan_logits = torch.log(torch.sum(torch.exp(stable_class_logits), 1)) + max_val - fake_class_logits
