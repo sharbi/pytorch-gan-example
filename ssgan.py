@@ -273,15 +273,15 @@ for epoch in range(num_epochs):
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
-                  format(epoch, self.opt.epochs,
+                  format(epoch, num_epochs,
                          d_gan_loss.data[0], d_class_loss.data[0],
                          g_loss.data[0], i + 1,
-                         len(self.svhn_loader_train)))
+                         len(b_size)))
             real_cpu = data
             vutils.save_image(real_cpu,
-                              '{}/real_samples.png'.format(self.opt.out_dir),
+                              '{}/real_samples.png'.format('./.gitignore/output/SS_GAN_TEST/'),
                               normalize=True)
             fake = self.netG(fixed_noise)
             vutils.save_image(fake.data,
-                              '{}/fake_samples_epoch_{:03d}.png'.format(self.opt.out_dir, epoch),
+                              '{}/fake_samples_epoch_{:03d}.png'.format('./.gitignore/output/SS_GAN_TEST/', epoch),
                               normalize=True)
