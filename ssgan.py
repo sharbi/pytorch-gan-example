@@ -241,9 +241,6 @@ for epoch in range(num_epochs):
             torch.mean(F.softplus(logits_sum_fake))
         )
 
-        print(logits_sum_real)
-        print(logits_sum_fake)
-
         loss_d = supervised_loss + unsupervised_loss
 
         loss_d.backward(retain_graph=True)
