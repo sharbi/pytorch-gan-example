@@ -35,9 +35,9 @@ beta = 0.5
 ngpu = 1
 # Create dataset
 
-os.makedirs('../../data/mnist', exist_ok=True)
+os.makedirs('./.gitignore/data/mnist', exist_ok=True)
 dataloader = torch.utils.data.DataLoader(
-    dset.MNIST('../../data/mnist', train=True, download=True,
+    dset.MNIST'./.gitignore/data/mnist', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.Resize(image_size),
                        transforms.ToTensor(),
@@ -182,12 +182,6 @@ def weights_init(m):
         nn.init.constant_(m.bias.data, 0)
 
 def one_hot(x):
-        '''
-        One-hot encoding of the vector of classes. It uses number of classes + 1 to
-        encode fake images
-        :param x: vector of output classes to one-hot encode
-        :return: one-hot encoded version of the input vector
-        '''
         label_numpy = x.data.cpu().numpy()
         label_onehot = np.zeros((label_numpy.shape[0], num_classes + 1))
         label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
@@ -216,7 +210,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
 for epoch in range(num_epochs):
     # For each batch in the dataloader
-    for i, (data, label) in enumerate(dataloader, 0):
+    for i, data in enumerate(dataloader, 0):
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
