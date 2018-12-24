@@ -112,46 +112,61 @@ class Discriminator(nn.Module):
     def __init__(self, ngpu):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
+
         self.main = nn.Sequential(
-            nn.Dropout2d(0.5/2.5),
+            nn.Dropout2d(drop_rate/2.5),
+
+            # input is (number_channels) x 32 x 32
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Dropout2d(0.5),
+            nn.LeakyReLU(alpha),
+            nn.Dropout2d(drop_rate),
+            # (ndf) x 16 x 16
             nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(alpha),
+            # (ndf) x 8 x 8
             nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Dropout2d(0.5),
-            nn.Conv2d(ndf, ndf*2, 3, 1, 1, bias=False),
-            nn.BatchNorm2d(ndf*2),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(ndf*2, ndf*2, 3, 1, 1, bias=False),
-            nn.BatchNorm2d(ndf*2),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(ndf*2, ndf*2, 3, 1, 0, bias=False),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(alpha),
+            nn.Dropout2d(drop_rate),
+            # (ndf) x 4 x 4
+            nn.Conv2d(ndf, ndf * 2, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(ndf * 2),
+            nn.LeakyReLU(alpha),
+            # (ndf * 2) x 4 x 4
+            nn.Conv2d(ndf * 2, ndf * 2, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(ndf * 2),
+            nn.LeakyReLU(alpha),
+            # (ndf * 2) x 4 x 4
+            nn.Conv2d(ndf * 2, ndf * 2, 3, 1, 0, bias=False),
+            nn.LeakyReLU(alpha),
+            # (ndf * 2) x 2 x 2
         )
 
         self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
-            in_features=(ndf*2) * 1 * 1,
-            out_features=(num_classes + 1)
-        )
+            in_features=(ndf * 2) * 1 * 1,
+            out_features=num_classes + 1)
 
-        self.gan_logits = _ganLogits()
+        self.gan_logits = _ganLogits(num_classes)
 
         self.softmax = nn.Softmax(dim=0)
 
-    def forward(self, input):
-        out = self.main(input)
+    def forward(self, inputs):
+        '''
+        :param inputs: we expect real or fake images as an input for discriminator network
+        '''
+        if isinstance(inputs.data, torch.cuda.FloatTensor) and self.use_gpu:
+            out = nn.parallel.data_parallel(self.main, inputs, range(1))
+        else:
+            out = self.main(inputs)
 
         features = self.features(out)
         features = features.squeeze()
 
         class_logits = self.class_logits(features)
+
         gan_logits = self.gan_logits(class_logits)
 
         out = self.softmax(class_logits)
