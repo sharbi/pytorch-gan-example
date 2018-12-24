@@ -216,7 +216,7 @@ for epoch in range(num_epochs):
         output, _, gan_logits_real, d_sample_features = netD(real_cpu)
 
         mnist_labels = one_hot(data[1])
-        supervised_loss = torch.mean(d_criterion(mnist_labels, output))
+        supervised_loss = -torch.sum(mnist_labels * torch.log(output), dim=1)
 
         ##########################
         # NEXT UNSUPERVISED LOSS:
