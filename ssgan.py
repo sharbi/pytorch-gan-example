@@ -114,12 +114,12 @@ class Discriminator(nn.Module):
         self.ngpu = ngpu
 
         self.main = nn.Sequential(
-            nn.Dropout2d(drop_rate/2.5),
+            nn.Dropout2d(0.5/2.5),
 
             # input is (number_channels) x 32 x 32
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
             nn.LeakyReLU(alpha),
-            nn.Dropout2d(drop_rate),
+            nn.Dropout2d(0.5),
             # (ndf) x 16 x 16
             nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf),
@@ -128,7 +128,7 @@ class Discriminator(nn.Module):
             nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf),
             nn.LeakyReLU(alpha),
-            nn.Dropout2d(drop_rate),
+            nn.Dropout2d(0.5),
             # (ndf) x 4 x 4
             nn.Conv2d(ndf, ndf * 2, 3, 1, 1, bias=False),
             nn.BatchNorm2d(ndf * 2),
