@@ -273,11 +273,10 @@ for epoch in range(num_epochs):
                          unsupervised_loss.data[0], supervised_loss.data[0],
                          g_loss.data[0], i + 1,
                          b_size))
-            real_cpu = data
-            vutils.save_image(real_cpu,
-                              '{}/real_samples.png'.format('./.gitignore/output/SS_GAN_TEST/'),
-                              normalize=True)
-            fake = self.netG(fixed_noise)
-            vutils.save_image(fake.data,
-                              '{}/fake_samples_epoch_{:03f}.png'.format('./.gitignore/output/SS_GAN_TEST/', epoch),
-                              normalize=True)
+        vutils.save_image(real_cpu,
+                './.gitignore/output/real_samples.png',
+                normalize=True)
+        fake = netG(fixed_noise)
+        vutils.save_image(fake.detach(),
+                './.gitignore/output/fake_samples_epoch_%03d.png' % epoch,
+                normalize=True)
