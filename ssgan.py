@@ -269,7 +269,7 @@ for epoch in range(num_epochs):
         g_loss = torch.mean(torch.abs(data_features_mean - sample_features_mean))
 
         g_loss.backward()
-        self.g_optimizer.step()
+        optimizerG.step()
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
