@@ -154,13 +154,8 @@ class Discriminator(nn.Module):
         self.softmax = nn.Softmax(dim=0)
 
     def forward(self, inputs):
-        '''
-        :param inputs: we expect real or fake images as an input for discriminator network
-        '''
-        if isinstance(inputs.data, torch.cuda.FloatTensor) and self.use_gpu:
-            out = nn.parallel.data_parallel(self.main, inputs, range(1))
-        else:
-            out = self.main(inputs)
+
+        out = self.main(inputs)
 
         features = self.features(out)
         features = features.squeeze()
