@@ -160,7 +160,7 @@ class Discriminator(nn.Module):
         print(out.size())
 
         features = self.features(out)
-        features = features.squeeze()
+        #features = features.squeeze()
 
         print(features.size())
 
@@ -223,8 +223,8 @@ for epoch in range(num_epochs):
         real_labels = torch.full((b_size, ), real_label, device=device)
         output, _, gan_logits_real, d_sample_features = netD(real_cpu)
 
-        #mnist_labels = one_hot(data[1])
-        supervised_loss = torch.mean(d_criterion(data[1], torch.log(output)))
+        mnist_labels = one_hot(data[1])
+        supervised_loss = torch.mean(d_criterion(mnist_labels, torch.log(output)))
 
         ##########################
         # NEXT UNSUPERVISED LOSS:
