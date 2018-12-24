@@ -153,12 +153,8 @@ class Discriminator(nn.Module):
 
         out = self.main(inputs)
 
-        print(out.size())
-
         features = self.features(out)
         features = features.squeeze()
-
-        print(features.size())
 
         class_logits = self.class_logits(features)
 
@@ -283,5 +279,5 @@ for epoch in range(num_epochs):
                               normalize=True)
             fake = self.netG(fixed_noise)
             vutils.save_image(fake.data,
-                              '{}/fake_samples_epoch_{:03d}.png'.format('./.gitignore/output/SS_GAN_TEST/', epoch),
+                              '{}/fake_samples_epoch_{:03f}.png'.format('./.gitignore/output/SS_GAN_TEST/', epoch),
                               normalize=True)
