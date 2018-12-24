@@ -218,12 +218,12 @@ for epoch in range(num_epochs):
         ##########################
 
         netD.zero_grad()
-        real_cpu = data.to(device)
+        real_cpu = data[0].to(device)
         b_size = real_cpu.size(0)
         real_labels = torch.full((b_size, ), real_label, device=device)
         output, _, gan_logits_real, d_sample_features = netD(real_cpu)
 
-        mnist_labels = one_hot(label)
+        mnist_labels = one_hot(data[1])
         supervised_loss = torch.mean(d_criterion(mnist_labels, torch.log(output)))
 
         ##########################
