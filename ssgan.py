@@ -274,7 +274,7 @@ for epoch in range(num_epochs):
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         d_gan_loss.data[0], d_class_loss.data[0],
+                         unsupervised_loss.data[0], supervised_loss.data[0],
                          g_loss.data[0], i + 1,
                          len(b_size)))
             real_cpu = data
