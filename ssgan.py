@@ -213,7 +213,7 @@ for epoch in range(num_epochs):
         real_cpu = data.to(device)
         b_size = real_cpu.size(0)
         real_labels = torch.full((b_size, ), real_label, device=device)
-        output, _, gan_logits_real, d_sample_features = netD(real_cpu).view(-1)
+        output, _, gan_logits_real, d_sample_features = netD(real_cpu)
 
         mnist_labels = one_hot(label)
         supervised_loss = torch.mean(d_criterion(mnist_labels, torch.log(output)))
@@ -230,7 +230,7 @@ for epoch in range(num_epochs):
         # Generate fake images
         fake = netG(noise)
 
-        _, _, gan_logits_fake, _ = netD(fake.detach()).view(-1)
+        _, _, gan_logits_fake, _ = netD(fake.detach())
 
         logits_sum_real = torch.logsumexp(gan_logits_real, 1)
         logits_sum_fake = torch.logsumexp(gan_logits_fake, 1)
