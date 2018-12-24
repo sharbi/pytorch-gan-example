@@ -149,7 +149,7 @@ class Discriminator(nn.Module):
             in_features=(ndf * 2) * 1 * 1,
             out_features=num_classes + 1)
 
-        self.gan_logits = _ganLogits(num_classes)
+        self.gan_logits = _ganLogits()
 
         self.softmax = nn.Softmax(dim=0)
 
