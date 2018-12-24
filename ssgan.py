@@ -276,7 +276,7 @@ for epoch in range(num_epochs):
                   format(epoch, num_epochs,
                          unsupervised_loss.data[0], supervised_loss.data[0],
                          g_loss.data[0], i + 1,
-                         len(b_size)))
+                         b_size))
             real_cpu = data
             vutils.save_image(real_cpu,
                               '{}/real_samples.png'.format('./.gitignore/output/SS_GAN_TEST/'),
