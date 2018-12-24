@@ -156,6 +156,8 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         real_cpu = data[0].to(device)
         b_size = real_cpu.size(0)
+
+        print(real_cpu.shape)
         label = torch.full((b_size, ), real_label, device=device)
         output = netD(real_cpu).view(-1)
         errD_real = criterion(output, label)
