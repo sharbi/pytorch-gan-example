@@ -229,17 +229,21 @@ for epoch in range(num_epochs):
         noise = torch.randn(b_size, nz, 1, 1, device=device)
         # Generate fake images
         fake = netG(noise)
+        fake_labels = torch.full((b_size, ), fake_label, device=device)
 
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
-        logits_sum_real = torch.logsumexp(gan_logits_real, 0)
-        logits_sum_fake = torch.logsumexp(gan_logits_fake, 0)
-
-        unsupervised_loss = 0.5 * (
-            -(torch.mean(logits_sum_real)) +
-            torch.mean(F.softplus(logits_sum_real)) +
-            torch.mean(F.softplus(logits_sum_fake))
+        real_unsupervised_loss = d_criterion(
+            gan_logits_real,
+            real_labels
         )
+
+        fake_unsupervised_loss = d_criterion(
+            gan_logits_fake,
+            fake_labels
+        )
+
+        unsupervised_loss = real_unsupervised_loss + fake_unsupervised_loss
 
         loss_d = supervised_loss + unsupervised_loss
 
@@ -274,9 +278,9 @@ for epoch in range(num_epochs):
                          g_loss.data[0], i + 1,
                          data[0].size()[0]))
             vutils.save_image(real_cpu,
-                    './.gitignore/output/real_samples.png',
+                    './.gitignore/output/SSGAN_TEST/real_samples.png',
                     normalize=True)
             fake = netG(fixed_noise)
             vutils.save_image(fake.detach(),
-                    './.gitignore/output/fake_samples_epoch_%03d.png' % epoch,
+                    './.gitignore/output/SSGAN_TEST/fake_samples_epoch_%03d.png' % epoch,
                     normalize=True)
