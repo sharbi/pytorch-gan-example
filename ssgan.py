@@ -37,7 +37,7 @@ ngpu = 1
 
 os.makedirs('./.gitignore/data/mnist', exist_ok=True)
 dataloader = torch.utils.data.DataLoader(
-    dset.MNIST'./.gitignore/data/mnist', train=True, download=True,
+    dset.MNIST('./.gitignore/data/mnist', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.Resize(image_size),
                        transforms.ToTensor(),
