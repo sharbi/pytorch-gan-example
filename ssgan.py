@@ -218,6 +218,8 @@ for epoch in range(num_epochs):
         mnist_labels = one_hot(data[1])
         supervised_loss = -torch.sum(mnist_labels * torch.log(output), dim=1)
 
+        supervised_loss = supervised_loss.squeeze()
+
         ##########################
         # NEXT UNSUPERVISED LOSS:
         # This checks the discriminator's ability to determine real and fake data
