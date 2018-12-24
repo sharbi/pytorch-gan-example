@@ -216,7 +216,7 @@ for epoch in range(num_epochs):
         output, _, gan_logits_real, d_sample_features = netD(real_cpu)
 
         mnist_labels = one_hot(data[1])
-        supervised_loss = torch.mean(d_criterion(mnist_labels, torch.log(output)))
+        supervised_loss = torch.mean(d_criterion(mnist_labels, output))
 
         ##########################
         # NEXT UNSUPERVISED LOSS:
@@ -240,6 +240,9 @@ for epoch in range(num_epochs):
             torch.mean(F.softplus(logits_sum_real)) +
             torch.mean(F.softplus(logits_sum_fake))
         )
+
+        print(logits_sum_real)
+        print(logits_sum_fake)
 
         loss_d = supervised_loss + unsupervised_loss
 
@@ -272,7 +275,7 @@ for epoch in range(num_epochs):
                   format(epoch, num_epochs,
                          unsupervised_loss.data[0], supervised_loss.data[0],
                          g_loss.data[0], i + 1,
-                         data[0].size()))
+                         data[0].size()[0]))
         vutils.save_image(real_cpu,
                 './.gitignore/output/real_samples.png',
                 normalize=True)
