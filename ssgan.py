@@ -23,7 +23,7 @@ torch.manual_seed(manual_seed)
 # Set initial paramaters
 workers = 2
 batch_size = 128
-image_size = 64
+image_size = 32
 num_classes = 10
 nc = 1
 nz = 100
@@ -160,7 +160,7 @@ class Discriminator(nn.Module):
         print(out.size())
 
         features = self.features(out)
-        #features = features.squeeze()
+        features = features.squeeze()
 
         print(features.size())
 
