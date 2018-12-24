@@ -189,7 +189,7 @@ netD = Discriminator(ngpu).to(device)
 netD.apply(weights_init)
 print(netD)
 
-d_criterion = nn.BCEWithLogitsLoss()
+d_criterion = nn.CrossEntropyLoss()
 fixed_noise = torch.randn(64, nz, 1, 1, device=device)
 
 
