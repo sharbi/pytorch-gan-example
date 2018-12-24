@@ -207,6 +207,15 @@ for epoch in range(num_epochs):
                   % (epoch, num_epochs, i, len(dataloader),
                      errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
 
+        if i % 100 == 0:
+            vutils.save_image(real_cpu,
+                    './.gitignore/output/real_samples.png',
+                    normalize=True)
+            fake = netG(fixed_noise)
+            vutils.save_image(fake.detach(),
+                    './.gitignore/output/fake_samples_epoch_%03d.png' % epoch,
+                    normalize=True)
+
         # Save Losses for plotting later
         G_losses.append(errG.item())
         D_losses.append(errD.item())
@@ -221,17 +230,3 @@ for epoch in range(num_epochs):
 
     # Grab a batch of real images from the dataloader
     real_batch = next(iter(dataloader))
-
-    # Plot the real images
-    plt.figure(figsize=(15,15))
-    plt.subplot(1,2,1)
-    plt.axis("off")
-    plt.title("Real Images")
-    plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(),(1,2,0)))
-
-    # Plot the fake images from the last epoch
-    plt.subplot(1,2,2)
-    plt.axis("off")
-    plt.title("Fake Images")
-    plt.imshow(np.transpose(img_list[-1],(1,2,0)))
-    plt.show()
