@@ -257,6 +257,8 @@ for epoch in range(num_epochs):
         fake = netG(noise)
         fake_labels = torch.full((b_size, ), fake_label, device=device)
 
+        _, _, _, d_data_features = netD(fake)
+
         data_features_mean = torch.mean(d_data_features, dim=0).squeeze()
         sample_features_mean = torch.mean(d_sample_features, dim=0).squeeze()
 
