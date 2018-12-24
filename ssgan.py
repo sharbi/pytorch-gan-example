@@ -95,7 +95,7 @@ class _ganLogits(nn.Module):
         real_class_logits, fake_class_logits = torch.split(class_logits, num_classes, dim=1)
         fake_class_logits = torch.squeeze(fake_class_logits)
 
-        max_val, _ = torch.max(real_class_logits, -1, keepdim=True)
+        max_val, _ = torch.max(real_class_logits, 1, keepdim=True)
         stable_class_logits = real_class_logits - max_val
         max_val = torch.squeeze(max_val)
         gan_logits = torch.log(torch.sum(torch.exp(stable_class_logits), 1)) + max_val - fake_class_logits
@@ -236,8 +236,8 @@ for epoch in range(num_epochs):
 
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
-        logits_sum_real = torch.logsumexp(gan_logits_real, 1)
-        logits_sum_fake = torch.logsumexp(gan_logits_fake, 1)
+        logits_sum_real = torch.logsumexp(gan_logits_real, -1)
+        logits_sum_fake = torch.logsumexp(gan_logits_fake, -1)
 
         unsupervised_loss = 0.5 * (
             -(torch.mean(logits_sum_real)) +
