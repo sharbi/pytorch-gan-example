@@ -232,8 +232,8 @@ for epoch in range(num_epochs):
 
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
-        logits_sum_real = torch.logsumexp(gan_logits_real, -1)
-        logits_sum_fake = torch.logsumexp(gan_logits_fake, -1)
+        logits_sum_real = torch.logsumexp(gan_logits_real, 0)
+        logits_sum_fake = torch.logsumexp(gan_logits_fake, 0)
 
         unsupervised_loss = 0.5 * (
             -(torch.mean(logits_sum_real)) +
