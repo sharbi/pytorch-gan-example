@@ -262,7 +262,7 @@ real_label = 1
 fake_label = 0
 
 
-optimizerD = optim.Adam(netD.parameters(), lr=(lr/30), betas=(beta, 0.999))
+optimizerD = optim.Adam(netD.parameters(), lr=(lr/50), betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
 for epoch in range(num_epochs):
