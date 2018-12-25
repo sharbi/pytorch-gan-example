@@ -281,7 +281,7 @@ for epoch in range(num_epochs):
 
         netD.zero_grad()
         d_gan_labels_real.resize_as_(svhn_labels.data.cpu()).fill_(1)
-        d_gan_labels_real_var = self._to_var(d_gan_labels_real).float()
+        d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
