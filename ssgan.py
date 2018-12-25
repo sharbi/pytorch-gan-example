@@ -35,15 +35,70 @@ beta = 0.5
 ngpu = 1
 # Create dataset
 
-os.makedirs('./.gitignore/data/mnist', exist_ok=True)
-dataloader = torch.utils.data.DataLoader(
-    dset.MNIST('./.gitignore/data/mnist', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.Resize(image_size),
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-                   ])),
-    batch_size=batch_size, shuffle=True)
+class SvhnDataset(Dataset):
+    def __init__(self, image_size, split):
+        self.split = split
+        self.use_gpu = True if torch.cuda.is_available() else False
+
+        self.svhn_dataset = self._create_dataset(image_size, split)
+        self.label_mask = self._create_label_mask()
+
+    def _create_dataset(self, image_size, split):
+        normalize = transforms.Normalize(
+            mean=[0.5, 0.5, 0.5],
+            std=[0.5, 0.5, 0.5])
+        transform = transforms.Compose([
+            transforms.Resize(image_size),
+            transforms.ToTensor(),
+            normalize])
+        return datasets.SVHN(root='./svhn', download=True, transform=transform, split=split)
+
+    def _is_train_dataset(self):
+        return True if self.split == 'train' else False
+
+    def _create_label_mask(self):
+        if self._is_train_dataset():
+            label_mask = np.zeros(len(self.svhn_dataset))
+            label_mask[0:1000] = 1
+            np.random.shuffle(label_mask)
+            label_mask = torch.LongTensor(label_mask)
+            return label_mask
+        return None
+
+    def __len__(self):
+        return len(self.svhn_dataset)
+
+    def __getitem__(self, idx):
+        data, label = self.svhn_dataset.__getitem__(idx)
+        if self._is_train_dataset():
+            return data, label, self.label_mask[idx]
+        return data, label
+
+def get_loader(image_size, batch_size):
+    num_workers = 2
+
+    svhn_train = SvhnDataset(image_size=image_size, split='train')
+    svhn_test = SvhnDataset(image_size=image_size, split='test')
+
+    svhn_loader_train = DataLoader(
+        dataset=svhn_train,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers
+    )
+
+    svhn_loader_test = DataLoader(
+        dataset=svhn_test,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers
+    )
+
+    return svhn_loader_train, svhn_loader_test
+
+svhn_loader_train, _ = get_loader(image_size=32, batch_size=36)
+image_iter = iter(svhn_loader_train)
+images, _, _ = image_iter.next()
 
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
@@ -202,7 +257,12 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
 for epoch in range(num_epochs):
     # For each batch in the dataloader
-    for i, data in enumerate(dataloader, 0):
+    for i, data in enumerate(svhn_loader_train):
+        svhn_data, svhn_labels, label_mask = data
+        svhn_data = svhn_data.to(device)
+        svhn_labels = svhn_labels.to(device).long().squeeze()
+        label_mask = label_mask.to(device).float().squeeze()
+
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
@@ -210,15 +270,17 @@ for epoch in range(num_epochs):
         ##########################
 
         netD.zero_grad()
-        real_cpu = data[0].to(device)
-        b_size = real_cpu.size(0)
+        b_size = svhn_data.size(0)
         real_labels = torch.full((b_size, ), real_label, device=device)
-        output, _, gan_logits_real, d_sample_features = netD(real_cpu)
+        output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
-        mnist_labels = one_hot(data[1])
-        supervised_loss = -torch.sum(mnist_labels * torch.log(output), dim=1)
+        svhn_labels_one_hot = one_hot(svhn_labels)
+        supervised_loss = -torch.sum(svhn_labels_one_hot * torch.log(d_out), dim=1)
 
         supervised_loss = supervised_loss.squeeze()
+        delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
+        supervised_loss = torch.sum(label_mask * d_class_loss_entropy) / delim
+
 
         ##########################
         # NEXT UNSUPERVISED LOSS:
@@ -228,6 +290,8 @@ for epoch in range(num_epochs):
         # Get the fake logits, real are obtained from above
 
 
+        gan_logits_real_var = ((gan_logits_real).float()).to(device)
+
         noise = torch.randn(b_size, nz, 1, 1, device=device)
         # Generate fake images
         fake = netG(noise)
@@ -235,13 +299,15 @@ for epoch in range(num_epochs):
 
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
+        gan_logits_fake_var = ((gan_logits_fake).float()).to(device)
+
         real_unsupervised_loss = d_criterion(
-            gan_logits_real,
+            gan_logits_real_var,
             real_labels
         )
 
         fake_unsupervised_loss = d_criterion(
-            gan_logits_fake,
+            gan_logits_fake_var,
             fake_labels
         )
 
