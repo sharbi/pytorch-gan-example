@@ -290,7 +290,7 @@ for epoch in range(num_epochs):
         # Get the fake logits, real are obtained from above
 
 
-        gan_logits_real_var = ((gan_logits_real).float()).to(device)
+        gan_logits_real_var = gan_logits_real.to(device).float()
 
         noise = torch.randn(b_size, nz, 1, 1, device=device)
         # Generate fake images
@@ -299,7 +299,7 @@ for epoch in range(num_epochs):
 
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
-        gan_logits_fake_var = ((gan_logits_fake).float()).to(device)
+        gan_logits_fake_var = gan_logits_fake.to(device).float()
 
         real_unsupervised_loss = d_criterion(
             gan_logits_real_var,
