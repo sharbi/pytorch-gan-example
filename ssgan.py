@@ -275,7 +275,7 @@ for epoch in range(num_epochs):
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        supervised_loss = -torch.sum(svhn_labels_one_hot * torch.log(d_out), dim=1)
+        supervised_loss = -torch.sum(svhn_labels_one_hot * torch.log(output), dim=1)
 
         supervised_loss = supervised_loss.squeeze()
         delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
