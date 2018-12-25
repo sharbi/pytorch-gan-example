@@ -357,6 +357,7 @@ for epoch in range(num_epochs):
                          unsupervised_loss.data[0], supervised_loss.data[0],
                          g_loss.data[0], i + 1,
                          data[0].size()[0]))
+            real_cpu, _, _ = data
             vutils.save_image(real_cpu,
                     './.gitignore/output/SS_GAN_TEST/real_samples.png',
                     normalize=True)
