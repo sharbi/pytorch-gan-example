@@ -313,13 +313,13 @@ for epoch in range(num_epochs):
 
 
         real_unsupervised_loss = d_criterion(
-            gan_logits_real_var,
+            gan_logits_real,
             d_gan_labels_real_var
         )
 
         fake_unsupervised_loss = d_criterion(
-            gan_logits_fake_var,
-            fake_labels
+            gan_logits_fake,
+            d_gan_labels_real_var
         )
 
         unsupervised_loss = real_unsupervised_loss + fake_unsupervised_loss
