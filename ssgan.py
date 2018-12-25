@@ -112,6 +112,11 @@ def weights_init(m):
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
 
+def _to_var(x):
+    if self.use_gpu:
+        x = x.cuda()
+    return Variable(x)
+
 
 class Generator(nn.Module):
 
@@ -232,7 +237,7 @@ def one_hot(x):
         label_numpy = x.data.cpu().numpy()
         label_onehot = np.zeros((label_numpy.shape[0], num_classes + 1))
         label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
-        label_onehot = torch.FloatTensor(label_onehot).to(device)
+        label_onehot = _to_var(torch.FloatTensor(label_onehot))
         return label_onehot
 
 netG = Generator(ngpu).to(device)
@@ -245,8 +250,12 @@ netD.apply(weights_init)
 print(netD)
 
 d_criterion = nn.BCEWithLogitsLoss()
-fixed_noise = torch.randn(64, nz, 1, 1, device=device)
+fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
+fixed_noise = self._to_var(fixed_noise)
 
+
+d_gan_labels_real = torch.LongTensor(batch_size)
+d_gan_labels_fake = torch.LongTensor(batch_size)
 
 real_label = 1
 fake_label = 0
@@ -259,9 +268,9 @@ for epoch in range(num_epochs):
     # For each batch in the dataloader
     for i, data in enumerate(svhn_loader_train):
         svhn_data, svhn_labels, label_mask = data
-        svhn_data = svhn_data.to(device)
-        svhn_labels = svhn_labels.to(device).long().squeeze()
-        label_mask = label_mask.to(device).float().squeeze()
+        svhn_data = _to_var(svhn_data)
+        svhn_labels = _to_var(svhn_labels.long().squeeze())
+        label_mask = _to_var(label_mask.float().squeeze())
 
 
         ##########################
@@ -270,8 +279,8 @@ for epoch in range(num_epochs):
         ##########################
 
         netD.zero_grad()
-        b_size = svhn_data.size(0)
-        real_labels = torch.full((b_size, ), real_label, device=device)
+        d_gan_labels_real.resize_as_(svhn_labels.data.cpu()).fill_(1)
+        d_gan_labels_real_var = self._to_var(d_gan_labels_real).float()
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
@@ -290,20 +299,20 @@ for epoch in range(num_epochs):
         # Get the fake logits, real are obtained from above
 
 
-        gan_logits_real_var = gan_logits_real.to(device).float()
+        noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
-        noise = torch.randn(b_size, nz, 1, 1, device=device)
-        # Generate fake images
-        fake = netG(noise)
-        fake_labels = torch.full((b_size, ), fake_label, device=device)
+        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise_var = _to_var(noise)
+        fake = netG(noise_var)
 
+        d_gan_labels_fake.resize_(svhn_labels.data.shape[0]).fill_(0)
+        d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
-        gan_logits_fake_var = gan_logits_fake.to(device).float()
 
         real_unsupervised_loss = d_criterion(
             gan_logits_real_var,
-            real_labels
+            d_gan_labels_real_var
         )
 
         fake_unsupervised_loss = d_criterion(
@@ -324,10 +333,11 @@ for epoch in range(num_epochs):
         ##########################
 
 
-        noise = torch.randn(b_size, nz, 1, 1, device=device)
+        noise = torch.FloatTensor(batch_size, nz, 1, 1)
+        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise_var = _to_var(noise)
         # Generate fake images
-        fake = netG(noise)
-        fake_labels = torch.full((b_size, ), fake_label, device=device)
+        fake = netG(noise_var)
 
         _, _, _, d_data_features = netD(fake)
 
