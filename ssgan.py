@@ -113,7 +113,7 @@ def weights_init(m):
         nn.init.constant_(m.bias.data, 0)
 
 def _to_var(x):
-    if self.use_gpu:
+    if ngpu > 0:
         x = x.cuda()
     return Variable(x)
 
