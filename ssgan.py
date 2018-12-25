@@ -204,8 +204,7 @@ class Discriminator(nn.Module):
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
-            out_features=num_classes + 1
-        )
+            out_features=num_classes + 1)
 
         self.gan_logits = _ganLogits()
 
@@ -286,7 +285,8 @@ for epoch in range(num_epochs):
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        supervised_loss =
+        supervised_loss = torch.mean(F.cross_entropy(svhn_labels_one_hot, gan_logits_real))
+
 
         ##########################
         # NEXT UNSUPERVISED LOSS:
