@@ -287,9 +287,8 @@ for epoch in range(num_epochs):
         svhn_labels_one_hot = one_hot(svhn_labels)
         supervised_loss = -torch.sum(svhn_labels_one_hot * torch.log(output), dim=1)
 
-        supervised_loss = _to_var(supervised_loss).float().squeeze()
-        delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
-        delim = _to_var(delim)
+        supervised_loss = supervised_loss.squeeze()
+        delim = torch.max(torch.FloatTensor([1.0, torch.sum(label_mask.data)]))
         supervised_loss = torch.sum(label_mask * supervised_loss) / delim
 
 
