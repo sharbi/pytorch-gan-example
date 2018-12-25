@@ -286,7 +286,7 @@ for epoch in range(num_epochs):
 
         svhn_labels_one_hot = one_hot(svhn_labels)
         output = output.long()
-        supervised_loss = torch.mean(F.cross_entropy(svhn_labels_one_hot, output))
+        supervised_loss = torch.mean(F.cross_entropy(svhn_labels_one_hot, log(output)))
 
 
         ##########################
