@@ -51,7 +51,7 @@ class SvhnDataset(Dataset):
             transforms.Resize(image_size),
             transforms.ToTensor(),
             normalize])
-        return datasets.SVHN(root='./svhn', download=True, transform=transform, split=split)
+        return dset.SVHN(root='./svhn', download=True, transform=transform, split=split)
 
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
