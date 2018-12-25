@@ -280,7 +280,7 @@ for epoch in range(num_epochs):
         ##########################
 
         netD.zero_grad()
-        d_gan_labels_real.resize_as_(svhn_labels.data.cpu()).fill_(1)
+        d_gan_labels_real.resize_as_(svhn_labels.data.cpu()).uniform_(0, 0.3)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
@@ -302,7 +302,7 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        d_gan_labels_fake.resize_(svhn_labels.data.shape[0]).fill_(0)
+        d_gan_labels_fake.resize_(svhn_labels.data.shape[0]).uniform_(0.9, 1.1)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
