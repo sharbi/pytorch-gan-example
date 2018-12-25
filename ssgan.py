@@ -23,7 +23,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 128
+batch_size = 36
 image_size = 32
 num_classes = 10
 nc = 3
