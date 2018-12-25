@@ -204,7 +204,8 @@ class Discriminator(nn.Module):
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
-            out_features=num_classes + 1)
+            out_features=num_classes + 1
+        )
 
         self.gan_logits = _ganLogits()
 
@@ -262,7 +263,7 @@ real_label = 1
 fake_label = 0
 
 
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
+optimizerD = optim.Adam(netD.parameters(), lr=(lr/10), betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=(lr * 10), betas=(beta, 0.999))
 
 for epoch in range(num_epochs):
@@ -285,13 +286,7 @@ for epoch in range(num_epochs):
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        supervised_loss = -torch.sum(svhn_labels_one_hot * torch.log(output), dim=1)
-
-        supervised_loss = supervised_loss.squeeze()
-        delim = torch.max(torch.FloatTensor([1.0, torch.sum(label_mask.data)]))
-        delim = _to_var(delim)
-        supervised_loss = torch.sum(label_mask * supervised_loss) / delim
-
+        supervised_loss =
 
         ##########################
         # NEXT UNSUPERVISED LOSS:
