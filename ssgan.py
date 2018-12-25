@@ -62,7 +62,7 @@ class SvhnDataset(Dataset):
             label_mask = np.zeros(len(self.svhn_dataset))
             label_mask[0:1000] = 1
             np.random.shuffle(label_mask)
-            label_mask = torch.LongTensor(label_mask)
+            label_mask = torch.FloatTensor(label_mask)
             return label_mask
         return None
 
