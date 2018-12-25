@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
-import torch.utils.data
+from torch.utils.data import DataLoader, Dataset
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
