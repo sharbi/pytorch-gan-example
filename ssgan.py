@@ -305,7 +305,9 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        d_gan_labels_fake = d_gan_labels_fake.resize_as_(svhn_labels.data.cpu()).uniform_(0.9, 1.2)
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(svhn_labels.data.cpu()).fill_(1)
+        d_gan_labels_fake = torch.FloatTensor(d_gan_labels_fake)
+        d_gan_labels_fake = d_gan_labels_fake.uniform(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
