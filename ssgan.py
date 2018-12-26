@@ -279,8 +279,10 @@ for epoch in range(num_epochs):
         # This is checking how well the discriminator can categorise the real data
         ##########################
 
+        shape = torch.FloatTensor(svhn_labels.data.cpu())
+
         netD.zero_grad()
-        torch.FloatTensor(d_gan_labels_real.resize_as_(svhn_labels.data.cpu())).uniform_(0, 0.3)
+        torch.FloatTensor(d_gan_labels_real.resize_as_(shape)).uniform_(0, 0.3)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
@@ -302,7 +304,7 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        torch.FloatTensor(d_gan_labels_fake.resize_as_(svhn_labels.data.cpu())).uniform_(0.9, 1.2)
+        torch.FloatTensor(d_gan_labels_fake.resize_as_(shape)).uniform_(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
