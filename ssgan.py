@@ -281,9 +281,7 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        d_gan_labels_real = d_gan_labels_real.resize_as_(svhn_labels.data.cpu()).fill_(0)
-        d_gan_labels_real = torch.FloatTensor(d_gan_labels_real)
-        d_gan_labels_real = d_gan_labels_real.uniform(0, 0.3)
+        d_gan_labels_real = d_gan_labels_real.resize_as_(svhn_labels.data.cpu()).float().uniform_(0, 0.3)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
@@ -305,9 +303,7 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        d_gan_labels_fake = d_gan_labels_fake.resize_as_(svhn_labels.data.cpu()).fill_(1)
-        d_gan_labels_fake = torch.FloatTensor(d_gan_labels_fake)
-        d_gan_labels_fake = d_gan_labels_fake.uniform(0.9, 1.2)
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(svhn_labels.data.cpu()).float().uniform_(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
