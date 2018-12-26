@@ -62,7 +62,7 @@ class SvhnDataset(Dataset):
             label_mask = np.zeros(len(self.svhn_dataset))
             label_mask[0:1000] = 1
             np.random.shuffle(label_mask)
-            label_mask = torch.FloatTensor(label_mask)
+            label_mask = torch.LongTensor(label_mask)
             return label_mask
         return None
 
@@ -255,8 +255,8 @@ fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
 
-d_gan_labels_real = torch.FloatTensor(batch_size)
-d_gan_labels_fake = torch.FloatTensor(batch_size)
+d_gan_labels_real = torch.LongTensor(batch_size)
+d_gan_labels_fake = torch.LongTensor(batch_size)
 
 real_label = 1
 fake_label = 0
@@ -298,11 +298,11 @@ for epoch in range(num_epochs):
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
-        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1):random(0, 1)
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        d_gan_labels_fake.resize_(svhn_labels.data.shape[0]).uniform_(0.9, 1.1)
+        d_gan_labels_fake.resize_(svhn_labels.data.shape[0]):random(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
