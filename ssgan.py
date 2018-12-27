@@ -30,7 +30,7 @@ nc = 3
 nz = 100
 ngf = 64
 ndf = 64
-num_epochs = 6000
+num_epochs = 200
 lr = 0.0002
 beta = 0.5
 ngpu = 1
@@ -262,8 +262,8 @@ real_label = 1
 fake_label = 0
 
 
-optimizerD = optim.Adam(netD.parameters(), lr=(lr/10), betas=(beta, 0.999))
-optimizerG = optim.Adam(netG.parameters(), lr=(lr * 10), betas=(beta, 0.999))
+optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
+optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
 for epoch in range(num_epochs):
     # For each batch in the dataloader
