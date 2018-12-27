@@ -330,6 +330,8 @@ for epoch in range(num_epochs):
         # This is based on the feature differences between real and fake
         ##########################
 
+        netG.zero_grad()
+
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
         noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
