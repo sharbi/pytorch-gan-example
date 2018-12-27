@@ -286,7 +286,7 @@ for epoch in range(num_epochs):
         output, _, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        supervised_loss = torch.mean(F.binary_cross_entropy_with_logits(svhn_labels_one_hot, output))
+        supervised_loss = torch.mean(d_criterion(svhn_labels_one_hot, output))
 
 
         ##########################
