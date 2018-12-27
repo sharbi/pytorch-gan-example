@@ -30,7 +30,7 @@ nc = 3
 nz = 100
 ngf = 64
 ndf = 64
-num_epochs = 200
+num_epochs = 1000
 lr = 0.0002
 beta = 0.5
 ngpu = 1
@@ -97,7 +97,7 @@ def get_loader(image_size, batch_size):
 
     return svhn_loader_train, svhn_loader_test
 
-svhn_loader_train, _ = get_loader(image_size=32, batch_size=36)
+svhn_loader_train, _ = get_loader(image_size=image_size, batch_size=batch_size)
 image_iter = iter(svhn_loader_train)
 images, _, _ = image_iter.next()
 
