@@ -31,7 +31,7 @@ nz = 100
 ngf = 64
 ndf = 64
 num_epochs = 500
-lr = 0.002
+lr = 0.0002
 beta = 0.5
 ngpu = 1
 # Create dataset
