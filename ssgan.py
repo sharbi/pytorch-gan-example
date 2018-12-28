@@ -289,7 +289,7 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         d_gan_labels_real = d_gan_labels_real.resize_as_(svhn_labels.data.cpu().float()).uniform_(0, 0.3)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
-        output, _, gan_logits_real, d_sample_features = netD(svhn_data)
+        output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
         supervised_loss = torch.mean(d_criterion(svhn_labels_one_hot, output))
@@ -355,6 +355,12 @@ for epoch in range(num_epochs):
         g_loss.backward()
         optimizerG.step()
 
+        _, pred_class = torch.max(d_class_logits_on_data, 1)
+        eq = torch.eq(svhn_labels, pred_class)
+        correct = torch.sum(eq.float())
+        masked_correct += torch.sum(label_mask * eq.float())
+        num_samples += torch.sum(label_mask)
+
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
@@ -369,3 +375,6 @@ for epoch in range(num_epochs):
             vutils.save_image(fake.detach(),
                     './.gitignore/output/SS_GAN_TEST/fake_samples_epoch_%03d.png' % epoch,
                     normalize=True)
+
+    accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
+    print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, self.settings.epochs, accuracy))
