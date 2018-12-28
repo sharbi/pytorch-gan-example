@@ -270,6 +270,9 @@ schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[1000, 1500, 
 
 
 for epoch in range(num_epochs):
+
+    masked_correct = 0
+    num_samples = 0
     schedulerD.step()
     schedulerG.step()
     # For each batch in the dataloader
