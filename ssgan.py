@@ -23,14 +23,14 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 64
+batch_size = 128
 image_size = 32
 num_classes = 10
 nc = 3
 nz = 100
 ngf = 64
 ndf = 64
-num_epochs = 500
+num_epochs = 5000
 lr = 0.0002
 beta = 0.5
 ngpu = 1
@@ -265,8 +265,8 @@ fake_label = 0
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
-schedulerD = optim.lr_scheduler.StepLR(optimizerD, step_size=100, gamma=0.1)
-schedulerG = optim.lr_scheduler.StepLR(optimizerD, step_size=100, gamma=0.1)
+schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[1000, 1500, 2000, 2500, 2750], gamma=0.1)
+schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[1000, 1500, 2000, 2500, 2750], gamma=0.1)
 
 
 for epoch in range(num_epochs):
