@@ -23,15 +23,15 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 128
+batch_size = 64
 image_size = 32
 num_classes = 10
 nc = 3
 nz = 100
 ngf = 64
 ndf = 64
-num_epochs = 1000
-lr = 0.0002
+num_epochs = 500
+lr = 0.002
 beta = 0.5
 ngpu = 1
 # Create dataset
@@ -265,7 +265,13 @@ fake_label = 0
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
+schedulerD = optim.StepLR(optimizerD, step_size=100, gamma=0.1)
+schedulerG = optim.StepLR(optimizerD, step_size=100, gamma=0.1)
+
+
 for epoch in range(num_epochs):
+    schedulerD.step()
+    schedulerG.step()
     # For each batch in the dataloader
     for i, data in enumerate(svhn_loader_train):
         svhn_data, svhn_labels, label_mask = data
