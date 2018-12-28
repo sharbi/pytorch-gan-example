@@ -295,8 +295,11 @@ for epoch in range(num_epochs):
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        supervised_loss = torch.mean(d_criterion(svhn_labels_one_hot, output))
+        d_class_loss_entropy = -torch.sum(svhn_labels_one_hot * torch.log(d_out), dim=1)
 
+        d_class_loss_entropy = d_class_loss_entropy.squeeze()
+        delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
+        supervised_loss = torch.sum(label_mask * d_class_loss_entropy) / delim
 
         ##########################
         # NEXT UNSUPERVISED LOSS:
