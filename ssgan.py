@@ -265,8 +265,8 @@ fake_label = 0
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
-schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[1000, 1500, 2000, 2500, 2750], gamma=0.1)
-schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[1000, 1500, 2000, 2500, 2750], gamma=0.1)
+schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500, 2750], gamma=0.1)
+schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500, 2750], gamma=0.1)
 
 
 for epoch in range(num_epochs):
