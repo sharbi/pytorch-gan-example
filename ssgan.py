@@ -295,7 +295,7 @@ for epoch in range(num_epochs):
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        print(output)
+        print(torch.log(output))
         print(svhn_labels_one_hot)
         d_class_loss_entropy = -torch.sum(svhn_labels_one_hot * torch.log(output), dim=1)
 
