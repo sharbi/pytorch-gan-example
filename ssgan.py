@@ -296,6 +296,7 @@ for epoch in range(num_epochs):
 
         svhn_labels_one_hot = one_hot(svhn_labels)
         print(output)
+        print(svhn_labels_one_hot)
         d_class_loss_entropy = -torch.sum(svhn_labels_one_hot * torch.log(output), dim=1)
 
         d_class_loss_entropy = d_class_loss_entropy.squeeze()
