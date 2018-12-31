@@ -329,8 +329,8 @@ for epoch in range(num_epochs):
 
         unsupervised_loss = 0.5 * (
             -torch.mean(log_sum_real) +
-            torch.mean(F.Softplus(log_sum_real)) +
-            torch.mean(F.Softplus(log_sum_fake))
+            torch.mean(F.softplus(log_sum_real)) +
+            torch.mean(F.softplus(log_sum_fake))
         )
 
         loss_d = supervised_loss + unsupervised_loss
