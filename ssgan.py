@@ -208,7 +208,7 @@ class Discriminator(nn.Module):
 
         self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax(dim=0)
+        self.softmax = nn.LogSoftmax()
 
     def forward(self, inputs):
 
