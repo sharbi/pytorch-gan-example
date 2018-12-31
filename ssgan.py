@@ -280,7 +280,7 @@ for epoch in range(num_epochs):
     for i, data in enumerate(svhn_loader_train):
         svhn_data, svhn_labels, label_mask = data
         svhn_data = _to_var(svhn_data)
-        svhn_labels = _to_var(svhn_labels).long().squeeze()
+        svhn_labels = _to_var(svhn_labels).float().squeeze()
         label_mask = _to_var(label_mask).float().squeeze()
 
 
