@@ -238,7 +238,7 @@ def one_hot(x):
         label_numpy = x.data.cpu().numpy()
         label_onehot = np.zeros((label_numpy.shape[0], num_classes + 1))
         label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
-        label_onehot = _to_var(torch.LongTensor(label_onehot))
+        label_onehot = _to_var(torch.FloatTensor(label_onehot))
         return label_onehot
 
 netG = Generator(ngpu).to(device)
@@ -296,7 +296,7 @@ for epoch in range(num_epochs):
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        d_class_loss_entropy = d_gan_criterion(torch.log(output), svhn_labels_one_hot)
+        d_class_loss_entropy = d_criterion(torch.log(output), svhn_labels_one_hot)
 
         d_class_loss_entropy = d_class_loss_entropy.squeeze()
         delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
