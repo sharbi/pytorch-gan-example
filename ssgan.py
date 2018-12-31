@@ -295,7 +295,7 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
-        supervised_loss = -torch.mean(d_criterion(svhn_labels, gan_logits_real))
+        supervised_loss = torch.neg(torch.mean(d_criterion(svhn_labels, gan_logits_real)))
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
