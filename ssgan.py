@@ -324,6 +324,9 @@ for epoch in range(num_epochs):
         log_sum_real = torch.logsumexp(d_class_logits_on_data)
         log_sum_fake = torch.logsumexp(d_fake_logits_on_data)
 
+        print(log_sum_real)
+        print(log_sum_fake)
+
         unsupervised_loss = 0.5 * (
             -torch.mean(log_sum_real) +
             torch.mean(torch.nn.Softplus(log_sum_real)) +
