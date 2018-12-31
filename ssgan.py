@@ -295,7 +295,7 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
-        supervised_loss = torch.mean(d_gan_criterion(torch.log(output), svhn_labels))
+        supervised_loss = torch.mean(d_gan_criterion(svhn_labels, torch.log(output)))
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
@@ -321,17 +321,14 @@ for epoch in range(num_epochs):
         _, _, gan_logits_fake, _ = netD(fake.detach())
 
 
-        real_unsupervised_loss = d_criterion(
-            gan_logits_real,
-            d_gan_labels_real_var
-        )
+        log_sum_real = torch.logsumexp(gan_logits_real)
+        log_sum_fake = torch.logsumexp(gan_logits_fake)
 
-        fake_unsupervised_loss = d_criterion(
-            gan_logits_fake,
-            d_gan_labels_real_var
+        unsupervised_loss = 0.5 * (
+            -torch.mean(log_sum_real) +
+            torch.mean(torch.nn.Softplus(log_sum_real)) +
+            torch.mean(torch.nn.Softplus(log_sum_fake))
         )
-
-        unsupervised_loss = real_unsupervised_loss + fake_unsupervised_loss
 
         loss_d = supervised_loss + unsupervised_loss
 
