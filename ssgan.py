@@ -318,11 +318,11 @@ for epoch in range(num_epochs):
 
         d_gan_labels_fake = d_gan_labels_fake.resize_as_(svhn_labels.data.cpu().float()).uniform_(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
-        _, _, gan_logits_fake, _ = netD(fake.detach())
+        _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
 
 
-        log_sum_real = torch.logsumexp(gan_logits_real)
-        log_sum_fake = torch.logsumexp(gan_logits_fake)
+        log_sum_real = torch.logsumexp(d_class_logits_on_data)
+        log_sum_fake = torch.logsumexp(d_fake_logits_on_data)
 
         unsupervised_loss = 0.5 * (
             -torch.mean(log_sum_real) +
