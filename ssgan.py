@@ -280,7 +280,7 @@ for epoch in range(num_epochs):
     for i, data in enumerate(svhn_loader_train):
         svhn_data, svhn_labels, label_mask = data
         svhn_data = _to_var(svhn_data)
-        svhn_labels = _to_var(svhn_labels).long().squeeze()
+        svhn_labels = _to_var(svhn_labels).float().squeeze()
         label_mask = _to_var(label_mask).float().squeeze()
 
 
@@ -295,7 +295,7 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
-        supervised_loss = torch.mean(d_criterion(svhn_labels, gan_logits_real.long()))
+        supervised_loss = torch.mean(d_criterion(svhn_labels, gan_logits_real)
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
@@ -363,7 +363,7 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
         _, pred_class = torch.max(d_class_logits_on_data, 1)
-        eq = torch.eq(svhn_labels, pred_class)
+        eq = torch.eq(svhn_labels, pred_class.float())
         correct = torch.sum(eq.float())
         masked_correct += torch.sum(label_mask * eq.float())
         num_samples += torch.sum(label_mask)
