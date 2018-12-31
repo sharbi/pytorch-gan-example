@@ -208,7 +208,7 @@ class Discriminator(nn.Module):
 
         self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax()
+        self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
 
@@ -295,7 +295,7 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
-        supervised_loss = torch.mean(d_criterion(svhn_labels, output))
+        supervised_loss = torch.mean(d_gan_criterion(svhn_labels, output))
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
