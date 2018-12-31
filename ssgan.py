@@ -251,6 +251,7 @@ netD.apply(weights_init)
 print(netD)
 
 d_criterion = nn.BCEWithLogitsLoss()
+d_gan_criterion = nn.CrossEntropyLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
@@ -295,7 +296,7 @@ for epoch in range(num_epochs):
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
 
         svhn_labels_one_hot = one_hot(svhn_labels)
-        d_class_loss_entropy = -torch.sum(svhn_labels_one_hot * torch.log(output), dim=1)
+        d_class_loss_entropy = d_gan_criterion(svhn_labels_one_hot, torch.log(output))
 
         d_class_loss_entropy = d_class_loss_entropy.squeeze()
         delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
