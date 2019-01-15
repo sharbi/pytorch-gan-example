@@ -51,7 +51,7 @@ class DiabetesDataset(Dataset):
         transform = transforms.Compose([
             transforms.ToTensor(),
             normalize])
-        return (root=root_dir, download=True, transform=transform, split=split)
+        return dset(root=root_dir, download=True, transform=transform, split=split)
 
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
