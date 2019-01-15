@@ -36,50 +36,39 @@ beta = 0.5
 ngpu = 1
 # Create dataset
 
-class SvhnDataset(Dataset):
-    def __init__(self, image_size, split):
+class DiabetesDataset(Dataset):
+    def __init__(self, root_dir, pkl_file, split):
         self.split = split
         self.use_gpu = True if torch.cuda.is_available() else False
 
-        self.svhn_dataset = self._create_dataset(image_size, split)
-        self.label_mask = self._create_label_mask()
+        self.diabetes_dataset = pkl.load(open(pkl_file, 'rb'))
 
-    def _create_dataset(self, image_size, split):
+
+    def _create_dataset(self, split):
         normalize = transforms.Normalize(
             mean=[0.5, 0.5, 0.5],
             std=[0.5, 0.5, 0.5])
         transform = transforms.Compose([
-            transforms.Resize(image_size),
             transforms.ToTensor(),
             normalize])
-        return dset.SVHN(root='./svhn', download=True, transform=transform, split=split)
+        return (root=root_dir, download=True, transform=transform, split=split)
 
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
 
-    def _create_label_mask(self):
-        if self._is_train_dataset():
-            label_mask = np.zeros(len(self.svhn_dataset))
-            label_mask[0:1000] = 1
-            np.random.shuffle(label_mask)
-            label_mask = torch.LongTensor(label_mask)
-            return label_mask
-        return None
 
     def __len__(self):
-        return len(self.svhn_dataset)
+        return len(self.diabetes_dataset)
 
     def __getitem__(self, idx):
-        data, label = self.svhn_dataset.__getitem__(idx)
-        if self._is_train_dataset():
-            return data, label, self.label_mask[idx]
+        data, label = self.diabetes_dataset.__getitem__(idx)
         return data, label
 
-def get_loader(image_size, batch_size):
+def get_loader(batch_size):
     num_workers = 2
 
-    svhn_train = SvhnDataset(image_size=image_size, split='train')
-    svhn_test = SvhnDataset(image_size=image_size, split='test')
+    svhn_train = DiabetesDataset('diabetes_data', 'spline_X_diabetes.pkl', split='train')
+    svhn_test = DiabetesDataset('diabetes_data', 'spline_X_diabetes.pkl', split='test')
 
     svhn_loader_train = DataLoader(
         dataset=svhn_train,
@@ -97,9 +86,10 @@ def get_loader(image_size, batch_size):
 
     return svhn_loader_train, svhn_loader_test
 
-svhn_loader_train, _ = get_loader(image_size=image_size, batch_size=batch_size)
-image_iter = iter(svhn_loader_train)
-images, _, _ = image_iter.next()
+diabetes_loader_train, _ = get_loader(batch_size=batch_size)
+image_iter = iter(diabetes_loader_train)
+images, _ = image_iter.next()
+
 
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
@@ -277,11 +267,10 @@ for epoch in range(num_epochs):
     schedulerD.step()
     schedulerG.step()
     # For each batch in the dataloader
-    for i, data in enumerate(svhn_loader_train):
-        svhn_data, svhn_labels, label_mask = data
-        svhn_data = _to_var(svhn_data)
-        svhn_labels = _to_var(svhn_labels).float().squeeze()
-        label_mask = _to_var(label_mask).float().squeeze()
+    for i, data in enumerate(diabetes_loader_train):
+        diabetes_data, diabetes_labels = data
+        diabetes_data = _to_var(diabetes_data)
+        diabetes_labels = _to_var(diabetes_labels).float().squeeze()
 
 
         ##########################
@@ -291,11 +280,11 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        d_gan_labels_real = d_gan_labels_real.resize_as_(svhn_labels.data.cpu().float()).uniform_(0, 0.3)
+        d_gan_labels_real = d_gan_labels_real.resize_as_(diabetes_labels.data.cpu().float()).uniform_(0, 0.3)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
-        output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(svhn_data)
+        output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(diabetes_data)
 
-        supervised_loss = torch.mean(torch.abs(svhn_labels - gan_logits_real))
+        supervised_loss = torch.mean(torch.abs(diabetes_labels - gan_logits_real))
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
@@ -312,11 +301,11 @@ for epoch in range(num_epochs):
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
-        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise.resize_(diabetes_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        d_gan_labels_fake = d_gan_labels_fake.resize_as_(svhn_labels.data.cpu().float()).uniform_(0.9, 1.2)
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(diabetes_labels.data.cpu().float()).uniform_(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
 
@@ -345,7 +334,7 @@ for epoch in range(num_epochs):
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
-        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise.resize_(diabetes_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
         noise_var = _to_var(noise)
         # Generate fake images
         fake = netG(noise_var)
@@ -360,18 +349,18 @@ for epoch in range(num_epochs):
         g_loss.backward()
         optimizerG.step()
 
-        _, pred_class = torch.max(d_class_logits_on_data, 1)
-        eq = torch.eq(svhn_labels, pred_class.float())
-        correct = torch.sum(eq.float())
-        masked_correct += torch.sum(label_mask * eq.float())
-        num_samples += torch.sum(label_mask)
+        #_, pred_class = torch.max(d_class_logits_on_data, 1)
+        #eq = torch.eq(svhn_labels, pred_class.float())
+        #correct = torch.sum(eq.float())
+        #masked_correct += torch.sum(label_mask * eq.float())
+        #num_samples += torch.sum(label_mask)
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
                          unsupervised_loss.data[0], supervised_loss.data[0],
                          g_loss.data[0], i + 1,
-                         len(svhn_loader_train)))
+                         len(diabetes_loader_train)))
             real_cpu, _, _ = data
             vutils.save_image(real_cpu,
                     './.gitignore/output/SS_GAN_TEST/real_samples.png',
@@ -381,5 +370,5 @@ for epoch in range(num_epochs):
                     './.gitignore/output/SS_GAN_TEST/fake_samples_epoch_%03d.png' % epoch,
                     normalize=True)
 
-    accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
+    #accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
     print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
