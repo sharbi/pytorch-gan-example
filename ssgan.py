@@ -69,8 +69,8 @@ class DiabetesDataset(Dataset):
 def get_loader(batch_size):
     num_workers = 2
 
-    svhn_train = DiabetesDataset('diabetes_data', 'spline_X_diabetes.pkl', split='train')
-    svhn_test = DiabetesDataset('diabetes_data', 'spline_X_diabetes.pkl', split='test')
+    svhn_train = DiabetesDataset('../diabetes_data/', 'spline_X_diabetes.pkl', split='train')
+    svhn_test = DiabetesDataset('../diabetes_data/', 'spline_X_diabetes.pkl', split='test')
 
     svhn_loader_train = DataLoader(
         dataset=svhn_train,
