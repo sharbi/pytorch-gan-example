@@ -15,6 +15,8 @@ import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import numpy as np
 
+import pickle as pkl
+
 manual_seed = 123
 
 # Set random seeds
