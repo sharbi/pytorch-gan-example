@@ -90,7 +90,7 @@ def get_loader(batch_size):
 
 diabetes_loader_train, _ = get_loader(batch_size=batch_size)
 image_iter = iter(diabetes_loader_train)
-images, _ = image_iter.next()
+images, labels = image_iter.next()
 
 
 
