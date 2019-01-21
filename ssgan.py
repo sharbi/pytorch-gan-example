@@ -44,7 +44,7 @@ class DiabetesDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
 
         self.diabetes_dataset = pkl.load(open(root_dir + pkl_file, 'rb'))
-        self.diabetes_labels = pkl.load(open(root_dir + "spline_y_diabetes.pkl", 'rb'))
+        self.diabetes_labels = pkl.load(open(root_dir + "spline_y_processed.pkl", 'rb'))
 
 
     def _create_dataset(self, split):
