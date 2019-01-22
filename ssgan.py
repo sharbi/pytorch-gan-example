@@ -43,7 +43,8 @@ class DiabetesDataset(Dataset):
         self.split = split
         self.use_gpu = True if torch.cuda.is_available() else False
 
-        self.diabetes_dataset = pkl.load(open(root_dir + pkl_file, 'rb'))
+        X = pkl.load(open(root_dir + pkl_file, 'rb'))
+        self.diabetes_dataset = np.expand_dims(X, axis=1)
         self.diabetes_labels = pkl.load(open(root_dir + "spline_y_processed.pkl", 'rb'))
 
 
@@ -165,7 +166,7 @@ class Discriminator(nn.Module):
         self.ngpu = ngpu
 
         self.main = nn.Sequential(
-            #nn.Dropout2d(0.5/2.5),
+            nn.Dropout2d(0.5/2.5),
 
             # input is (number_channels) x 32 x 32
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
