@@ -285,7 +285,7 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        d_gan_labels_real = d_gan_labels_real.resize_as_(diabetes_labels.data.cpu().float()).uniform_(0, 0.3))
+        d_gan_labels_real = d_gan_labels_real.resize_as_(diabetes_labels.data.cpu().float()).uniform_(0, 0.3)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).long()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(diabetes_data)
 
