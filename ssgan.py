@@ -66,15 +66,15 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         print(idx)
         print(self.__len__())
-        data = self.diabetes_dataset[idx]
+        data =
         label = self.diabetes_labels[idx]
         return data, label
 
 def get_loader(batch_size):
     num_workers = 2
 
-    svhn_train = DiabetesDataset('../diabetes_data/', 'spline_X_diabetes.pkl', split='train')
-    svhn_test = DiabetesDataset('../diabetes_data/', 'spline_X_diabetes.pkl', split='test')
+    svhn_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='train')
+    svhn_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='test')
 
     svhn_loader_train = DataLoader(
         dataset=svhn_train,
