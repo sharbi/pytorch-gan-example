@@ -310,7 +310,7 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        d_gan_labels_fake = d_gan_labels_fake.resize_as_(diabetes_labels.data.cpu().long()).uniform_(0.9, 1.2)
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(diabetes_labels.data.cpu().uniform_(0.9, 1.2).long())
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).long()
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
 
