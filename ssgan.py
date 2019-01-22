@@ -66,7 +66,7 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         print(idx)
         print(self.__len__())
-        data =
+        data = self.diabetes_dataset[idx]
         label = self.diabetes_labels[idx]
         return data, label
 
