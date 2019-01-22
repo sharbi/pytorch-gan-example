@@ -247,8 +247,8 @@ print(netD)
 
 d_criterion = nn.BCEWithLogitsLoss()
 d_gan_criterion = nn.CrossEntropyLoss()
-fixed_noise = torch.LongTensor(batch_size, nz, 1, 1).normal_(0, 1)
-fixed_noise = _to_var(fixed_noise)
+fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
+fixed_noise = _to_var(fixed_noise).long()
 
 
 d_gan_labels_real = torch.LongTensor(batch_size)
