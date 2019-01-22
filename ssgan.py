@@ -166,7 +166,7 @@ class Discriminator(nn.Module):
         self.ngpu = ngpu
 
         self.main = nn.Sequential(
-            nn.Dropout2d(0.5/2.5),
+            #nn.Dropout2d(0.5/2.5),
 
             # input is (number_channels) x 32 x 32
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
