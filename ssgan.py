@@ -277,6 +277,7 @@ for epoch in range(num_epochs):
         diabetes_data = _to_var(diabetes_data).float()
         diabetes_labels = _to_var(diabetes_labels).float().squeeze()
 
+        print(diabetes_data.shape)
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
