@@ -44,7 +44,6 @@ class DiabetesDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
 
         X = pkl.load(open(root_dir + pkl_file, 'rb'))
-        self.diabetes_dataset = np.expand_dims(X, axis=1)
         self.diabetes_labels = pkl.load(open(root_dir + "spline_y_processed.pkl", 'rb'))
 
 
@@ -121,12 +120,12 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # Input is Z, going into convolution
-            nn.ConvTranspose2d(nz, ngf * 4, 4, 1, 0, bias=False),
-            nn.BatchNorm2d(ngf * 4),
+            nn.ConvTranspose1d(nz, ngf * 4, 4, 1, 0, bias=False),
+            nn.BatchNorm1d(ngf * 4),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 2),
+            nn.ConvTranspose1d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
+            nn.BatchNorm1d(ngf * 2),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf*4) x 8 x 8
             nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 1, bias=False),
@@ -201,7 +200,6 @@ class Discriminator(nn.Module):
         out = self.main(inputs)
 
         features = self.features(out)
-        features = features.permute(0, 2, 3, 1)
         features = features.squeeze()
 
         print(features.size())
