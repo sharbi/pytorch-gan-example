@@ -183,16 +183,7 @@ class Discriminator(nn.Module):
             nn.Dropout2d(0.5),
             # (ndf) x 5 x 1
             nn.Conv2d(ndf, ndf * 2, 3, 1, 1, bias=False),
-            nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2),
-            # (ndf * 2) x 4 x 4
-            nn.Conv2d(ndf * 2, ndf * 2, 3, 1, 1, bias=False),
-            nn.BatchNorm2d(ndf * 2),
-            nn.LeakyReLU(0.2),
-            # (ndf * 2) x 4 x 4
-            nn.Conv2d(ndf * 2, ndf * 2, 3, 1, 0, bias=False),
-            nn.LeakyReLU(0.2),
-            # (ndf * 2) x 1 x 1
         )
 
         self.features = nn.AvgPool2d(kernel_size=2)
