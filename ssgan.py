@@ -182,7 +182,7 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout2d(0.5),
 
-            nn.Conv2d(ndf * 2, ndf * 4, 2, 1, 1, bias=False),
+            nn.Conv2d(ndf * 2, ndf * 4, 3, 1, 1, bias=False),
             nn.BatchNorm2d(ndf*4),
             nn.LeakyReLU(0.2),
             nn.Dropout2d(0.5),
@@ -210,7 +210,6 @@ class Discriminator(nn.Module):
 
         features = self.features(out)
         features = features.permute(0, 2, 3, 1)
-        features = features.squeeze()
 
         print(features.size())
 
