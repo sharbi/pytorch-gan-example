@@ -177,6 +177,11 @@ class Discriminator(nn.Module):
             nn.BatchNorm2d(ndf*2),
             nn.LeakyReLU(0.2),
             # (ndf) x 15 x 1
+            nn.Conv2d(ndf * 2, ndf * 2, 2, 1, 1, bias=False),
+            nn.BatchNorm2d(ndf*4),
+            nn.LeakyReLU(0.2),
+            nn.Dropout2d(0.5),
+
             nn.Conv2d(ndf * 2, ndf * 4, 2, 1, 1, bias=False),
             nn.BatchNorm2d(ndf*4),
             nn.LeakyReLU(0.2),
