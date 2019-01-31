@@ -27,7 +27,7 @@ torch.manual_seed(manual_seed)
 workers = 2
 batch_size = 128
 image_size = 60
-num_classes = 10
+num_classes = 3
 nc = 1
 nz = 100
 ngf = 60
