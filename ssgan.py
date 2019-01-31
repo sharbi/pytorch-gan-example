@@ -209,7 +209,7 @@ class Discriminator(nn.Module):
         print(out.size())
 
         features = self.features(out)
-        features = features.permute(0, 2, 3, 1)
+        features = features.squeeze()
 
         print(features.size())
 
