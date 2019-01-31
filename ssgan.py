@@ -148,7 +148,7 @@ class _ganLogits(nn.Module):
 
 
     def forward(self, class_logits):
-        real_class_logits, fake_class_logits = torch.split(class_logits, num_classes, dim=2)
+        real_class_logits, fake_class_logits = torch.split(class_logits, num_classes, dim=1)
         fake_class_logits = torch.squeeze(fake_class_logits)
 
         max_val, _ = torch.max(real_class_logits, 1, keepdim=True)
