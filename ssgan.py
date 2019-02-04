@@ -36,6 +36,12 @@ num_epochs = 5000
 lr = 0.0002
 beta = 0.5
 ngpu = 1
+
+def _to_var(x):
+    if ngpu > 0:
+        x = x.cuda()
+    return Variable(x)
+
 # Create dataset
 
 class DiabetesDataset(Dataset):
@@ -119,10 +125,7 @@ def weights_init(m):
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
 
-def _to_var(x):
-    if ngpu > 0:
-        x = x.cuda()
-    return Variable(x)
+
 
 
 class Generator(nn.Module):
