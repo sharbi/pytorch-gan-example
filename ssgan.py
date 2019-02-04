@@ -106,7 +106,7 @@ def get_loader(batch_size):
 
 diabetes_loader_train, _ = get_loader(batch_size=batch_size)
 patient_iter = iter(diabetes_loader_train)
-patient, labels, _ = patient_iter.next()
+patient, _, _ = patient_iter.next()
 
 
 
