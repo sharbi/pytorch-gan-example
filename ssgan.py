@@ -213,6 +213,8 @@ class Discriminator(nn.Module):
 
         gan_logits = self.gan_logits(class_logits)
 
+        print(gan_logits.size())
+
         out = self.softmax(class_logits)
 
         return out, class_logits, gan_logits, features
@@ -272,7 +274,7 @@ for epoch in range(num_epochs):
     for i, data in enumerate(diabetes_loader_train):
         diabetes_data, diabetes_labels = data
         diabetes_data = _to_var(diabetes_data).float()
-        diabetes_labels = _to_var(diabetes_labels).float().squeeze()
+        diabetes_labels = _to_var(diabetes_labels).float()
 
         print(diabetes_data.shape)
 
