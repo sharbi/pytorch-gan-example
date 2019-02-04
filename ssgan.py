@@ -44,20 +44,10 @@ class DiabetesDataset(Dataset):
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
 
-        self.diabetes_dataset = self._create_dataset(split)
+        self.diabetes_dataset = pkl.load(open(pkl_file, 'rb'))
 
         self.label_mask = np.zeros_like(self.diabetes_labels)
         self.label_mask[0:1000] = 1
-
-
-    def _create_dataset(self, split):
-        normalize = transforms.Normalize(
-            mean=[0.5, 0.5, 0.5],
-            std=[0.5, 0.5, 0.5])
-        transform = transforms.Compose([
-            transforms.ToTensor(),
-            normalize])
-        return dset(root='../diabetes_data', download=True, transform=transform, split=split)
 
     def _create_label_mask(self):
         if self._is_train_dataset():
@@ -84,8 +74,15 @@ class DiabetesDataset(Dataset):
 def get_loader(batch_size):
     num_workers = 2
 
-    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='train')
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='test')
+    normalize = transforms.Normalize(
+        mean=[0.5, 0.5, 0.5],
+        std=[0.5, 0.5, 0.5])
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        normalize])
+
+    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='train')
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='test')
 
     diabetes_loader_train = DataLoader(
         dataset=diabetes_train,
