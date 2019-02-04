@@ -68,11 +68,9 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         (data, label) = self.diabetes_dataset.__getitem__(idx)
-        print(data)
-        print(label)
         data = np.expand_dims(data, axis=2)
         data = self.transform(data)
-        label = torch.Tensor(label)
+        label = torch.Tensor([label])
         if self._is_train_dataset():
             return data, label, self.label_mask[idx]
         return data, label
