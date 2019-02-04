@@ -57,7 +57,7 @@ class DiabetesDataset(Dataset):
         transform = transforms.Compose([
             transforms.ToTensor(),
             normalize])
-        return dset(root=self.root_dir, download=True, transform=transform, split=split)
+        return dset(root=root_dir, download=True, transform=transform, split=split)
 
     def _create_label_mask(self):
         if self._is_train_dataset():
