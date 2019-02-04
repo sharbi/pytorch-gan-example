@@ -39,9 +39,10 @@ ngpu = 1
 # Create dataset
 
 class DiabetesDataset(Dataset):
-    def __init__(self, root_dir, pkl_file, split):
+    def __init__(self, root_dir, pkl_file, transform, split):
         self.split = split
         self.root_dir = root_dir
+        self.transform = transform
         self.use_gpu = True if torch.cuda.is_available() else False
 
         self.diabetes_dataset = pkl.load(open(pkl_file, 'rb'))
@@ -67,6 +68,7 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         data, label = self.diabetes_dataset.__getitem__(idx)
+        data = self.transform(data)
         if self._is_train_dataset():
             return data, label, self.label_mask[idx]
         return data, label
