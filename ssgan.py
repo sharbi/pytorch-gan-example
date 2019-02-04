@@ -58,7 +58,7 @@ class DiabetesDataset(Dataset):
             normalize])
         return dset(root=root_dir, download=True, transform=transform, split=split)
 
-     def _create_label_mask(self):
+    def _create_label_mask(self):
         if self._is_train_dataset():
             label_mask = np.zeros(len(self.diabetes_labels))
             label_mask[0:1000] = 1
