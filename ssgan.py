@@ -148,13 +148,7 @@ class _ganLogits(nn.Module):
 
 
     def forward(self, class_logits):
-        real_class_logits, fake_class_logits = torch.split(class_logits, num_classes, dim=2)
-        fake_class_logits = torch.squeeze(fake_class_logits)
-
-        max_val, _ = torch.max(real_class_logits, 1, keepdim=True)
-        stable_class_logits = real_class_logits - max_val
-        gan_logits = torch.log(torch.sum(torch.exp(stable_class_logits), 1)) + max_val - fake_class_logits
-
+        gan_logits = torch.logsumexp(class_logits, 1)
         return gan_logits
 
 
@@ -172,16 +166,16 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout2d(0.5),
             # (ndf) x 30 x 2
-            nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
+            nn.Conv2d(ndf, ndf * 2, 3, 2, 1, bias=False),
             nn.BatchNorm2d(ndf*2),
             nn.LeakyReLU(0.2),
             # (ndf) x 15 x 1
-            nn.Conv2d(ndf * 2, ndf * 2, 4, 2, 1, bias=False),
+            nn.Conv2d(ndf * 2, ndf * 2, 3, 2, 1, bias=False),
             nn.BatchNorm2d(ndf*2),
             nn.LeakyReLU(0.2),
             nn.Dropout2d(0.5),
 
-            nn.Conv2d(ndf * 2, ndf * 4, 3, 1, 1, bias=False),
+            nn.Conv2d(ndf * 2, ndf * 4, 3, 2, 1, bias=False),
             nn.BatchNorm2d(ndf*4),
             nn.LeakyReLU(0.2),
             nn.Dropout2d(0.5),
