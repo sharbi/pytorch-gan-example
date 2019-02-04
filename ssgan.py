@@ -68,14 +68,14 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         data, label = self.diabetes_dataset.__getitem__(idx)
-        data = np.expand_dims(data, axis=2)
+        data = np.expand_dims(data, axis=1)
         data = self.transform(data)
         if self._is_train_dataset():
             return data, label, self.label_mask[idx]
         return data, label
 
 def get_loader(batch_size):
-    num_workers = 0
+    num_workers = 2
 
     normalize = transforms.Normalize(
         mean=[0.5, 0.5, 0.5],
