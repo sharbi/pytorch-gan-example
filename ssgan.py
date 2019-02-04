@@ -69,7 +69,7 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         data, label = self.diabetes_dataset.__getitem__(idx)
         data = np.expand_dims(data, axis=1)
-        #data = self.transform(data)
+        data = self.transform(data)
         if self._is_train_dataset():
             return data, label, self.label_mask[idx]
         return data, label
@@ -81,8 +81,7 @@ def get_loader(batch_size):
         mean=[0.5, 0.5, 0.5],
         std=[0.5, 0.5, 0.5])
     transform = transforms.Compose([
-        transforms.ToTensor(),
-        normalize])
+        transforms.ToTensor()])
 
     diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='train')
     diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='test')
