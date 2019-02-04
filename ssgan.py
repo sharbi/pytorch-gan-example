@@ -36,12 +36,6 @@ num_epochs = 5000
 lr = 0.0002
 beta = 0.5
 ngpu = 1
-
-def _to_var(x):
-    if ngpu > 0:
-        x = x.cuda()
-    return Variable(x)
-
 # Create dataset
 
 class DiabetesDataset(Dataset):
@@ -75,7 +69,6 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         data, label = self.diabetes_dataset.__getitem__(idx)
         data = np.expand_dims(data, axis=1)
-        data = _to_var(data)
         if self._is_train_dataset():
             return data, label, self.label_mask[idx]
         return data, label
@@ -125,7 +118,10 @@ def weights_init(m):
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
 
-
+def _to_var(x):
+    if ngpu > 0:
+        x = x.cuda()
+    return Variable(x)
 
 
 class Generator(nn.Module):
