@@ -74,7 +74,7 @@ class DiabetesDataset(Dataset):
     def __len__(self):
         return len(self.diabetes_dataset)
 
-      def __getitem__(self, idx):
+    def __getitem__(self, idx):
         data, label = self.diabetes_dataset.__getitem__(idx)
         if self._is_train_dataset():
             return data, label, self.label_mask[idx]
