@@ -75,7 +75,7 @@ class DiabetesDataset(Dataset):
         return data, label
 
 def get_loader(batch_size):
-    num_workers = 2
+    num_workers = 0
 
     normalize = transforms.Normalize(
         mean=[0.5, 0.5, 0.5],
