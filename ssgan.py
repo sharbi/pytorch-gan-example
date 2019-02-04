@@ -71,11 +71,9 @@ class DiabetesDataset(Dataset):
         data = np.expand_dims(data, axis=2)
         data = self.transform(data)
         label = [label]
-        print(label)
-        label = torch.FloatTensor(label)
         if self._is_train_dataset():
-            return data, label, self.label_mask[idx]
-        return data, label
+            return data, torch.FloatTensor(label), self.label_mask[idx]
+        return data, torch.FloatTensor(label)
 
 def get_loader(batch_size):
     num_workers = 2
