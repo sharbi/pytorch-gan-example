@@ -44,13 +44,13 @@ class DiabetesDataset(Dataset):
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
 
-        self.diabetes_dataset = self._create_dataset(split)
+        self.diabetes_dataset = self._create_dataset(root_dir, split)
 
         self.label_mask = np.zeros_like(self.diabetes_labels)
         self.label_mask[0:1000] = 1
 
 
-    def _create_dataset(self, split):
+    def _create_dataset(self, root_dir, split):
         normalize = transforms.Normalize(
             mean=[0.5, 0.5, 0.5],
             std=[0.5, 0.5, 0.5])
