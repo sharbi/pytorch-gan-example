@@ -45,7 +45,7 @@ class DiabetesDataset(Dataset):
         self.transform = transform
         self.use_gpu = True if torch.cuda.is_available() else False
 
-        self.diabetes_dataset = pkl.load(open(pkl_file, 'rb'))
+        self.diabetes_dataset = pkl.load(open(root_dir + pkl_file, 'rb'))
 
         self.label_mask = np.zeros_like(self.diabetes_labels)
         self.label_mask[0:1000] = 1
