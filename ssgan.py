@@ -41,6 +41,7 @@ ngpu = 1
 class DiabetesDataset(Dataset):
     def __init__(self, root_dir, pkl_file, split):
         self.split = split
+        self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
 
         self.diabetes_dataset = self._create_dataset(split)
@@ -56,7 +57,7 @@ class DiabetesDataset(Dataset):
         transform = transforms.Compose([
             transforms.ToTensor(),
             normalize])
-        return dset(root=root_dir, download=True, transform=transform, split=split)
+        return dset(root=self.root_dir, download=True, transform=transform, split=split)
 
     def _create_label_mask(self):
         if self._is_train_dataset():
