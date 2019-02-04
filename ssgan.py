@@ -82,7 +82,7 @@ def get_loader(batch_size):
         std=[0.5, 0.5, 0.5])
     transform = transforms.Compose([
         transforms.ToTensor(),
-        normalise])
+        normalize])
 
     diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='train')
     diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='test')
