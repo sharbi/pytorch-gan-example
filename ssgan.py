@@ -47,12 +47,12 @@ class DiabetesDataset(Dataset):
 
         self.diabetes_dataset = pkl.load(open(root_dir + pkl_file, 'rb'))
 
-        self.label_mask = np.zeros_like(self.diabetes_labels)
+        self.label_mask = np.zeros_like(self.diabetes_dataset)
         self.label_mask[0:1000] = 1
 
     def _create_label_mask(self):
         if self._is_train_dataset():
-            label_mask = np.zeros(len(self.diabetes_labels))
+            label_mask = np.zeros(len(self.diabetes_dataset))
             label_mask[0:1000] = 1
             np.random.shuffle(label_mask)
             label_mask = torch.LongTensor(label_mask)
