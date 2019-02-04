@@ -47,6 +47,9 @@ class DiabetesDataset(Dataset):
         self.diabetes_dataset = np.expand_dims(X, axis=1)
         self.diabetes_labels = pkl.load(open(root_dir + "spline_y_processed.pkl", 'rb'))
 
+        self.label_mask = np.zeros_like(self.diabetes_labels)
+        self.label_mask[0:1000] = 1
+
 
     def _create_dataset(self, split):
         normalize = transforms.Normalize(
@@ -57,6 +60,15 @@ class DiabetesDataset(Dataset):
             normalize])
         return dset(root=root_dir, download=True, transform=transform, split=split)
 
+     def _create_label_mask(self):
+        if self._is_train_dataset():
+            label_mask = np.zeros(len(self.diabetes_labels))
+            label_mask[0:1000] = 1
+            np.random.shuffle(label_mask)
+            label_mask = torch.LongTensor(label_mask)
+            return label_mask
+        return None
+
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
 
@@ -64,36 +76,38 @@ class DiabetesDataset(Dataset):
     def __len__(self):
         return len(self.diabetes_dataset)
 
-    def __getitem__(self, idx):
-        data = self.diabetes_dataset[idx]
-        label = self.diabetes_labels[idx]
+      def __getitem__(self, idx):
+        data = self.diabetes_dataset.__getitem__(idx)
+        label = self.diabetes_labels.__getitem__(idx)
+        if self._is_train_dataset():
+            return data, label, self.label_mask[idx]
         return data, label
 
 def get_loader(batch_size):
     num_workers = 2
 
-    svhn_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='train')
-    svhn_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='test')
+    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='train')
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='test')
 
-    svhn_loader_train = DataLoader(
-        dataset=svhn_train,
+    diabetes_loader_train = DataLoader(
+        dataset=diabetes_train,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers
     )
 
-    svhn_loader_test = DataLoader(
-        dataset=svhn_test,
+    diabetes_loader_test = DataLoader(
+        dataset=diabetes_test,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers
     )
 
-    return svhn_loader_train, svhn_loader_test
+    return diabetes_loader_train, diabetes_loader_test
 
 diabetes_loader_train, _ = get_loader(batch_size=batch_size)
-image_iter = iter(diabetes_loader_train)
-images, labels = image_iter.next()
+patient_iter = iter(diabetes_loader_train)
+patient, labels = patient_iter.next()
 
 
 
@@ -244,8 +258,8 @@ netD = Discriminator(ngpu).to(device)
 netD.apply(weights_init)
 print(netD)
 
-d_criterion = nn.BCEWithLogitsLoss()
-d_gan_criterion = nn.CrossEntropyLoss()
+d_unsupervised_criterion = nn.BCEWithLogitsLoss()
+d_gan_criterion = nn.NLLLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
@@ -272,9 +286,10 @@ for epoch in range(num_epochs):
     schedulerG.step()
     # For each batch in the dataloader
     for i, data in enumerate(diabetes_loader_train):
-        diabetes_data, diabetes_labels = data
+        diabetes_data, diabetes_labels, label_mask = data
         diabetes_data = _to_var(diabetes_data).float()
-        diabetes_labels = _to_var(diabetes_labels).float()
+        diabetes_labels = _to_var(diabetes_labels).float().squeeze()
+        label_mask = _to_var(label_mask).float().squeeze()
 
         print(diabetes_data.shape)
 
@@ -289,7 +304,9 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(diabetes_data)
 
-        supervised_loss = torch.mean(torch.abs(diabetes_labels - gan_logits_real))
+        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels)
+
+        supervised_loss = torch.multiply(supervised_loss, label_mask)
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
@@ -315,15 +332,10 @@ for epoch in range(num_epochs):
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
 
 
-        log_sum_real = torch.logsumexp(d_class_logits_on_data, 1)
-        log_sum_fake = torch.logsumexp(d_fake_logits_on_data, 1)
+        real_data_loss = d_unsupervised_criterion(gan_logits_real, d_gan_labels_real)
+        fake_data_loss = d_unsupervised_criterion(gan_logits_fake, d_gan_labels_fake)
 
-
-        unsupervised_loss = 0.5 * (
-            -torch.mean(log_sum_real) +
-            torch.mean(F.softplus(log_sum_real)) +
-            torch.mean(F.softplus(log_sum_fake))
-        )
+        unsupervised_loss = real_data_loss + fake_data_loss
 
         loss_d = supervised_loss + unsupervised_loss
 
