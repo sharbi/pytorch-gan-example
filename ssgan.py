@@ -299,7 +299,7 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
 
 
-        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels)
+        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels.long())
 
         supervised_loss = torch.mean(torch.mul(supervised_loss, label_mask))
 
