@@ -84,8 +84,8 @@ def get_loader(batch_size):
     transform = transforms.Compose([
         transforms.ToTensor()])
 
-    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='train')
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='test')
+    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', 'spline_y_processed.pkl', split='train')
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', 'spline_y_processed.pkl', split='test')
 
     diabetes_loader_train = DataLoader(
         dataset=diabetes_train,
