@@ -217,7 +217,6 @@ class Discriminator(nn.Module):
         out = self.main(inputs)
 
         features = self.features(out)
-        features = features.permute(0, 2, 3, 1)
         features = features.squeeze()
 
         class_logits = self.class_logits(features)
