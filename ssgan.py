@@ -283,7 +283,7 @@ for epoch in range(num_epochs):
     # For each batch in the dataloader
     for i, data in enumerate(diabetes_loader_train):
         diabetes_data, diabetes_labels, label_mask = data
-        diabetes_data = _to_var(diabetes_data)
+        diabetes_data = _to_var(diabetes_data).float()
         diabetes_labels = _to_var(diabetes_labels).long().squeeze()
         label_mask = _to_var(label_mask).float().squeeze()
 
