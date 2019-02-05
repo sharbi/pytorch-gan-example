@@ -350,11 +350,11 @@ for epoch in range(num_epochs):
         g_loss.backward()
         optimizerG.step()
 
-        #_, pred_class = torch.max(d_class_logits_on_data, 1)
-        #eq = torch.eq(svhn_labels, pred_class.float())
-        #correct = torch.sum(eq.float())
-        #masked_correct += torch.sum(label_mask * eq.float())
-        #num_samples += torch.sum(label_mask)
+        _, pred_class = torch.max(d_class_logits_on_data, 1)
+        eq = torch.eq(diabetes_labels, pred_class.float())
+        correct = torch.sum(eq.float())
+        masked_correct += torch.sum(label_mask * eq.float())
+        num_samples += torch.sum(diabetes_labels)
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
@@ -371,5 +371,5 @@ for epoch in range(num_epochs):
                     './.gitignore/output/SS_GAN_TEST/fake_samples_epoch_%03d.png' % epoch,
                     normalize=True)
 
-    #accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
+    accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
     print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
