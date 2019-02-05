@@ -326,8 +326,8 @@ for epoch in range(num_epochs):
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
 
 
-        real_data_loss = d_unsupervised_criterion(gan_logits_real, d_gan_labels_real)
-        fake_data_loss = d_unsupervised_criterion(gan_logits_fake, d_gan_labels_fake)
+        real_data_loss = d_unsupervised_criterion(gan_logits_real, d_gan_labels_real_var)
+        fake_data_loss = d_unsupervised_criterion(gan_logits_fake, d_gan_labels_fake_var)
 
         unsupervised_loss = real_data_loss + fake_data_loss
 
