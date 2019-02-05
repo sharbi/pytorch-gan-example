@@ -141,8 +141,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(ngf),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf) x 16 x 16
-            nn.ConvTranspose2d( ngf, nc, 4, 4, 1, bias=False),
-            nn.Tanh()
+            nn.ConvTranspose2d( ngf, nc, 4, 4, 1, bias=False)
         # state size. (nc) x 32 x 32
         )
 
@@ -351,6 +350,8 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         # Generate fake images
         fake = netG(noise_var)
+
+        print(fake.size())
 
         _, _, _, d_data_features = netD(fake)
 
