@@ -67,7 +67,7 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         data = self.diabetes_dataset.__getitem__(idx)
-        label = self.diabetes_labels.__getitem__(idx)
+        label = self.diabetes_labels[idx]
         data = np.expand_dims(data, axis=2)
         data = torch.FloatTensor(data)
         labels = torch.FloatTensor(labels)
