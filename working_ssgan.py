@@ -218,6 +218,8 @@ class Discriminator(nn.Module):
         features = self.features(out)
         features = features.squeeze()
 
+        print(features.size())
+
         class_logits = self.class_logits(features)
 
         gan_logits = self.gan_logits(class_logits)
