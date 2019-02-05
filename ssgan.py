@@ -141,7 +141,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(ngf),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf) x 16 x 16
-            nn.ConvTranspose2d( ngf, nc, 3, (1, 3), 1, bias=False)
+            nn.ConvTranspose2d( ngf, nc, 3, (1, 2), 1, bias=False)
         # state size. (nc) x 32 x 32
         )
 
