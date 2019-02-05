@@ -298,7 +298,7 @@ for epoch in range(num_epochs):
 
         one_hot_labels = one_hot(diabetes_labels.long())
 
-        supervised_loss = d_gan_criterion(d_class_logits_on_data, one_hot_labels.float())
+        supervised_loss = d_gan_criterion(d_class_logits_on_data, one_hot_labels.long())
 
         supervised_loss = torch.multiply(supervised_loss, label_mask)
 
