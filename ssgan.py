@@ -39,20 +39,19 @@ ngpu = 1
 # Create dataset
 
 class DiabetesDataset(Dataset):
-    def __init__(self, root_dir, pkl_file, transform, split):
+    def __init__(self, root_dir, data_file, labels_file, split):
         self.split = split
         self.root_dir = root_dir
-        self.transform = transform
         self.use_gpu = True if torch.cuda.is_available() else False
 
-        self.diabetes_dataset = pkl.load(open(root_dir + pkl_file, 'rb'))
+        self.diabetes_dataset = pkl.load(open(root_dir + data_file, 'rb'))
+        self.diabetes_labels = pkl.load(open(root_dir + labels_file, 'rb'))
+        self.label_mask = self._create_label_mask()
 
-        self.label_mask = np.zeros_like(self.diabetes_dataset)
-        self.label_mask[0:1000] = 1
 
     def _create_label_mask(self):
         if self._is_train_dataset():
-            label_mask = np.zeros(len(self.diabetes_dataset))
+            label_mask = np.zeros(len(self.diabetes_labels))
             label_mask[0:1000] = 1
             np.random.shuffle(label_mask)
             label_mask = torch.LongTensor(label_mask)
@@ -67,11 +66,11 @@ class DiabetesDataset(Dataset):
         return len(self.diabetes_dataset)
 
     def __getitem__(self, idx):
-        data, label = self.diabetes_dataset.__getitem__(idx)
+        data = self.diabetes_dataset.__getitem__(idx)
+        label = self.diabetes_labels.__getitem__(idx)
         data = np.expand_dims(data, axis=2)
-        data = self.transform(data)
-        label = self.transform(np.array(label))
-        print(label)
+        data = torch.FloatTensor(data)
+        labels = torch.FloatTensor(labels)
         if self._is_train_dataset():
             return data, label, self.label_mask[idx]
         return data, label
