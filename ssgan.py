@@ -358,9 +358,9 @@ for epoch in range(num_epochs):
 
         _, pred_class = torch.max(d_class_logits_on_data, 1)
         eq = torch.eq(diabetes_labels, pred_class)
-        correct = torch.sum(eq.float())
+        #correct = torch.sum(eq.float())
         masked_correct += torch.sum(label_mask * eq.float())
-        num_samples += torch.sum(diabetes_labels)
+        num_samples += torch.sum(label_mask)
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
