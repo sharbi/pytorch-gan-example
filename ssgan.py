@@ -363,7 +363,7 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
         _, pred_class = torch.max(d_class_logits_on_data, 1)
-        eq = torch.eq(_to_var(one_hot_labels), pred_class.float())
+        eq = torch.eq(diabetes_labels, pred_class.float())
         correct = torch.sum(eq.float())
         masked_correct += torch.sum(label_mask * eq.float())
         num_samples += torch.sum(diabetes_labels)
