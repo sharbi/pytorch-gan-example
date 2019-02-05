@@ -300,7 +300,7 @@ for epoch in range(num_epochs):
 
         supervised_loss = d_gan_criterion(d_class_logits_on_data, _to_var(one_hot_labels.long()))
 
-        supervised_loss = torch.multiply(supervised_loss, label_mask)
+        supervised_loss = torch.mul(supervised_loss, label_mask)
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
