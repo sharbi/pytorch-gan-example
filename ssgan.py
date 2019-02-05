@@ -66,6 +66,7 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         data, labels = self.diabetes_dataset.__getitem__(idx)
+        data = np.expand_dims(data, axis=2)
         if self._is_train_dataset():
             return data, labels, self.label_mask[idx]
         return data, labels
