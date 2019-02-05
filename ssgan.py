@@ -27,7 +27,7 @@ torch.manual_seed(manual_seed)
 workers = 2
 batch_size = 128
 image_size = 60
-num_classes = 3
+num_classes = 2
 nc = 1
 nz = 100
 ngf = 60
@@ -284,8 +284,8 @@ for epoch in range(num_epochs):
     for i, data in enumerate(diabetes_loader_train):
         diabetes_data, diabetes_labels, label_mask = data
         diabetes_data = _to_var(diabetes_data).float()
-        diabetes_labels = _to_var(diabetes_labels).float()
-        label_mask = _to_var(label_mask).float()
+        diabetes_labels = _to_var(diabetes_labels).float().squeeze()
+        label_mask = _to_var(label_mask).float().squeeze()
 
         print(diabetes_data.shape)
 
