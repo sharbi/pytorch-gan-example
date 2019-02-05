@@ -202,7 +202,7 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
         )
 
-        self.features = nn.AvgPool2d(kernel_size=(2, 1))
+        self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 4) * 1 * 1,
