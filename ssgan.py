@@ -69,8 +69,6 @@ class DiabetesDataset(Dataset):
         data = np.expand_dims(data, axis=2)
         data = torch.FloatTensor(data)
         labels = torch.FloatTensor(labels)
-        print(data.size())
-        print(labels.size())
         if self._is_train_dataset():
             return data, labels, self.label_mask[idx]
         return data, labels
@@ -286,8 +284,8 @@ for epoch in range(num_epochs):
     for i, data in enumerate(diabetes_loader_train):
         diabetes_data, diabetes_labels, label_mask = data
         diabetes_data = _to_var(diabetes_data).float()
-        diabetes_labels = _to_var(diabetes_labels).float().squeeze()
-        label_mask = _to_var(label_mask).float().squeeze()
+        diabetes_labels = _to_var(diabetes_labels).float()
+        label_mask = _to_var(label_mask).float()
 
         print(diabetes_data.shape)
 
