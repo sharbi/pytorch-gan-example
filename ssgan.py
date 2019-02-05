@@ -28,7 +28,7 @@ workers = 2
 batch_size = 64
 image_size = 60
 num_classes = 2
-nc = 1
+nc = 4
 nz = 100
 ngf = 60
 ndf = 60
@@ -133,15 +133,15 @@ class Generator(nn.Module):
             nn.BatchNorm2d(ngf * 4),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 4, 1, bias=False),
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 2),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf*4) x 8 x 8
-            nn.ConvTranspose2d( ngf * 2, ngf, 4, 4, 1, bias=False),
+            nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf) x 16 x 16
-            nn.ConvTranspose2d( ngf, nc, 4, 4, 1, bias=False)
+            nn.ConvTranspose2d( ngf, nc, 4, 2, 1, bias=False)
         # state size. (nc) x 32 x 32
         )
 
