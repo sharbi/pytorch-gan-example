@@ -296,7 +296,7 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(diabetes_data)
 
-        one_hot_labels = one_hot(diabetes_labels)
+        one_hot_labels = one_hot(diabetes_labels.long())
 
         supervised_loss = d_gan_criterion(d_class_logits_on_data, one_hot_labels)
 
