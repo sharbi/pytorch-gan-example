@@ -333,6 +333,8 @@ for epoch in range(num_epochs):
 
         loss_d = supervised_loss + unsupervised_loss
 
+        print(loss_d)
+
         loss_d.backward(retain_graph=True)
         optimizerD.step()
 
