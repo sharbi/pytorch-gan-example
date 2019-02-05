@@ -51,7 +51,7 @@ class DiabetesDataset(Dataset):
 
     def _create_label_mask(self):
         if self._is_train_dataset():
-            label_mask = np.zeros(len(self.diabetes_labels))
+            label_mask = np.zeros(len(self.diabetes_dataset))
             label_mask[0:1000] = 1
             np.random.shuffle(label_mask)
             label_mask = torch.LongTensor(label_mask)
