@@ -150,11 +150,11 @@ class Generator(nn.Module):
 
 class _ganLogits(nn.Module):
 
-    def __init__(self):
+    def __init__(self, num_classes):
         super(_ganLogits, self).__init__()
 
 
-    def forward(self, class_logits, num_classes):
+    def forward(self, class_logits):
         real_class_logits, fake_class_logits = torch.split(class_logits, self.num_classes, dim=1)
         fake_class_logits = torch.squeeze(fake_class_logits)
 
