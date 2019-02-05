@@ -236,12 +236,10 @@ def weights_init(m):
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
 
-#def one_hot(x):
-#        label_numpy = x.data.cpu().numpy()
-#        label_onehot = np.zeros((label_numpy.shape[0], num_classes + 1))
-#        label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
-#        label_onehot = _to_var(torch.FloatTensor(label_onehot))
-#        return label_onehot
+
+def one_hot(labels):
+        y = torch.eye(num_classes)
+        return y[labels]
 
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
@@ -298,7 +296,9 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(diabetes_data)
 
-        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels)
+        one_hot_labels = one_hot(diabetes_labels)
+
+        supervised_loss = d_gan_criterion(d_class_logits_on_data, one_hot_labels)
 
         supervised_loss = torch.multiply(supervised_loss, label_mask)
 
