@@ -163,8 +163,6 @@ class _ganLogits(nn.Module):
 
         stable_class_logits = real_class_logits - max_val
         max_val = torch.squeeze(max_val)
-        print(fake_class_logits.size())
-        print(max_val.size())
         gan_logits = torch.log(torch.sum(torch.exp(stable_class_logits), 1)) + max_val - fake_class_logits
         return gan_logits
 
@@ -216,12 +214,8 @@ class Discriminator(nn.Module):
 
         out = self.main(inputs)
 
-        print(out.size())
-
         features = self.features(out)
         features = features.squeeze()
-
-        print(features.size())
 
         class_logits = self.class_logits(features)
 
