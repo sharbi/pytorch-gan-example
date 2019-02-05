@@ -219,10 +219,7 @@ class Discriminator(nn.Module):
         print(out.size())
 
         features = self.features(out)
-
-        print(features.size())
-
-        features = features.squeeze()
+        features = torch.squeeze(features)
 
         class_logits = self.class_logits(features)
 
