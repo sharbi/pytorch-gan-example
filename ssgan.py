@@ -67,7 +67,6 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         data, labels = self.diabetes_dataset.__getitem__(idx)
         data = torch.FloatTensor(data)
-        data.unsqueeze_(2)
         print(data.size())
         labels = torch.FloatTensor(labels)
         if self._is_train_dataset():
