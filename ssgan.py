@@ -39,13 +39,12 @@ ngpu = 1
 # Create dataset
 
 class DiabetesDataset(Dataset):
-    def __init__(self, root_dir, data_file, labels_file, split):
+    def __init__(self, root_dir, data_file, split):
         self.split = split
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
 
         self.diabetes_dataset = pkl.load(open(root_dir + data_file, 'rb'))
-        self.diabetes_labels = pkl.load(open(root_dir + labels_file, 'rb'))
         self.label_mask = self._create_label_mask()
 
 
@@ -66,14 +65,13 @@ class DiabetesDataset(Dataset):
         return len(self.diabetes_dataset)
 
     def __getitem__(self, idx):
-        data = self.diabetes_dataset.__getitem__(idx)
-        label = self.diabetes_labels[idx]
+        data, labels = self.diabetes_dataset.__getitem__(idx)
         data = np.expand_dims(data, axis=2)
         data = torch.FloatTensor(data)
         labels = torch.FloatTensor(labels)
         if self._is_train_dataset():
-            return data, label, self.label_mask[idx]
-        return data, label
+            return data, labels, self.label_mask[idx]
+        return data, labels
 
 def get_loader(batch_size):
     num_workers = 2
@@ -84,8 +82,8 @@ def get_loader(batch_size):
     transform = transforms.Compose([
         transforms.ToTensor()])
 
-    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', 'spline_y_processed.pkl', split='train')
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', 'spline_y_processed.pkl', split='test')
+    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='train')
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', split='test')
 
     diabetes_loader_train = DataLoader(
         dataset=diabetes_train,
