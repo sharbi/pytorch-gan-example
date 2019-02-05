@@ -212,15 +212,9 @@ class Discriminator(nn.Module):
         features = features.permute(0, 2, 3, 1)
         features = features.squeeze()
 
-        print(features.size())
-
         class_logits = self.class_logits(features)
 
-        print(class_logits.size())
-
         gan_logits = self.gan_logits(class_logits)
-
-        print(gan_logits.size())
 
         out = self.softmax(class_logits)
 
@@ -332,7 +326,6 @@ for epoch in range(num_epochs):
 
         loss_d = supervised_loss + unsupervised_loss
 
-        print(loss_d)
 
         loss_d.backward(retain_graph=True)
         optimizerD.step()
