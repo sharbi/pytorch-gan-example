@@ -340,8 +340,6 @@ for epoch in range(num_epochs):
         # Generate fake images
         fake = netG(noise_var)
 
-        print(fake.size())
-
         _, _, _, d_data_features = netD(fake)
 
         data_features_mean = torch.mean(d_data_features, dim=0).squeeze()
