@@ -66,9 +66,8 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         data, labels = self.diabetes_dataset.__getitem__(idx)
-        data = np.expand_dims(data, axis=0)
         data = torch.FloatTensor(data)
-        print(data.size())
+        data.unsqueeze_(1)
         labels = torch.FloatTensor(labels)
         if self._is_train_dataset():
             return data, labels, self.label_mask[idx]
