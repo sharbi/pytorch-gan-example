@@ -202,7 +202,7 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
         )
 
-        self.features = nn.AvgPool2d(kernel_size=(1, 2))
+        self.features = nn.AvgPool2d(kernel_size=(2, 1))
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 4) * 1 * 1,
@@ -220,7 +220,7 @@ class Discriminator(nn.Module):
 
         features = self.features(out)
 
-        print(features)
+        print(features.size())
 
         features = features.squeeze()
 
