@@ -129,7 +129,7 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # Input is Z, going into convolution
-            nn.ConvTranspose2d(nz, ngf * 4, 4, (1, 2), 0, bias=False),
+            nn.ConvTranspose2d(nz, ngf * 4, 4, (1, 5), 0, bias=False),
             nn.BatchNorm2d(ngf * 4),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf*8) x 4 x 4
@@ -141,7 +141,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(ngf),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf) x 16 x 16
-            nn.ConvTranspose2d( ngf, nc, 4, (1, 2), 1, bias=False)
+            nn.ConvTranspose2d( ngf, nc, 4, (0, 2), 1, bias=False)
         # state size. (nc) x 32 x 32
         )
 
