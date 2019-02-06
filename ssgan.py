@@ -292,7 +292,7 @@ for epoch in range(num_epochs):
 
         netD.zero_grad()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(diabetes_data)
-        d_gan_labels_real = d_gan_labels_real.resize_as_(gan_logits_real.data.cpu().float()).uniform_(0.9, 1.2)
+        d_gan_labels_real = d_gan_labels_real.resize_as_(gan_logits_real.data.cpu()).uniform_(0.9, 1.2)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
 
         supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels)
