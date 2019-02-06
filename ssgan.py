@@ -166,7 +166,7 @@ class _ganLogits(nn.Module):
 
         stable_class_logits = real_class_logits - max_val
         max_val = torch.squeeze(max_val)
-        gan_logits = torch.log(torch.sum(torch.exp(stable_class_logits), 1)) + max_val - fake_class_logits
+        gan_logits = torch.logsumexp(stable_class_logits), 1)) + max_val - fake_class_logits
         return gan_logits
 
 
@@ -180,26 +180,34 @@ class Discriminator(nn.Module):
             #nn.Dropout2d(0.5/2.5),
 
             # input is (number_channels) x 60 x 4
-            nn.Conv2d(nc, ndf, 3, 1, 1, bias=False),
+            nn.Conv2d(nc, ndf, 3, (2, 4), 1, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout2d(0.5),
             # (ndf) x 30 x 2
-            nn.Conv2d(ndf, ndf * 2, 3, (2, 4), 1, bias=False),
-            nn.BatchNorm2d(ndf*2),
+            nn.Conv2d(ndf, ndf, 3, (2, 4), 1, bias=False),
+            nn.BatchNorm2d(ndf),
             nn.LeakyReLU(0.2),
             # (ndf) x 15 x 1
+            nn.Conv2d(ndf, ndf, 3, (2, 4), 1, bias=False),
+            nn.BatchNorm2d(ndf),
+            nn.LeakyReLU(0.2),
+            nn.Dropout2d(0.5),
+
+            nn.Conv2d(ndf, ndf * 2, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(ndf*2),
+            nn.LeakyReLU(0.2),
+
+            nn.Conv2d(ndf* 2, ndf * 2, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(ndf*2),
+            nn.LeakyReLU(0.2),
+
             nn.Conv2d(ndf * 2, ndf * 2, 3, (2, 4), 1, bias=False),
             nn.BatchNorm2d(ndf*2),
             nn.LeakyReLU(0.2),
             nn.Dropout2d(0.5),
 
-            nn.Conv2d(ndf * 2, ndf * 4, 3, (2, 4), 1, bias=False),
-            nn.BatchNorm2d(ndf*4),
-            nn.LeakyReLU(0.2),
-            nn.Dropout2d(0.5),
-
             # (ndf) x 5 x 1
-            nn.Conv2d(ndf * 4, ndf * 4, 2, 1, 1, bias=False),
+            nn.Conv2d(ndf * 2, ndf * 2, 3, 1, 1, bias=False),
             nn.LeakyReLU(0.2),
         )
 
