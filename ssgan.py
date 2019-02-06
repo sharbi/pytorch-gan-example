@@ -240,7 +240,7 @@ def weights_init(m):
 
 def one_hot(labels):
         y = torch.eye(num_classes + 1)
-        return y[labels]
+        return y[labels].long()
 
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
