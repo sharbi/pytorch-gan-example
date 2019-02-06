@@ -299,7 +299,7 @@ for epoch in range(num_epochs):
 
         supervised_loss = torch.sum(torch.mul(supervised_loss, label_mask))
 
-        supervised_loss = supervised_loss / _to_var(np.maximum(1.0, torch.sum(label_mask)))
+        supervised_loss = supervised_loss / _to_var(np.maximum(1.0, torch.sum(label_mask))).float()
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
