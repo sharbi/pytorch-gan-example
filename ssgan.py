@@ -330,7 +330,7 @@ for epoch in range(num_epochs):
 
         unsupervised_loss = real_data_loss + fake_data_loss
 
-        loss_d = supervised_loss + unsupervised_loss
+        loss_d = torch.abs(supervised_loss + unsupervised_loss)
 
 
         loss_d.backward(retain_graph=True)
