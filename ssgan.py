@@ -296,9 +296,12 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
 
 
-        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels.long())
+        diabetes_labels_one_hot = one_hot(diabetes_labels)
+        d_class_loss_entropy = -torch.sum(diabetes_labels_one_hot * torch.log(d_out), dim=1)
 
-        supervised_loss = torch.mean(torch.mul(supervised_loss, label_mask))
+        d_class_loss_entropy = d_class_loss_entropy.squeeze()
+        delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
+        d_class_loss = torch.sum(label_mask * d_class_loss_entropy) / delim
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
@@ -327,7 +330,7 @@ for epoch in range(num_epochs):
         real_data_loss = d_unsupervised_criterion(gan_logits_real, d_gan_labels_real_var)
         fake_data_loss = d_unsupervised_criterion(gan_logits_fake, d_gan_labels_fake_var)
 
-        unsupervised_loss = torch.mean(real_data_loss) + torch.mean(fake_data_loss)
+        unsupervised_loss = real_data_loss + fake_data_loss
 
         loss_d = supervised_loss + unsupervised_loss
 
