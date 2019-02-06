@@ -231,7 +231,7 @@ class Discriminator(nn.Module):
 
         gan_logits = self.gan_logits(class_logits)
 
-        print(gan_logits.size())
+        print(gan_logits)
 
         out = self.softmax(class_logits)
 
