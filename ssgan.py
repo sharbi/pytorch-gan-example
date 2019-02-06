@@ -321,7 +321,7 @@ for epoch in range(num_epochs):
         fake = netG(noise_var)
 
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
-        d_gan_labels_fake = d_gan_labels_fake.resize_as_(diabetes_labels.data.shape[0]).fill_(0)
+        d_gan_labels_fake.resize_(diabetes_labels.data.shape[0]).fill_(0)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
 
 
