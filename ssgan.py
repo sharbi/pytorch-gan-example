@@ -158,8 +158,15 @@ class _ganLogits(nn.Module):
 
 
     def forward(self, class_logits):
-        gan_logits = torch.logsumexp(class_logits, 1)
+        real_class_logits, fake_class_logits = torch.split(class_logits, num_classes, dim=1)
+        fake_class_logits = torch.squeeze(fake_class_logits)
+
+        max_val, _ = torch.max(real_class_logits, 1, keepdim=True)
+        stable_class_logits = real_class_logits - max_val
+        max_val = torch.squeeze(max_val)
+        gan_logits = torch.logsumexp(stable_class_logits, 1) + max_val - fake_class_logits
         return gan_logits
+
 
 
 class Discriminator(nn.Module):
@@ -207,7 +214,7 @@ class Discriminator(nn.Module):
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
-            out_features=num_classes)
+            out_features=num_classes + 1)
 
         self.gan_logits = _ganLogits()
 
@@ -223,6 +230,8 @@ class Discriminator(nn.Module):
         class_logits = self.class_logits(features)
 
         gan_logits = self.gan_logits(class_logits)
+
+        print(gan_logits.size())
 
         out = self.softmax(class_logits)
 
@@ -330,7 +339,7 @@ for epoch in range(num_epochs):
 
         unsupervised_loss = real_data_loss + fake_data_loss
 
-        loss_d = torch.abs(supervised_loss + unsupervised_loss)
+        loss_d = supervised_loss + unsupervised_loss
 
 
         loss_d.backward(retain_graph=True)
