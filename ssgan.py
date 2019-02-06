@@ -257,8 +257,8 @@ fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
 
-d_gan_labels_real = torch.FloatTensor(batch_size)
-d_gan_labels_fake = torch.FloatTensor(batch_size)
+d_gan_labels_real = torch.LongTensor(batch_size)
+d_gan_labels_fake = torch.LongTensor(batch_size)
 
 real_label = 1
 fake_label = 0
@@ -321,7 +321,7 @@ for epoch in range(num_epochs):
         fake = netG(noise_var)
 
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
-        d_gan_labels_fake =torch.zeros(gan_logits_fake.size()[0])
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(diabetes_labels.data.shape[0]).fill_(0)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
 
 
@@ -342,13 +342,6 @@ for epoch in range(num_epochs):
         ##########################
 
         netG.zero_grad()
-
-
-        noise = torch.FloatTensor(batch_size, nz, 1, 1)
-        noise.resize_(diabetes_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
-        noise_var = _to_var(noise)
-        # Generate fake images
-        fake = netG(noise_var)
 
         _, _, _, d_data_features = netD(fake)
 
