@@ -295,10 +295,7 @@ for epoch in range(num_epochs):
         d_gan_labels_real = d_gan_labels_real.resize_as_(gan_logits_real.data.cpu().float()).uniform_(0.9, 1.2)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
 
-
-        diabetes_labels_one_hot = one_hot(diabetes_labels)
-
-        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels_one_hot)
+        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels)
 
         supervised_loss = torch.sum(torch.mul(supervised_loss, label_mask))
 
