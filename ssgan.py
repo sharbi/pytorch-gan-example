@@ -217,7 +217,7 @@ class Discriminator(nn.Module):
             in_features=(ndf * 4) * 1 * 1,
             out_features=num_classes + 1)
 
-        self.gan_logits = _ganLogits(num_classes)
+        self.gan_logits = torch.logsumexp(class_logits, 1)
 
         self.softmax = nn.LogSoftmax(dim=0)
 
