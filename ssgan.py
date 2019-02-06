@@ -321,7 +321,7 @@ for epoch in range(num_epochs):
         fake = netG(noise_var)
 
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
-        d_gan_labels_size = (batch_size / 2).int
+        d_gan_labels_size = int(batch_size / 2)
         d_gan_labels_fake =torch.zeros(d_gan_labels_size)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
 
