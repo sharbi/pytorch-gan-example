@@ -158,7 +158,7 @@ class _ganLogits(nn.Module):
 
 
     def forward(self, class_logits):
-        torch.logsumexp(class_logits, 1)
+        gan_logits = torch.logsumexp(class_logits, 1)
         return gan_logits
 
 
