@@ -153,9 +153,8 @@ class Generator(nn.Module):
 
 class _ganLogits(nn.Module):
 
-    def __init__(self, num_classes):
+    def __init__(self):
         super(_ganLogits, self).__init__()
-        self.num_classes = num_classes
 
 
     def forward(self, class_logits):
