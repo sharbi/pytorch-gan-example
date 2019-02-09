@@ -44,7 +44,7 @@ class DiabetesDataset(Dataset):
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
         self.transform = transform
-        self.diabetes_dataset = np.read_csv(root_dir + data_file)
+        self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
 
 
