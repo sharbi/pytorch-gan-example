@@ -44,7 +44,7 @@ class DiabetesDataset(Dataset):
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
         self.transform = transform
-        self.diabetes_dataset = pkl.load(open(root_dir + data_file, 'rb'))
+        self.diabetes_dataset = np.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
 
 
@@ -83,8 +83,8 @@ def get_loader(batch_size):
     transform = transforms.Compose([
         transforms.ToTensor()])
 
-    diabetes_train = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='train')
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'spline_X_processed.pkl', transform=transform, split='test')
+    diabetes_train = DiabetesDataset('../diabetes_data/', 'normalised_diabetes_dataset.csv', transform=transform, split='train')
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_diabetes_dataset.csv', transform=transform, split='test')
 
     diabetes_loader_train = DataLoader(
         dataset=diabetes_train,
@@ -145,6 +145,7 @@ class Generator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf) x 16 x 16
             nn.ConvTranspose2d( ngf, nc, 2, (2, 3), 1, bias=False)
+            nn.Tanh()
         # state size. (nc) x 32 x 32
         )
 
@@ -230,7 +231,6 @@ class Discriminator(nn.Module):
         class_logits = self.class_logits(features)
 
         gan_logits = self.gan_logits(class_logits)
-
 
         out = self.softmax(class_logits)
 
