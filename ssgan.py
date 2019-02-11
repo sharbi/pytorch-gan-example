@@ -45,7 +45,7 @@ class DiabetesDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
         self.transform = transform
         self.diabetes_dataset = pkl.load(open(root_dir + data_file, 'rb'))
-        self.diabetes_data = diabetes_dataset.to_numpy()
+        self.diabetes_data = self.diabetes_dataset.to_numpy()
         self.label_mask = self._create_label_mask()
 
 
@@ -68,8 +68,9 @@ class DiabetesDataset(Dataset):
         return len(self.diabetes_dataset)
 
     def __getitem__(self, idx):
-        data, labels = self.diabetes_dataset.__getitem__(idx)
-        print(data)
+        data = self.diabetes_dataset.__getitem__(idx)
+        labels = data[:, 6]
+        data = data[:, 1:5]
         #data = self.transform(data)
         data = np.expand_dims(data, axis=0)
         if self._is_train_dataset():
