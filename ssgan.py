@@ -45,7 +45,7 @@ class DiabetesDataset(Dataset):
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
         self.transform = transform
-        self.diabetes_dataset = pd.read_csv("normalised_diabetes_dataset.csv")
+        self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_data = self.diabetes_dataset.to_numpy()
         self.label_mask = self._create_label_mask()
 
@@ -87,8 +87,8 @@ def get_loader(batch_size):
     transform = transforms.Compose([
         transforms.ToTensor()])
 
-    diabetes_train = DiabetesDataset('../diabetes_data/', 'normalised_X.pkl', transform=transform, split='train')
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_X.pkl', transform=transform, split='test')
+    diabetes_train = DiabetesDataset('../diabetes_data/', 'normalised_diabetes_dataset.csv', transform=transform, split='train')
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_diabetes_dataset.csv', transform=transform, split='test')
 
     diabetes_loader_train = DataLoader(
         dataset=diabetes_train,
