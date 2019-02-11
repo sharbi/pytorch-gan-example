@@ -314,7 +314,8 @@ for epoch in range(num_epochs):
 
         supervised_loss = supervised_loss / torch.sum(label_mask)
 
-        print("supervised_loss " + supervised_loss.data[0])
+        print("Supervised loss: ")
+        print(supervised_loss)
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
@@ -345,7 +346,8 @@ for epoch in range(num_epochs):
 
         unsupervised_loss = real_data_loss + fake_data_loss
 
-        print("unsupervised_loss " + unsupervised_loss.data[0])
+        print("Unsupervised loss: ")
+        print(unsupervised_loss)
 
         loss_d = supervised_loss + unsupervised_loss
 
@@ -367,7 +369,8 @@ for epoch in range(num_epochs):
 
         g_loss = torch.mean(torch.abs(data_features_mean - sample_features_mean))
 
-        print("generator loss " + g_loss.data[0])
+        print("G_loss: ")
+        print(g_loss)
 
         g_loss.backward()
         optimizerG.step()
