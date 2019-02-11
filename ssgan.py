@@ -314,6 +314,8 @@ for epoch in range(num_epochs):
 
         supervised_loss = supervised_loss / torch.sum(label_mask)
 
+        print(supervised_loss)
+
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
         #delim = _to_var(delim)
@@ -343,6 +345,8 @@ for epoch in range(num_epochs):
 
         unsupervised_loss = real_data_loss + fake_data_loss
 
+        print(unsupervised_loss)
+
         loss_d = supervised_loss + unsupervised_loss
 
 
@@ -362,6 +366,8 @@ for epoch in range(num_epochs):
         sample_features_mean = torch.mean(d_sample_features, dim=0).squeeze()
 
         g_loss = torch.mean(torch.abs(data_features_mean - sample_features_mean))
+
+        print(g_loss)
 
         g_loss.backward()
         optimizerG.step()
