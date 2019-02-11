@@ -341,7 +341,7 @@ for epoch in range(num_epochs):
         real_data_loss = d_unsupervised_criterion(gan_logits_real, d_gan_labels_real_var)
         fake_data_loss = d_unsupervised_criterion(gan_logits_fake, d_gan_labels_fake_var)
 
-        unsupervised_loss = real_data_loss + fake_data_loss
+        unsupervised_loss = torch.abs(real_data_loss + fake_data_loss)
 
         loss_d = supervised_loss + unsupervised_loss
 
