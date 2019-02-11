@@ -70,6 +70,7 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         data = self.diabetes_dataset.__getitem__(idx)
+        print(data)
         labels = data[:, 6]
         data = data[:, 1:6]
         #data = self.transform(data)
