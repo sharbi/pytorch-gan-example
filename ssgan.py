@@ -312,7 +312,7 @@ for epoch in range(num_epochs):
 
         supervised_loss = torch.sum(torch.mul(supervised_loss, label_mask))
 
-        supervised_loss = supervised_loss / torch.max(1, torch.sum(label_mask))
+        supervised_loss = supervised_loss / np.maximum(1, torch.sum(label_mask))
 
         print("Supervised loss: ")
         print(supervised_loss)
