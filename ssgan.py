@@ -264,7 +264,7 @@ netD = Discriminator(ngpu).to(device)
 netD.apply(weights_init)
 print(netD)
 
-loss_weighting = _to_var(torch.tensor([97, 3, 50]).float())
+loss_weighting = _to_var(torch.tensor([.97, .3, .5]).float())
 
 d_unsupervised_criterion = nn.BCEWithLogitsLoss()
 d_gan_criterion = nn.CrossEntropyLoss(weight=loss_weighting)
