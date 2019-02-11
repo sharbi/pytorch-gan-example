@@ -14,6 +14,7 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import numpy as np
+import pandas as pd
 
 import pickle as pkl
 
@@ -44,7 +45,7 @@ class DiabetesDataset(Dataset):
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
         self.transform = transform
-        self.diabetes_dataset = pkl.load(open(root_dir + data_file, 'rb'))
+        self.diabetes_dataset = pd.read_csv("normalised_diabetes_dataset.csv")
         self.diabetes_data = self.diabetes_dataset.to_numpy()
         self.label_mask = self._create_label_mask()
 
@@ -70,7 +71,7 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         data = self.diabetes_dataset.__getitem__(idx)
         labels = data[:, 6]
-        data = data[:, 1:5]
+        data = data[:, 1:6]
         #data = self.transform(data)
         data = np.expand_dims(data, axis=0)
         if self._is_train_dataset():
