@@ -31,10 +31,10 @@ image_size = 60
 num_classes = 2
 nc = 1
 nz = 100
-ngf = 60
-ndf = 60
+ngf = 64
+ndf = 64
 num_epochs = 5000
-lr = 0.0002
+lr = 0.0003
 beta = 0.5
 ngpu = 1
 # Create dataset
@@ -330,7 +330,7 @@ for epoch in range(num_epochs):
         fake = netG(noise_var)
 
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
-        d_gan_labels_fake.resize_(diabetes_labels.data.shape[0]).uniform_(0.9, 1.2)
+        d_gan_labels_fake.resize_(diabetes_labels.data.shape[0]).uniform_(0.7, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
 
 
