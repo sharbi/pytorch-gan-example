@@ -34,7 +34,7 @@ nz = 100
 ngf = 64
 ndf = 64
 num_epochs = 5000
-lr = 0.0002
+lr = 0.0003
 beta = 0.5
 ngpu = 1
 # Create dataset
@@ -116,6 +116,7 @@ device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else 
 
 # Sort weight initialization
 def weights_init(m):
+    print(m.weight.data.shape)
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
         nn.init.normal_(m.weight.data, 0.0, 0.02)
@@ -273,9 +274,6 @@ fake_label = 0
 
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
-
-schedulerD = optim.lr_scheduler.StepLR(optimizerD, step_size=50, gamma=0.1)
-schedulerG = optim.lr_scheduler.StepLR(optimizerG, step_size=50, gamma=0.1)
 
 
 for epoch in range(num_epochs):
