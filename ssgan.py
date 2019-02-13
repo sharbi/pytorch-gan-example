@@ -141,7 +141,7 @@ class Generator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.BatchNorm(ngf * 8),
             # Input is Z, going into convolution
-            nn.ConvTranspose1d(ngf*8, ngf * 4, stride=5, 0, bias=False),
+            nn.ConvTranspose1d(ngf*8, ngf * 4, stride=5, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 4),
             # state size. (ngf*8) x 4 x 4
