@@ -158,7 +158,6 @@ class Generator(nn.Module):
 
     def forward(self, input):
         out = self.main(input)
-        print(out.shape)
         return out
 
 class _ganLogits(nn.Module):
@@ -282,7 +281,6 @@ for epoch in range(num_epochs):
         diabetes_labels = _to_var(diabetes_labels).long().squeeze()
         label_mask = _to_var(label_mask).float().squeeze()
 
-        print(diabetes_data.shape)
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
