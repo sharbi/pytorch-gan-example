@@ -157,7 +157,9 @@ class Generator(nn.Module):
         )
 
     def forward(self, input):
-        return self.main(input)
+        out = self.main(input)
+        print(out.shape)
+        return out
 
 class _ganLogits(nn.Module):
 
