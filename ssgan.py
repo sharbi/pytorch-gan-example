@@ -188,31 +188,23 @@ class Discriminator(nn.Module):
             nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            print("test1"),
             nn.utils.weight_norm(nn.Conv1d(nc, ndf, (1, 3), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            print("test2"),
             nn.utils.weight_norm(nn.Conv1d(ndf, ndf, (1, 3), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            print("test3"),
             nn.utils.weight_norm(nn.Conv1d(ndf, ndf, (1, 3), padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
-            print("test4"),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
             nn.utils.weight_norm(nn.Conv1d(ndf, ndf *2, (1, 3), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            print("test5"),
             nn.utils.weight_norm(nn.Conv1d(ndf*2, ndf*2, (1, 3), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            print("test6"),
             nn.utils.weight_norm(nn.Conv1d(ndf*2, ndf*2, (1, 3), padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            print("test7"),
             # (ndf) x 15 x 1
             nn.utils.weight_norm(nn.Conv1d(ndf*2, ndf*2, (1, 3), padding=0, bias=False)),
-            print("test8"),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
         )
@@ -271,6 +263,8 @@ d_gan_labels_fake = torch.FloatTensor(batch_size)
 real_label = 1
 fake_label = 0
 
+print(netD.paramaters())
+print(netG.paramaters())
 
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
