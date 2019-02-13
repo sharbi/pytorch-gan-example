@@ -188,7 +188,7 @@ class Discriminator(nn.Module):
             nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            print("test1")
+            print("test1"),
             nn.utils.weight_norm(nn.Conv1d(nc, ndf, (1, 3), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
             print("test2")
