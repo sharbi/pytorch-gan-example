@@ -280,8 +280,6 @@ for epoch in range(num_epochs):
 
     masked_correct = 0
     num_samples = 0
-    schedulerD.step()
-    schedulerG.step()
     # For each batch in the dataloader
     for i, data in enumerate(diabetes_loader_train):
         diabetes_data, diabetes_labels, label_mask = data
