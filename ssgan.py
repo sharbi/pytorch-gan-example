@@ -136,20 +136,22 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
+
+            nn.Linear(nz, ngf * 8),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm(ngf * 8),
             # Input is Z, going into convolution
-            nn.ConvTranspose2d(nz, ngf * 4, 3, (2, 4), 0, bias=False),
+            nn.ConvTranspose1d(ngf*8, ngf * 4, stride=5, 0, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 4),
-            nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, (1, 3), 2, bias=False),
+            nn.ConvTranspose1d(ngf * 4, ngf * 2, stride=5, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 2),
-            nn.LeakyReLU(0.2, inplace=True),
             # state size. (ngf*4) x 8 x 8
-            nn.ConvTranspose2d( ngf * 2, ngf, 3, (2, 4), 1, bias=False),
-            nn.BatchNorm2d(ngf),
+            nn.weight_norm(nn.ConvTranspose1d(ngf * 2, ngf, stride=5, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ngf) x 16 x 16
-            nn.ConvTranspose2d( ngf, nc, 2, (2, 3), 1, bias=False),
+
             nn.Tanh()
         # state size. (nc) x 32 x 32
         )
@@ -183,41 +185,32 @@ class Discriminator(nn.Module):
         self.ngpu = ngpu
 
         self.main = nn.Sequential(
-            #nn.Dropout2d(0.5/2.5),
+
+            nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            nn.Conv2d(nc, ndf, 3, (2, 4), 1, bias=False),
+            nn.weight_norm(nn.Conv2d(nc, ndf, 3, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.Dropout2d(0.5),
+            nn.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.Conv2d(ndf, ndf, 3, (2, 4), 1, bias=False),
-            nn.BatchNorm2d(ndf),
+            nn.weight_norm(nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
+            nn.weight_norm(nn.Conv2d(ndf*2, ndf*2, 3, padding=1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.weight_norm(nn.Conv2d(ndf*2, ndf*2, 3, padding=1, stride=2, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.Conv2d(ndf, ndf, 3, (2, 4), 1, bias=False),
-            nn.BatchNorm2d(ndf),
+            nn.weight_norm(nn.Conv1d(ndf*2, ndf*2, 3, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.Dropout2d(0.5),
-
-            nn.Conv2d(ndf, ndf * 2, 3, 1, 1, bias=False),
-            nn.BatchNorm2d(ndf*2),
-            nn.LeakyReLU(0.2),
-
-            nn.Conv2d(ndf* 2, ndf * 2, 3, 1, 1, bias=False),
-            nn.BatchNorm2d(ndf*2),
-            nn.LeakyReLU(0.2),
-
-            nn.Conv2d(ndf * 2, ndf * 2, 3, (2, 4), 1, bias=False),
-            nn.BatchNorm2d(ndf*2),
-            nn.LeakyReLU(0.2),
-            nn.Dropout2d(0.5),
-
-            # (ndf) x 5 x 1
-            nn.Conv2d(ndf * 2, ndf * 2, 2, 1, 1, bias=False),
-            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
         )
 
-        self.features = nn.AvgPool2d(kernel_size=2)
+        self.features = nn.AvgPool1d(kernel_size=2)
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
