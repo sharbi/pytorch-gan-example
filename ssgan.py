@@ -191,17 +191,17 @@ class Discriminator(nn.Module):
             # input is (number_channels) x 60 x 4
             nn.utils.weight_norm(nn.Conv2d(nc, ndf, 3, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, (1, 2), padding=1, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, (1, 2), padding=1, stride=2, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 2, padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
             nn.utils.weight_norm(nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 2), padding=1, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 2, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 2), padding=1, stride=2, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 2, padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
