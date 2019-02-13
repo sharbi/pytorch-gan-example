@@ -139,17 +139,17 @@ class Generator(nn.Module):
 
             nn.Linear(nz, ngf * 8),
             nn.LeakyReLU(0.2),
-            nn.BatchNorm1d(ngf * 8),
+            nn.BatchNorm2d(ngf * 8),
             # Input is Z, going into convolution
-            nn.ConvTranspose1d(ngf*8, ngf * 4, 5, bias=False),
+            nn.ConvTranspose2d(ngf*8, ngf * 4, 5, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm1d(ngf * 4),
+            nn.BatchNorm2d(ngf * 4),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose1d(ngf * 4, ngf * 2, 5, bias=False),
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 5, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm1d(ngf * 2),
+            nn.BatchNorm2d(ngf * 2),
             # state size. (ngf*4) x 8 x 8
-            nn.utils.weight_norm(nn.ConvTranspose1d(ngf * 2, ngf, 5, bias=False)),
+            nn.utils.weight_norm(nn.ConvTranspose2d(ngf * 2, ngf, 5, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Tanh()
@@ -189,28 +189,28 @@ class Discriminator(nn.Module):
             nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            nn.utils.weight_norm(nn.Conv1d(nc, ndf, (1, 2), padding=1, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(nc, ndf, (1, 2), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv1d(ndf, ndf, (1, 2), padding=1, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, (1, 2), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv1d(ndf, ndf, (1, 2), padding=1, stride=2, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, (1, 2), padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.utils.weight_norm(nn.Conv1d(ndf, ndf *2, (1, 2), padding=1, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf *2, (1, 2), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv1d(ndf*2, ndf*2, (1, 2), padding=1, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 2), padding=1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv1d(ndf*2, ndf*2, (1, 2), padding=1, stride=2, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 2), padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.utils.weight_norm(nn.Conv1d(ndf*2, ndf*2, (1, 2), padding=0, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 2), padding=0, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
         )
 
-        self.features = nn.AvgPool1d(kernel_size=2)
+        self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
