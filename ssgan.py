@@ -139,15 +139,15 @@ class Generator(nn.Module):
 
             nn.Linear(nz, ngf * 8),
             nn.LeakyReLU(0.2),
-            nn.BatchNorm(ngf * 8),
+            nn.BatchNorm1d(ngf * 8),
             # Input is Z, going into convolution
             nn.ConvTranspose1d(ngf*8, ngf * 4, stride=5, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf * 4),
+            nn.BatchNorm1d(ngf * 4),
             # state size. (ngf*8) x 4 x 4
             nn.ConvTranspose1d(ngf * 4, ngf * 2, stride=5, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf * 2),
+            nn.BatchNorm1d(ngf * 2),
             # state size. (ngf*4) x 8 x 8
             nn.weight_norm(nn.ConvTranspose1d(ngf * 2, ngf, stride=5, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
