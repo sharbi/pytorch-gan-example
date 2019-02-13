@@ -144,8 +144,12 @@ class Generator(nn.Module):
             nn.ConvTranspose2d(ngf * 4, ngf * 2, 5, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 2),
+            # state size. (ngf*8) x 4 x 4
+            nn.ConvTranspose2d(ngf * 2, 5, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.BatchNorm2d(ngf),
             # state size. (ngf*4) x 8 x 8
-            nn.utils.weight_norm(nn.ConvTranspose2d(ngf * 2, ngf, 5, bias=False)),
+            nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 5, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Tanh()
@@ -219,8 +223,6 @@ class Discriminator(nn.Module):
     def forward(self, inputs):
 
         out = self.main(inputs)
-
-        print(out.shape)
 
         features = self.features(out)
         features = features.squeeze()
