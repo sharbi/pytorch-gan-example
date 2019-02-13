@@ -263,8 +263,6 @@ d_gan_labels_fake = torch.FloatTensor(batch_size)
 real_label = 1
 fake_label = 0
 
-print(netD.paramaters())
-print(netG.paramaters())
 
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
