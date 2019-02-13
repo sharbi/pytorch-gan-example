@@ -282,6 +282,8 @@ for epoch in range(num_epochs):
         diabetes_labels = _to_var(diabetes_labels).long().squeeze()
         label_mask = _to_var(label_mask).float().squeeze()
 
+        print(diabetes_data.shape)
+
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
         # This is checking how well the discriminator can categorise the real data
