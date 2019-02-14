@@ -70,11 +70,18 @@ class DiabetesDataset(Dataset):
 
     def __getitem__(self, idx):
         data = self.diabetes_dataset.__getitem__(idx)
-        labels = data[6]
-        data = data[1:6]
+        labels = data[,6]
+        data = data[,1:6]
+
         #data = self.transform(data)
-        data = np.expand_dims(data, axis=0)
-        data = np.expand_dims(data, axis=0)
+
+        labeled_data = data[0:890]
+        unlabeled_data = data[890:]
+
+        unlabeled_data = np.expand_dims(data, axis=0)
+        unlabeled_data = np.expand_dims(data, axis=0)
+        labeled_data = np.expand_dims(data, axis=0)
+        labeled_data = np.expand_dims(data, axis=0)
         if self._is_train_dataset():
             return data, labels, self.label_mask[idx]
         return data, labels
@@ -215,11 +222,11 @@ class Discriminator(nn.Module):
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
-            out_features=num_classes + 1)
+            out_features=num_classes)
 
-        self.gan_logits = _ganLogits()
+        #self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax(dim=0)
+        #self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
 
@@ -230,18 +237,12 @@ class Discriminator(nn.Module):
 
         class_logits = self.class_logits(features)
 
-        gan_logits = self.gan_logits(class_logits)
+        #gan_logits = self.gan_logits(class_logits)
 
-        out = self.softmax(class_logits)
+        #out = self.softmax(class_logits)
 
-        return out, class_logits, gan_logits, features
+        return class_logits, features
 
-
-
-
-def one_hot(labels):
-        y = torch.eye(num_classes + 1)
-        return _to_var(y[labels]).long()
 
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
@@ -289,7 +290,7 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(diabetes_data)
+        d_class_logits_on_data, d_sample_features = netD(diabetes_data)
         d_gan_labels_real = d_gan_labels_real.resize_as_(gan_logits_real.data.cpu()).uniform_(0.7, 1.2)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
 
@@ -318,8 +319,8 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
-        _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
-        d_gan_labels_fake.resize_(diabetes_labels.data.shape[0]).uniform_(0.0, 0.3)
+        d_fake_logits_on_data, _ = netD(fake.detach())
+        d_gan_labels_fake.resize_(diabetes_labels.data.shape[0]).=fill(0)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
 
 
@@ -341,7 +342,7 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, _, _, d_data_features = netD(fake)
+        _, d_data_features = netD(fake)
 
         data_features_mean = torch.mean(d_data_features, dim=0).squeeze()
         sample_features_mean = torch.mean(d_sample_features, dim=0).squeeze()
