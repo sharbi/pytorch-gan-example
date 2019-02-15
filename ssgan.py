@@ -345,6 +345,8 @@ for epoch in range(num_epochs):
         loss_g.backward()
         optimizerG.step()
 
+        epoch_accuracy = torch.eq())
+
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
@@ -366,7 +368,7 @@ for epoch in range(num_epochs):
             test_values = _to_var(test_values).float()
             test_labels = _to_var(test_labels).float()
             test_logits, _ = netD(test_values)
-            correct_pred = torch.eq(torch.argmax(test_logits).float(), test_labels)
+            correct_pred = torch.eq(torch.max(test_logits.float(), 1), test_labels)
             accuracy = torch.mean(correct_pred.float())
 
         print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
