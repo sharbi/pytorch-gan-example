@@ -303,8 +303,8 @@ for epoch in range(num_epochs):
         logits_gen, _ = netD(generator_input.detach())
         logits_gen_adv, _ = netD(gen_adv.detach())
 
-        print(logits_lab.size)
-        print(labels.size)
+        print(logits_lab.shape)
+        print(labels.shape)
 
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
