@@ -364,6 +364,8 @@ for epoch in range(num_epochs):
         for i, data in enumerate(diabetes_loader_test):
             for data in diabetes_loader_test:
                 test_values, test_labels = data
+                test_values = _to_var(test_values).float()
+                test_labels = _to_var(test_labels).float()
                 disc_test = netD(test_values)
                 pred_class, _  = torch.max(disc_test, 1)
                 correct_pred = torch.equal(torch.cast(torch.argmax(pred_class, 1),
