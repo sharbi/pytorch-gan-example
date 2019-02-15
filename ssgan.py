@@ -276,16 +276,16 @@ for epoch in range(num_epochs):
         generator_input = netG(noise_var)
 
         pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
-        pert_calc = pert_input.norm(p=2, dim=1, keepdim=True)
-        pert_n = pert_input.div(pert_calc)
+        pert_calc = F.normalize(pert_input)
 
         noise_pert = noise + 1. * pert_n
         noise_pert = _to_var(noise_pert)
         gen_inp_pert = netG(noise_pert)
 
+
+
         manifold_regularisation_value = (gen_inp_pert - generator_input)
-        manifold_regularisation_norm = manifold_regularisation_value.norm(p=2, dim=1, keepdim=True)
-        manifold_regularisation_value = manifold_regularisation_norm.div(manifold_regularisation_norm)
+        manifold_regularisation_norm = F.normalize(manifold_regularisation_value)
 
         gen_adv = noise_var + 20. * manifold_regularisation_value
 
