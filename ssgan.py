@@ -105,7 +105,7 @@ patient_iter = iter(diabetes_loader_train)
 patient, _, _ = patient_iter.next()
 
 test_iter = iter(diabetes_loader_test)
-test_patient, _, _ = test_iter.next()
+test_patient, _ = test_iter.next()
 
 
 
