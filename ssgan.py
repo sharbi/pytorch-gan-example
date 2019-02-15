@@ -219,8 +219,6 @@ class Discriminator(nn.Module):
 
         out = self.main(inputs)
 
-        print(out.shape)
-
         features = self.features(out)
         features = features.squeeze()
 
@@ -286,7 +284,7 @@ for epoch in range(num_epochs):
         gen_inp_pert = netG(noise_pert)
 
         manifold_regularisation_value = (gen_inp_pert - generator_input)
-        manifold_regularisation_norm = manifold_regularisation_value.norm(p=2, dim=2, keepdim=True)
+        manifold_regularisation_norm = manifold_regularisation_value.norm(p=2, dim=1, keepdim=True)
         manifold_regularisation_value = manifold_regularisation_norm.div(manifold_regularisation_norm)
 
         gen_adv = noise_var + 20. * manifold_regularisation_value
