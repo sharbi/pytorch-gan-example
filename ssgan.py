@@ -289,7 +289,7 @@ for epoch in range(num_epochs):
         manifold_regularisation_norm = manifold_regularisation_value.norm(p=2, dim=2, keepdim=True)
         manifold_regularisation_value = manifold_regularisation_norm.div(manifold_regularisation_norm)
 
-        gen_adv = noise + 20. * manifold_regularisation_value
+        gen_adv = noise_var + 20. * manifold_regularisation_value
 
 
 
