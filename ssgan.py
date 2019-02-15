@@ -47,19 +47,13 @@ class DiabetesDataset(Dataset):
         self.transform = transform
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.to_numpy()
-        self.label_mask = self._create_label_mask()
+
+        self.labeled_dataset = self.diabetes_dataset[0:890, 1:]
+        self.unlabeled_dataset = self.diabetes_dataset[890:,1:6]
 
 
 
 
-    def _create_label_mask(self):
-        if self._is_train_dataset():
-            label_mask = np.zeros(len(self.diabetes_dataset))
-            label_mask[0:1000] = 1
-            np.random.shuffle(label_mask)
-            label_mask = torch.LongTensor(label_mask)
-            return label_mask
-        return None
 
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
@@ -69,22 +63,24 @@ class DiabetesDataset(Dataset):
         return len(self.diabetes_dataset)
 
     def __getitem__(self, idx):
-        data = self.diabetes_dataset.__getitem__(idx)
-        labels = data[,6]
-        data = data[,1:6]
+        whole_data = self.diabetes_dataset.__getitem__(idx)
 
-        #data = self.transform(data)
+        labeled_data = self.labeled_dataset.__getitem__(idx)
+        unlabeled_data = self.unlabeled_dataset.__getitem__(idx)
 
-        labeled_data = data[0:890]
-        unlabeled_data = data[890:]
+        labels = labeled_data[5]
+        labeled_data = labeled_data[0:5]
+
+        test_labels = whole_data[6]
+        whole_data = whole_data[1:6]
 
         unlabeled_data = np.expand_dims(data, axis=0)
         unlabeled_data = np.expand_dims(data, axis=0)
         labeled_data = np.expand_dims(data, axis=0)
         labeled_data = np.expand_dims(data, axis=0)
         if self._is_train_dataset():
-            return data, labels, self.label_mask[idx]
-        return data, labels
+            return labeled_data, unlabeled_data, labels
+        return whole_data, test_labels
 
 def get_loader(batch_size):
     num_workers = 2
@@ -114,9 +110,12 @@ def get_loader(batch_size):
 
     return diabetes_loader_train, diabetes_loader_test
 
-diabetes_loader_train, _ = get_loader(batch_size=batch_size)
+diabetes_loader_train, diabetes_loader_test = get_loader(batch_size=batch_size)
 patient_iter = iter(diabetes_loader_train)
 patient, _, _ = patient_iter.next()
+
+test_iter = iter(diabetes_loader_test)
+test_patient, _, _ = test_iter.nest()
 
 
 
@@ -277,10 +276,34 @@ for epoch in range(num_epochs):
     num_samples = 0
     # For each batch in the dataloader
     for i, data in enumerate(diabetes_loader_train):
-        diabetes_data, diabetes_labels, label_mask = data
-        diabetes_data = _to_var(diabetes_data).float()
-        diabetes_labels = _to_var(diabetes_labels).long().squeeze()
+        labeled_data, unlabeled_data, labels = data
+        labeled_data = _to_var(labeled_data).float()
+        unlabeled_data = _to_var(unlabeled_data).float()
+        labels = _to_var(labels).long().squeeze()
         label_mask = _to_var(label_mask).float().squeeze()
+
+
+
+        noise = torch.FloatTensor(batch_size, nz, 1, 1)
+
+        noise.resize_(labels.data.shape[0], nz, 1, 1).uniform_(0, 100)
+        noise_var = _to_var(noise)
+        generator_input = netG(noise_var)
+
+        pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal(0, 100)
+        pert_calc = pert_input.norm(p=2, dim=1, keepdim=True)
+        pert_n = pert_input.div(pert_calc)
+
+        noise_pert = noise + 1. * pert_n
+        noise_pert = _to_var(noise_pert)
+        gen_inp_pert = netG(noise_pert)
+
+        manifold_regularisation_value = (gen_inp_pert - generator_input)
+        manifold_regularisation_norm = manifold_regularisation_value.norm(p=2, dim=[1,2,3], keepdim=True)
+        manifold_regularisation_value = manifold_regularisation_norm.div(manifold_regularisation_norm)
+
+        gen_adv = noise + 20. * manifold_regularisation_value
+
 
 
         ##########################
@@ -290,46 +313,25 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        d_class_logits_on_data, d_sample_features = netD(diabetes_data)
-        d_gan_labels_real = d_gan_labels_real.resize_as_(gan_logits_real.data.cpu()).uniform_(0.7, 1.2)
-        d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
+        logits_lab, _ = netD(labeled_data)
+        logits_unl, layer_real = netD(unlabeled_data)
+        logits_gen, _ = netD(generator_input.detach())
+        logits_gen_adv, _ = netD(gen_adv.detach())
 
-        supervised_loss = d_gan_criterion(d_class_logits_on_data, diabetes_labels)
-
-        supervised_loss = torch.sum(torch.mul(supervised_loss, label_mask))
-
-        supervised_loss = supervised_loss / _to_var(np.maximum(1.0, torch.sum(label_mask))).float()
-
-        #d_class_loss_entropy = d_class_loss_entropy.squeeze()
-        #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
-        #delim = _to_var(delim)
-        #supervised_loss = torch.sum(label_mask * d_class_loss_entropy) / delim
-
-        ##########################
-        # NEXT UNSUPERVISED LOSS:
-        # This checks the discriminator's ability to determine real and fake data
-        ##########################
-
-        # Get the fake logits, real are obtained from above
+        l_unl = torch.logsumexp(logits_unl, 1)
+        l_gen = torch.logsumexp(logits_gen, 1)
+        loss_lab = d_gan_criterion(labels, logits_lab)
+        loss_lab = torch.mean(loss_lab)
+        loss_unlabeled = - 0.5 * torch.mean() \
+                         + 0.5 * torch.mean(torch.nn.functional.softplus(l_unl)) \
+                         + 0.5 * torch.mean(torch.nn.functional.softplus(l_gen))
 
 
-        noise = torch.FloatTensor(batch_size, nz, 1, 1)
+        manifold = torch.sum(torch.sqrt(torch.square(logits_gen - logits_gen_adv) + 1e-8))
 
-        noise.resize_(diabetes_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
-        noise_var = _to_var(noise)
-        fake = netG(noise_var)
+        j_loss = torch.mean(manifold)
 
-        d_fake_logits_on_data, _ = netD(fake.detach())
-        d_gan_labels_fake.resize_(diabetes_labels.data.shape[0]).=fill(0)
-        d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
-
-
-        real_data_loss = d_unsupervised_criterion(gan_logits_real, d_gan_labels_real_var)
-        fake_data_loss = d_unsupervised_criterion(gan_logits_fake, d_gan_labels_fake_var)
-
-        unsupervised_loss = real_data_loss + fake_data_loss
-
-        loss_d = supervised_loss + unsupervised_loss
+        loss_d = loss_unl + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
@@ -342,28 +344,24 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, d_data_features = netD(fake)
-
-        data_features_mean = torch.mean(d_data_features, dim=0).squeeze()
-        sample_features_mean = torch.mean(d_sample_features, dim=0).squeeze()
-
-        g_loss = torch.mean(torch.abs(data_features_mean - sample_features_mean))
+        _, layer_fake = netD(fake)
 
 
-        g_loss.backward()
+        m1 = torch.mean(layer_real, dim=0).squeeze()
+        m2 = torch.mean(layer_fake, dim=0).squeeze()
+
+
+        loss_g = torch.mean(torch.abs(m1 - m2))
+
+
+        loss_g.backward()
         optimizerG.step()
-
-        _, pred_class = torch.max(d_class_logits_on_data, 1)
-        eq = torch.eq(diabetes_labels, pred_class)
-        #correct = torch.sum(eq.float())
-        masked_correct += torch.sum(label_mask * eq.float())
-        num_samples += torch.sum(label_mask)
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         unsupervised_loss.data[0], supervised_loss.data[0],
-                         g_loss.data[0], i + 1,
+                         loss_unl.data[0], loss_lab.data[0],
+                         loss_g.data[0], i + 1,
                          len(diabetes_loader_train)))
             real_cpu, _, _ = data
             vutils.save_image(real_cpu,
@@ -373,6 +371,16 @@ for epoch in range(num_epochs):
             vutils.save_image(fake.detach(),
                     './.gitignore/output/SS_GAN_TEST/fake_samples_epoch_%03d.png' % epoch,
                     normalize=True)
+
+    with torch.no_grad():
+        for i, data in enumerate(diabetes_loader_test):
+            for data in diabetes_loader_test:
+                test_values, test_labels = data
+                disc_test = netD(test_values)
+                pred_class, _  = torch.max(disc_test, 1)
+                correct_pred = torch.equal(torch.cast(torch.argmax(pred_class, 1),
+                    torch.int32), torch.cast(test_labels, torch.int32))
+                accuracy = torch.mean(torch.cast(correct_pred, torch.float32))
 
     accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
     print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
