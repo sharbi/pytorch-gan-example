@@ -310,9 +310,10 @@ for epoch in range(num_epochs):
         l_gen = torch.logsumexp(logits_gen, 1)
         loss_lab = d_gan_criterion(logits_lab, labels)
         loss_lab = torch.mean(loss_lab)
+
         loss_unlabeled = - 0.5 * torch.mean() \
-                         + 0.5 * torch.mean(torch.nn.functional.softplus(l_unl)) \
-                         + 0.5 * torch.mean(torch.nn.functional.softplus(l_gen))
+                         + 0.5 * torch.mean(F.softplus(l_unl)) \
+                         + 0.5 * torch.mean(F.softplus(l_gen))
 
 
         manifold = torch.sum(torch.sqrt(torch.square(logits_gen - logits_gen_adv) + 1e-8))
