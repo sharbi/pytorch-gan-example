@@ -335,7 +335,7 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, layer_fake = netD(fake)
+        _, layer_fake = netD(generator_input)
 
 
         m1 = torch.mean(layer_real, dim=0).squeeze()
