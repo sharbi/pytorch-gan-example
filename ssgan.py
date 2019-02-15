@@ -316,7 +316,9 @@ for epoch in range(num_epochs):
                          + 0.5 * torch.mean(F.softplus(l_gen))
 
 
-        manifold = torch.sum(torch.sqrt(torch.square(logits_gen - logits_gen_adv) + 1e-8))
+        manifold_diff = logits_gen - logits_gen_adv
+
+        manifold = torch.sum(torch.sqrt((manifold_diff ** 2) + 1e-8))
 
         j_loss = torch.mean(manifold)
 
