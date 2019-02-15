@@ -63,24 +63,14 @@ class DiabetesDataset(Dataset):
         return len(self.diabetes_dataset)
 
     def __getitem__(self, idx):
-        whole_data = self.diabetes_dataset.__getitem__(idx)
+        data = self.diabetes_dataset.__getitem__(idx)
 
-        labeled_data = self.labeled_dataset.__getitem__(idx)
-        unlabeled_data = self.unlabeled_dataset.__getitem__(idx)
+        labels = data[6]
+        data = data[1:6]
 
-        labels = labeled_data[5]
-        labeled_data = labeled_data[0:5]
-
-        test_labels = whole_data[6]
-        whole_data = whole_data[1:6]
-
-        unlabeled_data = np.expand_dims(data, axis=0)
-        unlabeled_data = np.expand_dims(data, axis=0)
-        labeled_data = np.expand_dims(data, axis=0)
-        labeled_data = np.expand_dims(data, axis=0)
         if self._is_train_dataset():
-            return labeled_data, unlabeled_data, labels
-        return whole_data, test_labels
+            return data, data, labels
+        return data, labels
 
 def get_loader(batch_size):
     num_workers = 2
@@ -280,9 +270,6 @@ for epoch in range(num_epochs):
         labeled_data = _to_var(labeled_data).float()
         unlabeled_data = _to_var(unlabeled_data).float()
         labels = _to_var(labels).long().squeeze()
-        label_mask = _to_var(label_mask).float().squeeze()
-
-
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
