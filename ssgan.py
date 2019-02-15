@@ -267,7 +267,7 @@ for epoch in range(num_epochs):
         labeled_data, unlabeled_data, labels = data
         labeled_data = _to_var(labeled_data).float()
         unlabeled_data = _to_var(unlabeled_data).float()
-        labels = _to_var(labels).long().squeeze()
+        labels = _to_var(labels).long()
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
