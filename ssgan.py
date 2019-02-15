@@ -64,7 +64,7 @@ class DiabetesDataset(Dataset):
 
 
         data = np.expand_dims(data, axis=0)
-        data = np.expand_dims(data, axis=0)
+        data = np.expand_dims(data, axis=1)
 
         if self._is_train_dataset():
             return data, data, labels
