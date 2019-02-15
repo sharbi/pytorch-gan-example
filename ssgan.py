@@ -48,12 +48,6 @@ class DiabetesDataset(Dataset):
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.to_numpy()
 
-        self.labeled_dataset = self.diabetes_dataset[0:890, 1:]
-        self.unlabeled_dataset = self.diabetes_dataset[890:,1:6]
-
-
-
-
 
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
@@ -69,8 +63,8 @@ class DiabetesDataset(Dataset):
         data = data[1:6]
 
 
-        data = np.expand_dims(data, axis=1)
-        data = np.expand_dims(data, axis=1)
+        data = np.expand_dims(data, axis=0)
+        data = np.expand_dims(data, axis=0)
 
         if self._is_train_dataset():
             return data, data, labels
