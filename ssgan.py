@@ -366,7 +366,6 @@ for epoch in range(num_epochs):
             test_values = _to_var(test_values).float()
             test_labels = _to_var(test_labels).float()
             disc_test, _ = netD(test_values)
-            pred_class, _  = torch.max(disc_test, 1)
             correct_pred = torch.eq(torch.argmax(pred_class).float(), test_labels)
             accuracy = torch.mean(correct_pred.float())
 
