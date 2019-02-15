@@ -311,7 +311,7 @@ for epoch in range(num_epochs):
         loss_lab = d_gan_criterion(logits_lab, labels)
         loss_lab = torch.mean(loss_lab)
 
-        loss_unlabeled = - 0.5 * torch.mean(l_unl) \
+        loss_unl = - 0.5 * torch.mean(l_unl) \
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
                          + 0.5 * torch.mean(F.softplus(l_gen))
 
