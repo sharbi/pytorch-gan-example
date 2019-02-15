@@ -369,7 +369,7 @@ for epoch in range(num_epochs):
                 disc_test, _ = netD(test_values)
                 pred_class, _  = torch.max(disc_test, 1)
                 correct_pred = torch.equal(torch.argmax(pred_class).float(), test_labels)
-                accuracy = torch.mean(torch.cast(correct_pred, torch.float32))
+                accuracy = torch.mean(correct_pred)
 
     accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
     print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
