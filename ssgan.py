@@ -277,7 +277,7 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         generator_input = netG(noise_var)
 
-        pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal(0, 100)
+        pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
         pert_calc = pert_input.norm(p=2, dim=1, keepdim=True)
         pert_n = pert_input.div(pert_calc)
 
