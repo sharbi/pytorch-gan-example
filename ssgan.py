@@ -287,7 +287,7 @@ for epoch in range(num_epochs):
         manifold_regularisation_value = (gen_inp_pert - generator_input)
         manifold_regularisation_norm = F.normalize(manifold_regularisation_value)
 
-        gen_adv = noise_var + 20. * manifold_regularisation_norm
+        gen_adv = generator_input + 20. * manifold_regularisation_norm
 
 
 
