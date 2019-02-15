@@ -219,6 +219,8 @@ class Discriminator(nn.Module):
 
         out = self.main(inputs)
 
+        print(out.shape)
+
         features = self.features(out)
         features = features.squeeze()
 
