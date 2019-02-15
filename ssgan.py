@@ -303,9 +303,12 @@ for epoch in range(num_epochs):
         logits_gen, _ = netD(generator_input.detach())
         logits_gen_adv, _ = netD(gen_adv.detach())
 
+        print(logits_lab.size)
+        print(labels.size)
+
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
-        loss_lab = d_gan_criterion(labels, logits_lab)
+        loss_lab = d_gan_criterion(logits_lab, labels)
         loss_lab = torch.mean(loss_lab)
         loss_unlabeled = - 0.5 * torch.mean() \
                          + 0.5 * torch.mean(torch.nn.functional.softplus(l_unl)) \
