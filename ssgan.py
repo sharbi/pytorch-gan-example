@@ -368,8 +368,7 @@ for epoch in range(num_epochs):
                 test_labels = _to_var(test_labels).float()
                 disc_test, _ = netD(test_values)
                 pred_class, _  = torch.max(disc_test, 1)
-                correct_pred = torch.equal(torch.cast(torch.argmax(pred_class, 1),
-                    torch.int32), torch.cast(test_labels, torch.int32))
+                correct_pred = torch.equal(torch.argmax(pred_class, 1), test_labels)
                 accuracy = torch.mean(torch.cast(correct_pred, torch.float32))
 
     accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
