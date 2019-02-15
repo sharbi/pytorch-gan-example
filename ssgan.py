@@ -362,14 +362,13 @@ for epoch in range(num_epochs):
 
     with torch.no_grad():
         for i, data in enumerate(diabetes_loader_test):
-            for data in diabetes_loader_test:
-                test_values, test_labels = data
-                test_values = _to_var(test_values).float()
-                test_labels = _to_var(test_labels).float()
-                disc_test, _ = netD(test_values)
-                pred_class, _  = torch.max(disc_test, 1)
-                correct_pred = torch.eq(torch.max(pred_class).float(), test_labels)
-                accuracy = torch.mean(correct_pred.float())
+            test_values, test_labels = data
+            test_values = _to_var(test_values).float()
+            test_labels = _to_var(test_labels).float()
+            disc_test, _ = netD(test_values)
+            pred_class, _  = torch.max(disc_test, 1)
+            correct_pred = torch.eq(torch.max(pred_class).float(), test_labels)
+            accuracy = torch.mean(correct_pred.float())
 
     accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
     print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
