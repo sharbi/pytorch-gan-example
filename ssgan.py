@@ -305,7 +305,7 @@ for epoch in range(num_epochs):
 
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
-        loss_lab = d_gan_criterion(labels, logits_lab)
+        loss_lab = torch.sum( - labels * F.log_softmax(logits_lab, 1), -1)
         loss_lab = torch.mean(loss_lab)
         loss_unlabeled = - 0.5 * torch.mean() \
                          + 0.5 * torch.mean(torch.nn.functional.softplus(l_unl)) \
