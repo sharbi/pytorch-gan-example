@@ -345,7 +345,7 @@ for epoch in range(num_epochs):
         loss_g.backward()
         optimizerG.step()
 
-        epoch_accuracy = torch.eq())
+        #epoch_accuracy = torch.eq())
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
