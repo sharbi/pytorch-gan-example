@@ -9,6 +9,12 @@ num_classes = 2
 
 state = torch.load("best_model.pkl")
 
+
+def _to_var(x):
+    if ngpu > 0:
+        x = x.cuda()
+    return Variable(x)
+
 class Discriminator(nn.Module):
 
     def __init__(self, ngpu):
@@ -77,6 +83,8 @@ np.random.shuffle(test_dataset)
 
 test_labels = test_dataset[:, 6]
 test_dataset = test_dataset[:, 1:6]
+
+test_dataset = _to_var(test_dataset)
 
 classifier.load_state_dict(state['state_dict_disc'])
 
