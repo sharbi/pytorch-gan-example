@@ -265,10 +265,16 @@ best_epoch_number = 0
 
 for epoch in range(num_epochs):
 
+
+    schedulerD.step()
+    schedulerG.step()
+
     masked_correct = 0
     num_samples = 0
     # For each batch in the dataloader
     for i, data in enumerate(diabetes_loader_train):
+
+
         labeled_data, unlabeled_data, labels = data
         labeled_data = _to_var(labeled_data).float()
         unlabeled_data = _to_var(unlabeled_data).float()
