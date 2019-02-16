@@ -11,8 +11,7 @@ state = torch.load("best_model.pkl")
 
 
 def _to_var(x):
-    if ngpu > 0:
-        x = x.cuda()
+    x = x.cuda()
     return Variable(x)
 
 class Discriminator(nn.Module):
