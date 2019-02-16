@@ -3,6 +3,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+nc = 1
+ndf = 64
+num_classes = 2
+
 state = torch.load("best_model.pkl")
 
 class Discriminator(nn.Module):
