@@ -393,6 +393,7 @@ for epoch in range(num_epochs):
             'state_dict_disc': netD.state_dict(),
             'state_dict_gen': netG.state_dict(),
             'optimizerD': optimizerD.state_dict(),
-            'optimizerG': optimizerG.state_dict()
+            'optimizerG': optimizerG.state_dict(),
+            'accuracy': accuracy
         }
         torch.save(state, "best_model.pkl")
