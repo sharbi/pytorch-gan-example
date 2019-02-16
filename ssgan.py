@@ -257,6 +257,11 @@ fake_label = 0
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
+schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
+schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
+
+best_epoch_accuracy = 0
+best_epoch_number = 0
 
 for epoch in range(num_epochs):
 
@@ -373,3 +378,15 @@ for epoch in range(num_epochs):
             accuracy = torch.mean(correct_pred.float())
 
         print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
+
+    if accuracy > best_epoch_accuracy:
+        best_epoch_accuracy = accuracy
+        best_epoch_number = epoch
+        state = {
+            'epoch': epoch,
+            'state_dict_disc': netD.state_dict(),
+            'state_dict_gen': netG.state_dict(),
+            'optimizerD': optimizerD.state_dict(),
+            'optimizerG': optimizerG.state_dict()
+        }
+        torch.save(state, "best_model.pkl")
