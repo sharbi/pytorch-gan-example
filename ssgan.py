@@ -385,7 +385,7 @@ for epoch in range(num_epochs):
 
         print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
 
-    if accuracy > best_epoch_accuracy:
+    if accuracy > best_epoch_accuracy && accuracy != 1.:
         best_epoch_accuracy = accuracy
         best_epoch_number = epoch
         state = {
