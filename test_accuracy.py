@@ -6,12 +6,14 @@ import torch.nn as nn
 nc = 1
 ndf = 64
 num_classes = 2
+ngpu = 1
 
 state = torch.load("best_model.pkl")
 
 
 def _to_var(x):
-    x = x.cuda()
+    if ngpu > 0:
+        x = x.cuda()
     return Variable(x)
 
 class Discriminator(nn.Module):
