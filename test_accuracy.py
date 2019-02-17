@@ -85,6 +85,7 @@ np.random.shuffle(test_dataset)
 test_labels = test_dataset[:, 6]
 test_dataset = test_dataset[:, 1:6]
 
+test_dataset = Variable(test_dataset)
 
 classifier.load_state_dict(state['state_dict_disc'])
 
