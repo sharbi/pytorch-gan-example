@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.autograd import Variable
+
 
 nc = 1
 ndf = 64
