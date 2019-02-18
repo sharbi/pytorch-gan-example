@@ -77,7 +77,7 @@ class Discriminator(nn.Module):
 
 
 
-classifier = Discriminator(1)
+classifier = Discriminator(ngpu)
 
 test_dataset = pd.read_csv("../diabetes_data/normalised_diabetes_dataset.csv").to_numpy()
 test_dataset = test_dataset[:1780]
@@ -96,6 +96,8 @@ classifier.load_state_dict(state['state_dict_disc'])
 
 
 classifier.eval()
+
+classifier.train(False)
 
 test_logits, _ = classifier(test_dataset)
 pred_class = torch.argmax(test_logits, 1)
