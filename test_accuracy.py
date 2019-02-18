@@ -64,8 +64,12 @@ class Discriminator(nn.Module):
 
         out = self.main(inputs)
 
+        print(out.shape)
+
         features = self.features(out)
         features = features.squeeze()
+
+        print(features.shape)
 
         class_logits = self.class_logits(features)
 
@@ -87,10 +91,11 @@ np.random.shuffle(test_dataset)
 test_labels = test_dataset[:, 6]
 test_dataset = test_dataset[:, 1:6]
 
-print(test_dataset.shape)
 
 test_dataset = np.expand_dims(test_dataset, 0)
 test_dataset = np.expand_dims(test_dataset, 0)
+
+print(test_dataset.shape)
 
 test_dataset = torch.tensor(test_dataset).float()
 
