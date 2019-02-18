@@ -92,8 +92,8 @@ test_labels = test_dataset[:, 6]
 test_dataset = test_dataset[:, 1:6]
 
 
-test_dataset = np.expand_dims(test_dataset, 0)
-test_dataset = np.expand_dims(test_dataset, 0)
+test_dataset = np.expand_dims(test_dataset, 1)
+test_dataset = np.expand_dims(test_dataset, 1)
 
 print(test_dataset.shape)
 
