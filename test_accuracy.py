@@ -111,3 +111,5 @@ test_logits, _ = classifier(test_dataset)
 pred_class = torch.argmax(test_logits, 1)
 correct_pred = torch.eq(pred_class.float(), test_labels)
 accuracy = torch.mean(correct_pred.float())
+
+print(accuracy)
