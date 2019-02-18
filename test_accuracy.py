@@ -98,6 +98,7 @@ test_dataset = np.expand_dims(test_dataset, 1)
 print(test_dataset.shape)
 
 test_dataset = torch.tensor(test_dataset).float()
+test_labels = torch.tensor(test_labels).float()
 
 classifier.load_state_dict(state['state_dict_disc'])
 
