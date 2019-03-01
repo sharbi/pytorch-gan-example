@@ -3,6 +3,7 @@ from __future__ import print_function
 import argparse
 import os
 import random
+import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,6 +17,7 @@ import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
 
+
 import pickle as pkl
 
 manual_seed = 123
@@ -26,7 +28,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 100
+batch_size = 64
 image_size = 60
 num_classes = 2
 nc = 1
@@ -36,17 +38,19 @@ ndf = 64
 num_epochs = 5000
 lr = 0.0003
 beta = 0.5
-ngpu = 1
+ngpu = 0
 # Create dataset
 
 class DiabetesDataset(Dataset):
-    def __init__(self, root_dir, data_file, transform, split):
+    def __init__(self, root_dir, data_file, split):
         self.split = split
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
-        self.transform = transform
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
-        self.diabetes_dataset = self.diabetes_dataset.to_numpy()
+        self.diabetes_dataset = self.diabetes_dataset.values
+        self.label_mask = self._create_label_mask()
+
+
 
 
     def _is_train_dataset(self):
@@ -62,25 +66,29 @@ class DiabetesDataset(Dataset):
         labels = data[6]
         data = data[1:6]
 
+        data = np.expand_dims(data, axis=0)
+        data = np.expand_dims(data, axis=0)
 
-        data = np.expand_dims(data, axis=0)
-        data = np.expand_dims(data, axis=0)
 
         if self._is_train_dataset():
-            return data, data, labels
+            return data, data, labels, self.label_mask[idx]
         return data, labels
+
+    def _create_label_mask(self):
+        if self._is_train_dataset():
+            label_mask = np.zeros(len(self.diabetes_dataset))
+            label_mask[0:1000] = 1
+            np.random.shuffle(label_mask)
+            label_mask = torch.LongTensor(label_mask)
+            return label_mask
+        return None
+
 
 def get_loader(batch_size):
     num_workers = 2
 
-    normalize = transforms.Normalize(
-        mean=[0.5, 0.5],
-        std=[0.5, 0.5])
-    transform = transforms.Compose([
-        transforms.ToTensor()])
-
-    diabetes_train = DiabetesDataset('../diabetes_data/', 'normalised_diabetes_dataset.csv', transform=transform, split='train')
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_diabetes_dataset.csv', transform=transform, split='test')
+    diabetes_train = DiabetesDataset('../diabetes_data/', 'normalised_train_dataset.csv', split='train')
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_test_dataset.csv', split='test')
 
     diabetes_loader_train = DataLoader(
         dataset=diabetes_train,
@@ -100,7 +108,7 @@ def get_loader(batch_size):
 
 diabetes_loader_train, diabetes_loader_test = get_loader(batch_size=batch_size)
 patient_iter = iter(diabetes_loader_train)
-patient, _, _ = patient_iter.next()
+patient, _, _, _ = patient_iter.next()
 
 test_iter = iter(diabetes_loader_test)
 test_patient, _ = test_iter.next()
@@ -122,6 +130,13 @@ def _to_var(x):
     if ngpu > 0:
         x = x.cuda()
     return Variable(x)
+
+def _one_hot(x):
+        label_numpy = x.data.cpu().numpy()
+        label_onehot = np.zeros((label_numpy.shape[0], num_classes))
+        label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
+        label_onehot = _to_var(torch.FloatTensor(label_onehot))
+        return label_onehot
 
 
 class Generator(nn.Module):
@@ -235,14 +250,12 @@ netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
 print(netG)
 
-
 netD = Discriminator(ngpu).to(device)
 netD.apply(weights_init)
 print(netD)
 
-
 d_unsupervised_criterion = nn.BCEWithLogitsLoss()
-d_gan_criterion = nn.CrossEntropyLoss()
+d_gan_criterion = nn.BCEWithLogitsLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
@@ -260,7 +273,8 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
 schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
 
-best_epoch_accuracy = 0
+best_disc_loss = 1
+best_gen_loss = 1
 best_epoch_number = 0
 
 for epoch in range(num_epochs):
@@ -275,10 +289,12 @@ for epoch in range(num_epochs):
     for i, data in enumerate(diabetes_loader_train):
 
 
-        labeled_data, unlabeled_data, labels = data
+        labeled_data, unlabeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
         unlabeled_data = _to_var(unlabeled_data).float()
         labels = _to_var(labels).long().squeeze()
+        label_mask = _to_var(label_mask).float().squeeze()
+
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
@@ -316,8 +332,13 @@ for epoch in range(num_epochs):
 
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
-        loss_lab = d_gan_criterion(logits_lab, labels)
-        loss_lab = torch.mean(loss_lab)
+
+        one_hot_labels = _one_hot(labels)
+
+        loss_lab = d_gan_criterion(logits_lab, one_hot_labels)
+        loss_lab = loss_lab.squeeze()
+        delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
+        loss_lab = torch.sum(label_mask * loss_lab) / delim
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
@@ -356,44 +377,65 @@ for epoch in range(num_epochs):
         loss_g.backward()
         optimizerG.step()
 
-        #epoch_accuracy = torch.eq())
+
+        _, pred_class = torch.max(logits_lab, 1)
+        eq = torch.eq(labels, pred_class)
+        masked_correct += torch.sum(label_mask * eq.float())
+        # correct = torch.sum(eq.float())
+        # masked_correct += correct
+        num_samples += torch.sum(label_mask)
+        # num_samples += numpy_labels.shape[0]
 
         if i % 200 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         loss_unl.data[0], loss_lab.data[0],
-                         loss_g.data[0], i + 1,
+                         loss_unl.item(), loss_lab.item(),
+                         loss_g.item(), i + 1,
                          len(diabetes_loader_train)))
-            real_cpu, _, _ = data
-            vutils.save_image(real_cpu,
-                    './.gitignore/output/SS_GAN_TEST/real_samples.png',
-                    normalize=True)
+            real_cpu, _, _, _ = data
+            #vutils.save_image(real_cpu,
+            #        './.gitignore/output/SS_GAN_TEST/real_samples.png',
+            #        normalize=True)
             fake = netG(fixed_noise)
-            vutils.save_image(fake.detach(),
-                    './.gitignore/output/SS_GAN_TEST/fake_samples_epoch_%03d.png' % epoch,
-                    normalize=True)
+            #vutils.save_image(fake.detach(),
+            #        './.gitignore/output/SS_GAN_TEST/fake_samples_epoch_%03d.png' % epoch,
+            #        normalize=True)
 
-    with torch.no_grad():
-        for i, data in enumerate(diabetes_loader_test):
-            test_values, test_labels = data
-            test_values = _to_var(test_values).float()
-            test_labels = _to_var(test_labels).float()
-            test_logits, _ = netD(test_values)
-            pred_class = torch.argmax(test_logits, 1)
-            correct_pred = torch.eq(pred_class.float(), test_labels)
-            accuracy = torch.mean(correct_pred.float())
+            train_accuracy = masked_correct.data.item()/max(1.0, num_samples.data.item())
+            print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, train_accuracy))
 
-        print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, accuracy))
 
-    if accuracy > best_epoch_accuracy and accuracy != 1.:
-        best_epoch_accuracy = accuracy
+    #with torch.no_grad():
+    #    for i, data in enumerate(diabetes_loader_test):
+    #        test_values, test_labels = data
+    #        test_values = _to_var(test_values).float()
+    #        test_labels = _to_var(test_labels).float()
+    #        test_logits, _ = netD(test_values)
+    #        pred_class = torch.argmax(test_logits, 1)
+    #        correct_pred = torch.eq(pred_class.float(), test_labels)
+    #        test_accuracy = torch.mean(correct_pred.float())
+
+    #        print(f'Testing:\tepoch {epoch}/{num_epochs}\taccuracy {test_accuracy}')
+
+
+
+    if loss_d < best_disc_loss:
+        best_disc_loss = loss_d
         best_epoch_number = epoch
         state = {
             'epoch': epoch,
             'state_dict_disc': netD.state_dict(),
-            'state_dict_gen': netG.state_dict(),
             'optimizerD': optimizerD.state_dict(),
-            'optimizerG': optimizerG.state_dict(),
-            'accuracy': accuracy
+            'loss': loss_d
         }
-        torch.save(state, "best_model.pkl")
+        torch.save(state, "best_disc_model.pkl")
+    if loss_g < best_gen_loss:
+        best_gen_loss = loss_g
+        best_epoch_number = epoch
+        state = {
+            'epoch': epoch,
+            'state_dict_disc': netG.state_dict(),
+            'optimizerD': optimizerG.state_dict(),
+            'loss': loss_g
+        }
+        torch.save(state, "best_gen_model.pkl")
