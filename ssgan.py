@@ -186,7 +186,18 @@ class _ganLogits(nn.Module):
 
         return gan_logits
 
+class NiN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(NiN, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.LeakyReLU(0.2)
+        self.fc2 = nn.Linear(hidden_size, output_size)
 
+    def forward(self, x):
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        return out
 
 class Discriminator(nn.Module):
 
@@ -218,9 +229,11 @@ class Discriminator(nn.Module):
             nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
+            NiN(ndf * 2, 10, ndf * 2),
+            NiN(ndf * 2, 10, ndf * 2),
         )
 
-        self.features = nn.AvgPool2d(kernel_size=2)
+        self.features = nn.MaxPool1d(6, strides=1)
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
