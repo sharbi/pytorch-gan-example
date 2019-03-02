@@ -376,7 +376,7 @@ for epoch in range(num_epochs):
                          loss_unl.item(), loss_lab.item(),
                          loss_g.item(), i + 1,
                          len(diabetes_loader_train)))
-            real_cpu, _, _, _ = data
+            real_cpu, _, _ = data
             #vutils.save_image(real_cpu,
             #        './.gitignore/output/SS_GAN_TEST/real_samples.png',
             #        normalize=True)
