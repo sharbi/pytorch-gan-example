@@ -429,9 +429,10 @@ for epoch in range(num_epochs):
 
     print(test_dataset.shape)
 
+    netD.train(False)
     test_dataset = torch.tensor(test_dataset).float()
     test_labels = torch.tensor(test_labels).float()
-    test_logits, _ = classifier(test_dataset)
+    test_logits, _ = detD(test_dataset)
     pred_class = torch.argmax(test_logits, 1)
     correct_pred = torch.eq(pred_class.float(), test_labels)
     test_accuracy = torch.mean(correct_pred.float())
