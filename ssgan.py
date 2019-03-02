@@ -367,7 +367,7 @@ for epoch in range(num_epochs):
 
 
         pred_class = torch.argmax(logits_lab, 1)
-        correct_pred = torch.eq(pred_class.float(), labels)
+        correct_pred = torch.eq(pred_class, labels)
         train_accuracy = torch.mean(correct_pred.float())
 
         if i % 50 == 0:
