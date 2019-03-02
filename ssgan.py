@@ -327,8 +327,6 @@ for epoch in range(num_epochs):
 
         loss_lab = d_gan_criterion(logits_lab, one_hot_labels)
         loss_lab = loss_lab.squeeze()
-        delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
-        loss_lab = torch.sum(label_mask * loss_lab) / delim
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
@@ -387,7 +385,6 @@ for epoch in range(num_epochs):
             #        './.gitignore/output/SS_GAN_TEST/fake_samples_epoch_%03d.png' % epoch,
             #        normalize=True)
 
-            train_accuracy = masked_correct.data.item()/max(1.0, num_samples.data.item())
             print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, train_accuracy))
 
 
