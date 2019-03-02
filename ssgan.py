@@ -233,7 +233,7 @@ class Discriminator(nn.Module):
             NiN(ndf * 2, 10, ndf * 2),
         )
 
-        self.features = nn.MaxPool1d(6, strides=1)
+        self.features = nn.MaxPool1d(6, stride=1)
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
