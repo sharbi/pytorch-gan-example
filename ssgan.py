@@ -189,9 +189,9 @@ class _ganLogits(nn.Module):
 class NiN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(NiN, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc1 = nn.Linear(input_size, 2)
         self.relu = nn.LeakyReLU(0.2)
-        self.fc2 = nn.Linear(hidden_size, output_size)
+        self.fc2 = nn.Linear(2, output_size)
 
     def forward(self, x):
         out = self.fc1(x)
