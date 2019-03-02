@@ -386,7 +386,7 @@ for epoch in range(num_epochs):
         num_samples += torch.sum(label_mask)
         # num_samples += numpy_labels.shape[0]
 
-        if i % 200 == 0:
+        if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
                          loss_unl.item(), loss_lab.item(),
