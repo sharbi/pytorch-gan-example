@@ -416,7 +416,7 @@ for epoch in range(num_epochs):
     #        test_accuracy = torch.mean(correct_pred.float())
 
     #        print(f'Testing:\tepoch {epoch}/{num_epochs}\taccuracy {test_accuracy}')
-    test_dataset = pd.read_csv("../ssgan/normalised_test_dataset.csv").values
+    test_dataset = pd.read_csv("../diabetes_data/normalised_test_dataset.csv").values
 
     np.random.shuffle(test_dataset)
 
