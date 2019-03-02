@@ -275,6 +275,7 @@ schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1
 
 best_disc_loss = 1
 best_gen_loss = 1
+best_accuracy = 0
 best_epoch_number = 0
 
 for epoch in range(num_epochs):
