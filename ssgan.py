@@ -186,19 +186,7 @@ class _ganLogits(nn.Module):
 
         return gan_logits
 
-class NiN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(NiN, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.relu = nn.LeakyReLU(0.2)
-        self.fc2 = nn.Linear(hidden_size, output_size)
 
-    def forward(self, x):
-        print(x.shape)
-        out = self.fc1(x)
-        out = self.relu(out)
-        out = self.fc2(out)
-        return out
 
 class Discriminator(nn.Module):
 
@@ -230,11 +218,9 @@ class Discriminator(nn.Module):
             nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            NiN(ndf * 2, 10, ndf * 2),
-            NiN(ndf * 2, 10, ndf * 2),
         )
 
-        self.features = nn.MaxPool1d(6, stride=1)
+        self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 2) * 1 * 1,
@@ -250,8 +236,6 @@ class Discriminator(nn.Module):
 
         features = self.features(out)
         features = features.squeeze()
-
-        print(features.shape)
 
         class_logits = self.class_logits(features)
 
@@ -432,17 +416,36 @@ for epoch in range(num_epochs):
     #        test_accuracy = torch.mean(correct_pred.float())
 
     #        print(f'Testing:\tepoch {epoch}/{num_epochs}\taccuracy {test_accuracy}')
+    test_dataset = pd.read_csv("../ssgan/normalised_test_dataset.csv").values
+
+    np.random.shuffle(test_dataset)
+
+    test_labels = test_dataset[:, 6]
+    test_dataset = test_dataset[:, 1:6]
 
 
+    test_dataset = np.expand_dims(test_dataset, 1)
+    test_dataset = np.expand_dims(test_dataset, 1)
 
-    if loss_d < best_disc_loss:
-        best_disc_loss = loss_d
+    print(test_dataset.shape)
+
+    test_dataset = torch.tensor(test_dataset).float()
+    test_labels = torch.tensor(test_labels).float()
+    test_logits, _ = classifier(test_dataset)
+    pred_class = torch.argmax(test_logits, 1)
+    correct_pred = torch.eq(pred_class.float(), test_labels)
+    test_accuracy = torch.mean(correct_pred.float())
+    print(f"Testing accuracy for epoch# {epoch} :{test_accuracy}")
+
+    if test_accuracy > best_accuracy:
+        best_accuracy = test_accuracy
         best_epoch_number = epoch
         state = {
             'epoch': epoch,
             'state_dict_disc': netD.state_dict(),
             'optimizerD': optimizerD.state_dict(),
-            'loss': loss_d
+            'loss': loss_d,
+            'accuracy': test_accuracy
         }
         torch.save(state, "best_disc_model.pkl")
     if loss_g < best_gen_loss:
