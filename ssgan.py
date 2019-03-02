@@ -48,7 +48,6 @@ class DiabetesDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.values
-        self.label_mask = self._create_label_mask()
 
 
 
@@ -71,17 +70,8 @@ class DiabetesDataset(Dataset):
 
 
         if self._is_train_dataset():
-            return data, data, labels, self.label_mask[idx]
+            return data, data, labels
         return data, labels
-
-    def _create_label_mask(self):
-        if self._is_train_dataset():
-            label_mask = np.zeros(len(self.diabetes_dataset))
-            label_mask[0:1000] = 1
-            np.random.shuffle(label_mask)
-            label_mask = torch.LongTensor(label_mask)
-            return label_mask
-        return None
 
 
 def get_loader(batch_size):
@@ -108,7 +98,7 @@ def get_loader(batch_size):
 
 diabetes_loader_train, diabetes_loader_test = get_loader(batch_size=batch_size)
 patient_iter = iter(diabetes_loader_train)
-patient, _, _, _ = patient_iter.next()
+patient, _, _ = patient_iter.next()
 
 test_iter = iter(diabetes_loader_test)
 test_patient, _ = test_iter.next()
@@ -290,11 +280,10 @@ for epoch in range(num_epochs):
     for i, data in enumerate(diabetes_loader_train):
 
 
-        labeled_data, unlabeled_data, labels, label_mask = data
+        labeled_data, unlabeled_data, labels = data
         labeled_data = _to_var(labeled_data).float()
         unlabeled_data = _to_var(unlabeled_data).float()
         labels = _to_var(labels).long().squeeze()
-        label_mask = _to_var(label_mask).float().squeeze()
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
@@ -379,13 +368,9 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        _, pred_class = torch.max(logits_lab, 1)
-        eq = torch.eq(labels, pred_class)
-        masked_correct += torch.sum(label_mask * eq.float())
-        # correct = torch.sum(eq.float())
-        # masked_correct += correct
-        num_samples += torch.sum(label_mask)
-        # num_samples += numpy_labels.shape[0]
+        pred_class = torch.argmax(logits_lab, 1)
+        correct_pred = torch.eq(pred_class.float(), labels)
+        train_accuracy = torch.mean(correct_pred.float())
 
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
