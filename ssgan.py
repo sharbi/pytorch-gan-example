@@ -208,7 +208,7 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
             nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
