@@ -139,14 +139,17 @@ class Generator(nn.Module):
             nn.ConvTranspose2d(nz, ngf * 4, 2, (1, 2), 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 4),
+            nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
             nn.ConvTranspose2d(ngf * 4, ngf * 2, 2, (1, 3), 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 2),
+            nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
             nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 2), 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf),
+            nn.Dropout(0.2),
             # state size. (ngf*4) x 8 x 8
             nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 1, (1, 1), 0, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
@@ -205,7 +208,11 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 1, padding=0, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
         )
@@ -213,7 +220,7 @@ class Discriminator(nn.Module):
         self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
-            in_features=(ndf * 2) * 1 * 1,
+            in_features=(ndf * 4) * 1 * 1,
             out_features=num_classes)
 
         #self.gan_logits = _ganLogits()
