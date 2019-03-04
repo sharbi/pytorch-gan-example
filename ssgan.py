@@ -330,7 +330,6 @@ for epoch in range(num_epochs):
         logits_lab, _ = netD(labeled_data)
         logits_unl, layer_real = netD(unlabeled_data)
 
-        print(generator_input.shape)
         logits_gen, _ = netD(generator_input.detach())
         logits_gen_adv, _ = netD(gen_adv.detach())
 
