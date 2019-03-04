@@ -135,8 +135,12 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
+
+            nn.Conv2d(nz, ngf * 8, 3, 1, bias=False),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
             # Input is Z, going into convolution
-            nn.ConvTranspose2d(nz, ngf * 8, 2, (1, 2), 0, bias=False),
+            nn.ConvTranspose2d(ngf*8, ngf * 8, 2, (1, 2), 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 8),
             nn.Dropout(0.2),
