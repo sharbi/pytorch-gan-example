@@ -201,7 +201,7 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.Conv2d(ndf, ndf *2, 3, padding=1, stride=2, bias=False),
+            nn.Conv2d(ndf, ndf *2, 3, padding=1, stride=1, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
