@@ -269,8 +269,8 @@ real_label = 1
 fake_label = 0
 
 
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
-optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
+optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=.2)
+optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=.2)
 
 schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
 schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
