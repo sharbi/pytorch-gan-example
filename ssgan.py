@@ -210,14 +210,13 @@ class Discriminator(nn.Module):
             nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.Conv2d(ndf*2, ndf*2, (1,3), padding=1, bias=False),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
             nn.Conv2d(ndf*2, ndf*2, 3, padding=1, stride=2, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False),
+            nn.Conv2d(ndf*2, ndf*4, 3, padding=0, bias=False),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5)
         )
 
         self.features = nn.AvgPool2d(kernel_size=2)
