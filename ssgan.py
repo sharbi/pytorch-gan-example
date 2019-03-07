@@ -200,8 +200,21 @@ class Discriminator(nn.Module):
             nn.Conv2d(nc, ndf, 3, padding=1, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
+            nn.Conv2d(ndf, ndf, 3, padding=1, bias=False),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
+            nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
+            # (ndf) x 30 x 2
+            nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
+            nn.Conv2d(ndf*2, ndf*2, (1, 3), padding=1, stride=2, bias=False),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.Conv2d(ndf, ndf*2, 1, padding=0, bias=False),
+            nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5)
         )
@@ -209,8 +222,8 @@ class Discriminator(nn.Module):
         self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
-            in_features=(ndf * 2) * 1 * 1,
-            out_features=num_classes + 1)
+            in_features=(ndf * 4) * 1 * 1,
+            out_features=num_classes)
 
         #self.gan_logits = _ganLogits()
 
