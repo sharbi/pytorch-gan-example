@@ -197,7 +197,7 @@ class Discriminator(nn.Module):
             nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            nn.Conv2d(nc, ndf, 3, padding=1, stride=1, bias=False),
+            nn.Conv2d(nc, ndf, 3, padding=1, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
