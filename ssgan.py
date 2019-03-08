@@ -123,7 +123,7 @@ def _to_var(x):
 
 def _one_hot(x):
         label_numpy = x.data.cpu().numpy()
-        label_onehot = np.zeros((label_numpy.shape[0], num_classes))
+        label_onehot = np.zeros((label_numpy.shape[0], num_classes + 1))
         label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
         label_onehot = _to_var(torch.FloatTensor(label_onehot))
         return label_onehot
