@@ -229,7 +229,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        #self.softmax = nn.LogSoftmax(dim=0)
+        self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
 
@@ -242,9 +242,9 @@ class Discriminator(nn.Module):
 
         #gan_logits = self.gan_logits(class_logits)
 
-        #out = self.softmax(class_logits)
+        out = self.softmax(class_logits)
 
-        return class_logits, features
+        return class_logits, features, out
 
 
 netG = Generator(ngpu).to(device)
@@ -326,11 +326,13 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        logits_lab, _ = netD(labeled_data)
-        logits_unl, layer_real = netD(unlabeled_data)
+        logits_lab, real_features, real_prob = netD(labeled_data)
+        #logits_unl, layer_real = netD(unlabeled_data)
 
-        logits_gen, _ = netD(generator_input.detach())
-        logits_gen_adv, _ = netD(gen_adv.detach())
+        epsilon = 1e-8
+
+        logits_gen, fake_features, fake_prob = netD(generator_input.detach())
+        logits_gen_adv, fake_adv_features, fake_adv_prob = netD(gen_adv.detach())
 
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
@@ -340,9 +342,17 @@ for epoch in range(num_epochs):
         loss_lab = d_gan_criterion(logits_lab, one_hot_labels)
         loss_lab = loss_lab.squeeze()
 
-        loss_unl = - 0.5 * torch.mean(l_unl) \
-                         + 0.5 * torch.mean(F.softplus(l_unl)) \
-                         + 0.5 * torch.mean(F.softplus(l_gen))
+        #loss_unl = - 0.5 * torch.mean(l_unl) \
+        #                 + 0.5 * torch.mean(F.softplus(l_unl)) \
+        #                 + 0.5 * torch.mean(F.softplus(l_gen))
+
+        probs_real_is_real = 1 - real_prob[:, -1] + epsilon
+        tmp_log = torch.log(probs_real_is_real)
+        loss_unsupervised_1 = -1 * torch.mean(tmp_log)
+
+        probs_fake_is_fake = fake_features[:, -1] + epsilon
+        tmp_log = torch.log(probs_fake_is_fake)
+        loss_unsupervised_2 = -1 * torch.mean(tmp_log)
 
 
         manifold_diff = logits_gen - logits_gen_adv
@@ -364,15 +374,20 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, layer_fake = netD(generator_input)
+        _, fake_features, fake_prob = netD(generator_input)
 
 
-        m1 = torch.mean(layer_real, dim=0).squeeze()
-        m2 = torch.mean(layer_fake, dim=0).squeeze()
 
+        m1 = torch.mean(real_features, dim=0).squeeze()
+        m2 = torch.mean(fake_features, dim=0).squeeze()
 
-        loss_g = torch.mean(torch.abs(m1 - m2))
+        probs_fake_is_real = 1 - fake_prob[:, -1] + epsilon
+        tmp_log = torch.log(probs_fake_is_real)
+        loss_g_1 = -1 * torch.mean(tmp_log)
 
+        loss_g_2 = torch.mean(torch.abs(m1 - m2))
+
+        loss_g = loss_g_1 + loss_g_2
 
         loss_g.backward()
         optimizerG.step()
