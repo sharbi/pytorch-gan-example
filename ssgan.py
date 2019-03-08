@@ -66,7 +66,6 @@ class DiabetesDataset(Dataset):
         data = data[1:6]
 
         data = np.expand_dims(data, axis=0)
-        data = np.expand_dims(data, axis=0)
 
 
         if self._is_train_dataset():
