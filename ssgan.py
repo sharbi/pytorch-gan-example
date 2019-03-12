@@ -33,8 +33,8 @@ image_size = 60
 num_classes = 2
 nc = 1
 nz = 100
-ngf = 32
-ndf = 32
+ngf = 64
+ndf = 64
 num_epochs = 5000
 lr = 0.0003
 beta = 0.5
@@ -48,6 +48,9 @@ class DiabetesDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.values
+
+
+
 
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
@@ -120,7 +123,7 @@ def _to_var(x):
 
 def _one_hot(x):
         label_numpy = x.data.cpu().numpy()
-        label_onehot = np.zeros((label_numpy.shape[0], num_classes + 1))
+        label_onehot = np.zeros((label_numpy.shape[0], num_classes))
         label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
         label_onehot = _to_var(torch.FloatTensor(label_onehot))
         return label_onehot
@@ -191,42 +194,44 @@ class Discriminator(nn.Module):
 
         self.main = nn.Sequential(
 
-            nn.Dropout(0.5),
+            nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            nn.utils.weight_norm(nn.Conv2d(nc, ndf, 3, padding=1, bias=False)),
+            nn.Conv2d(nc, ndf, 3, padding=1, bias=False),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, bias=False)),
+            nn.Conv2d(ndf, ndf, 3, padding=1, bias=False),
             nn.BatchNorm2d(ndf),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False)),
+            nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False),
             nn.BatchNorm2d(ndf),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False)),
-            nn.BatchNorm2d(ndf*2),
+            nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False),
+            nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 3), padding=1, stride=2, bias=False)),
+            nn.Conv2d(ndf*2, ndf*2, (1, 3), padding=1, stride=2, bias=False),
+            nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False)),
+            nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False),
             nn.LeakyReLU(0.2),
+            nn.Dropout(0.5)
         )
 
         self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 4) * 1 * 1,
-            out_features=num_classes + 1)
+            out_features=num_classes)
 
         #self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax(dim=0)
+        #self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
 
@@ -239,9 +244,9 @@ class Discriminator(nn.Module):
 
         #gan_logits = self.gan_logits(class_logits)
 
-        out = self.softmax(class_logits)
+        #out = self.softmax(class_logits)
 
-        return class_logits, features, out
+        return class_logits, features
 
 
 netG = Generator(ngpu).to(device)
@@ -265,8 +270,8 @@ real_label = 1
 fake_label = 0
 
 
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=0.3)
-optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=0.3)
+optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=1)
+optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=1)
 
 schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
 schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
@@ -323,15 +328,13 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        logits_lab, real_features, real_prob = netD(labeled_data)
-        #logits_unl, layer_real = netD(unlabeled_data)
+        logits_lab, _ = netD(labeled_data)
+        logits_unl, layer_real = netD(unlabeled_data)
 
-        epsilon = 1e-8
+        logits_gen, _ = netD(generator_input.detach())
+        logits_gen_adv, _ = netD(gen_adv.detach())
 
-        logits_gen, fake_features, fake_prob = netD(generator_input.detach())
-        logits_gen_adv, fake_adv_features, fake_adv_prob = netD(gen_adv.detach())
-
-        l_unl = torch.logsumexp(logits_lab, 1)
+        l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
         one_hot_labels = _one_hot(labels)
@@ -339,19 +342,9 @@ for epoch in range(num_epochs):
         loss_lab = d_gan_criterion(logits_lab, one_hot_labels)
         loss_lab = loss_lab.squeeze()
 
-        #loss_unl = - 0.5 * torch.mean(l_unl) \
-        #                 + 0.5 * torch.mean(F.softplus(l_unl)) \
-        #                 + 0.5 * torch.mean(F.softplus(l_gen))
-
-        probs_real_is_real = 1 - real_prob[:, -1] + epsilon
-        tmp_log = torch.log(probs_real_is_real)
-        loss_unsupervised_1 = -1 * torch.mean(tmp_log)
-
-        probs_fake_is_fake = fake_features[:, -1] + epsilon
-        tmp_log = torch.log(probs_fake_is_fake)
-        loss_unsupervised_2 = -1 * torch.mean(tmp_log)
-
-        total_unsupervised_loss = loss_unsupervised_1 + loss_unsupervised_2
+        loss_unl = - 0.5 * torch.mean(l_unl) \
+                         + 0.5 * torch.mean(F.softplus(l_unl)) \
+                         + 0.5 * torch.mean(F.softplus(l_gen))
 
 
         manifold_diff = logits_gen - logits_gen_adv
@@ -360,7 +353,7 @@ for epoch in range(num_epochs):
 
         j_loss = torch.mean(manifold)
 
-        loss_d = total_unsupervised_loss + loss_unsupervised_2 + loss_lab + (0.001 * j_loss)
+        loss_d = loss_unl + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
@@ -373,20 +366,15 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, fake_features, fake_prob = netD(generator_input)
+        _, layer_fake = netD(generator_input)
 
 
+        m1 = torch.mean(layer_real, dim=0).squeeze()
+        m2 = torch.mean(layer_fake, dim=0).squeeze()
 
-        m1 = torch.mean(real_features, dim=0).squeeze()
-        m2 = torch.mean(fake_features, dim=0).squeeze()
 
-        probs_fake_is_real = 1 - fake_prob[:, -1] + epsilon
-        tmp_log = torch.log(probs_fake_is_real)
-        loss_g_1 = -1 * torch.mean(tmp_log)
+        loss_g = torch.mean(torch.abs(m1 - m2))
 
-        loss_g_2 = torch.mean(torch.abs(m1 - m2))
-
-        loss_g = torch.abs(loss_g_1 + loss_g_2)
 
         loss_g.backward()
         optimizerG.step()
@@ -399,7 +387,7 @@ for epoch in range(num_epochs):
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         total_unsupervised_loss.item(), loss_lab.item(),
+                         loss_unl.item(), loss_lab.item(),
                          loss_g.item(), i + 1,
                          len(diabetes_loader_train)))
             real_cpu, _, _ = data
@@ -441,7 +429,7 @@ for epoch in range(num_epochs):
     netD.train(False)
     test_dataset = torch.tensor(test_dataset).float()
     test_labels = torch.tensor(test_labels).float()
-    test_logits, _, _ = netD(test_dataset)
+    test_logits, _ = netD(test_dataset)
     pred_class = torch.argmax(test_logits, 1)
     correct_pred = torch.eq(pred_class.float(), test_labels)
     test_accuracy = torch.mean(correct_pred.float())
