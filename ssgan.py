@@ -351,6 +351,8 @@ for epoch in range(num_epochs):
         tmp_log = torch.log(probs_fake_is_fake)
         loss_unsupervised_2 = -1 * torch.mean(tmp_log)
 
+        total_unsupervised_loss = loss_unsupervised_1 + loss_unsupervised_2
+
 
         manifold_diff = logits_gen - logits_gen_adv
 
@@ -358,7 +360,7 @@ for epoch in range(num_epochs):
 
         j_loss = torch.mean(manifold)
 
-        loss_d = loss_unsupervised_1 + loss_unsupervised_2 + loss_lab + (0.001 * j_loss)
+        loss_d = total_unsupervised_loss + loss_unsupervised_2 + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
@@ -397,7 +399,7 @@ for epoch in range(num_epochs):
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         loss_unl.item(), loss_lab.item(),
+                         total_unsupervised_loss.item(), loss_lab.item(),
                          loss_g.item(), i + 1,
                          len(diabetes_loader_train)))
             real_cpu, _, _ = data
