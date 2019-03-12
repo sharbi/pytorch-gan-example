@@ -331,7 +331,7 @@ for epoch in range(num_epochs):
         logits_gen, fake_features, fake_prob = netD(generator_input.detach())
         logits_gen_adv, fake_adv_features, fake_adv_prob = netD(gen_adv.detach())
 
-        l_unl = torch.logsumexp(logits_unl, 1)
+        l_unl = torch.logsumexp(logits_lab, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
         one_hot_labels = _one_hot(labels)
