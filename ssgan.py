@@ -386,7 +386,7 @@ for epoch in range(num_epochs):
 
         loss_g_2 = torch.mean(torch.abs(m1 - m2))
 
-        loss_g = loss_g_1 + loss_g_2
+        loss_g = torch.abs(loss_g_1 + loss_g_2)
 
         loss_g.backward()
         optimizerG.step()
