@@ -49,9 +49,6 @@ class DiabetesDataset(Dataset):
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.values
 
-
-
-
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
 
@@ -66,7 +63,7 @@ class DiabetesDataset(Dataset):
         data = data[1:6]
 
         data = np.expand_dims(data, axis=0)
-        data = np.expand_dims(data, axis=0)
+        #data = np.expand_dims(data, axis=0)
 
 
         if self._is_train_dataset():
@@ -194,7 +191,7 @@ class Discriminator(nn.Module):
 
         self.main = nn.Sequential(
 
-            nn.Dropout(0.2),
+            nn.Dropout(0.5),
 
             # input is (number_channels) x 60 x 4
             nn.Conv2d(nc, ndf, 3, padding=1, bias=False),
