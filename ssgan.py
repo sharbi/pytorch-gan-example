@@ -194,27 +194,27 @@ class Discriminator(nn.Module):
             nn.Dropout(0.5),
 
             # input is (number_channels) x 60 x 4
-            nn.Conv2d(nc, ndf, 3, padding=1, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(nc, ndf, 3, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.Conv2d(ndf, ndf, 3, padding=1, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, bias=False)),
             nn.BatchNorm2d(ndf),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False)),
             nn.BatchNorm2d(ndf),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False)),
             nn.BatchNorm2d(ndf*2),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.Conv2d(ndf*2, ndf*2, (1, 3), padding=1, stride=2, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 3), padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
         )
 
@@ -265,8 +265,8 @@ real_label = 1
 fake_label = 0
 
 
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=1)
-optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=1)
+optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=0.3)
+optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=0.3)
 
 schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
 schedulerG = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
