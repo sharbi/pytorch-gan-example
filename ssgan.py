@@ -439,21 +439,21 @@ for epoch in range(num_epochs):
     if test_accuracy > best_accuracy:
         best_accuracy = test_accuracy
         best_epoch_number = epoch
-        state = {
+        disc_state = {
             'epoch': epoch,
             'state_dict_disc': netD.state_dict(),
             'optimizerD': optimizerD.state_dict(),
             'loss': loss_d,
             'accuracy': test_accuracy
         }
-        torch.save(state, "best_disc_model.pkl")
+        torch.save(disc_state, "best_disc_model.pkl")
     if loss_g < best_gen_loss:
         best_gen_loss = loss_g
         best_epoch_number = epoch
-        state = {
+        gen_state = {
             'epoch': epoch,
-            'state_dict_disc': netG.state_dict(),
-            'optimizerD': optimizerG.state_dict(),
+            'state_dict_gen': netG.state_dict(),
+            'optimizerG': optimizerG.state_dict(),
             'loss': loss_g
         }
-        torch.save(state, "best_gen_model.pkl")
+        torch.save(gen_state, "best_gen_model.pkl")
