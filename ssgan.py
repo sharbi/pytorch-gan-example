@@ -374,7 +374,7 @@ for epoch in range(num_epochs):
         print(m2)
 
 
-        loss_g = torch.mean(torch.abs(m1 - m2))
+        loss_g = torch.mean(torch.pow((m1 - m2), 2))
 
 
         loss_g.backward()
