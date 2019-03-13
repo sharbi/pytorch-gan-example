@@ -258,7 +258,7 @@ netD.apply(weights_init)
 print(netD)
 
 d_unsupervised_criterion = nn.BCEWithLogitsLoss()
-d_gan_criterion = nn.BCEWithLogitsLoss()
+d_gan_criterion = nn.CrossEntropyLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
@@ -337,9 +337,9 @@ for epoch in range(num_epochs):
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
-        lab_final = torch.argmax(logits_lab)
+        print(logits_lab)
 
-        loss_lab = d_gan_criterion(lab_final, labels)
+        loss_lab = d_gan_criterion(logits_lab, labels)
         loss_lab = loss_lab.squeeze()
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
