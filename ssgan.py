@@ -273,6 +273,8 @@ for epoch in range(num_epochs):
         unlabeled_data = _to_var(unlabeled_data).float()
         labels = _to_var(labels).long().squeeze()
 
+        extended_labels = torch.concatenate(labels, torch.zeros(labels.data.shape[0], 1), axis=1)
+
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
@@ -310,23 +312,27 @@ for epoch in range(num_epochs):
         logits_gen, _, fake_fake = netD(generator_input.detach())
         logits_gen_adv, _, _ = netD(gen_adv.detach())
 
-        l_unl = torch.logsumexp(logits_unl, 1)
-        l_gen = torch.logsumexp(logits_gen, 1)
+        #l_unl = torch.logsumexp(logits_unl, 1)
+        #l_gen = torch.logsumexp(logits_gen, 1)
 
-        loss_lab = d_gan_criterion(logits_lab, labels)
+        loss_lab = d_gan_criterion(logits_lab, extended_labels)
         loss_lab = loss_lab.squeeze()
 
-        loss_unl = - 0.5 * torch.mean(l_unl) \
-                         + 0.5 * torch.mean(F.softplus(l_unl)) \
-                         + 0.5 * torch.mean(F.softplus(l_gen))
+        #loss_unl = - 0.5 * torch.mean(l_unl) \
+        #                 + 0.5 * torch.mean(F.softplus(l_unl)) \
+        #                 + 0.5 * torch.mean(F.softplus(l_gen))
 
+        epsilon = 1e-8
 
+        prob_real_be_real = 1 - real_real_1[:, -1] + epsilon
+        tmp_log = torch.log(prob_real_be_real)
+        unsupervised_loss_1 = -1 * torch.mean(tmp_log)
 
-        labeled_is_real = d_gan_criterion(real_real_1, reals)
-        unlabeled_is_real = d_gan_criterion(real_real_2, reals)
-        fake_is_fake = d_gan_criterion(fake_fake, fakes)
+        prob_fake_be_fake = 1 - fake_fake[:, -1] + epsilon
+        tmp_log = torch.log(prob_fake_be_fake)
+        unsupervised_loss_2 = -1 * torch.mean(tmp_log)
 
-        combined_is_real_loss = labeled_is_real + unlabeled_is_real
+        total_unsupervised_loss = unsupervised_loss_1 + unsupervised_loss_2
 
         manifold_diff = logits_gen - logits_gen_adv
 
@@ -334,7 +340,7 @@ for epoch in range(num_epochs):
 
         j_loss = torch.mean(manifold)
 
-        loss_d = combined_is_real_loss + loss_unl + loss_lab + (0.001 * j_loss)
+        loss_d = total_unsupervised_loss + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
