@@ -273,7 +273,7 @@ for epoch in range(num_epochs):
         unlabeled_data = _to_var(unlabeled_data).float()
         labels = _to_var(labels).long().squeeze()
 
-        extended_labels = torch.cat((labels, torch.zeros_like(labels.data.shape[0]).long()), 1)
+        extended_labels = torch.cat((labels, torch.zeros(labels.data.shape[0]).long()), 1)
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
