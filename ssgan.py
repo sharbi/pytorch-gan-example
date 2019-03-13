@@ -305,8 +305,6 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         generator_input = netG(noise_var)
 
-        print(generator_input)
-
         pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
         pert_n = F.normalize(pert_input)
 
