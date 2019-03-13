@@ -287,8 +287,8 @@ for epoch in range(num_epochs):
         noise_pert = _to_var(noise_pert)
         gen_inp_pert = netG(noise_pert)
 
-        reals = torch.ones(labels.data.shape[0]).float()
-        fakes = torch.zeros(labels.data.shape[0]).float()
+        reals = torch.ones(labels.data.shape[0]).long()
+        fakes = torch.zeros(labels.data.shape[0]).long()
 
         manifold_regularisation_value = (gen_inp_pert - generator_input)
         manifold_regularisation_norm = F.normalize(manifold_regularisation_value)
