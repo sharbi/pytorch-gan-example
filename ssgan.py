@@ -140,7 +140,7 @@ class Generator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
-            nn.utils.weight_norm(nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 3), 0, bias=False)),
+            nn.utils.weight_norm(nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 2), 0, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Dropout(0.2),
             # state size. (ngf*4) x 8 x 8
