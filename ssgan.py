@@ -367,8 +367,8 @@ for epoch in range(num_epochs):
         _, layer_fake = netD(generator_input)
 
 
-        m1 = torch.mean(layer_real, dim=0).squeeze()
-        m2 = torch.mean(layer_fake, dim=0).squeeze()
+        m1 = torch.mean(layer_real)
+        m2 = torch.mean(layer_fake)
 
         feature_difference = m1 - m2
 
