@@ -337,9 +337,9 @@ for epoch in range(num_epochs):
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
-        print(logits_lab)
+        max_val, max_index = torch.max(logits_lab)
 
-        loss_lab = d_gan_criterion(logits_lab, labels)
+        loss_lab = d_gan_criterion(max_index, labels)
         loss_lab = loss_lab.squeeze()
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
