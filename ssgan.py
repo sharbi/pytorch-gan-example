@@ -136,14 +136,12 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # Input is Z, going into convolution
-            nn.ConvTranspose2d(nz, ngf * 2, 2, (1, 3), 0, bias=False),
+            nn.utils.weight_norm(nn.ConvTranspose2d(nz, ngf * 2, 2, (1, 3), 0, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf * 2),
             nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 3), 0, bias=False),
+            nn.utils.weight_norm(nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 3), 0, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf),
             nn.Dropout(0.2),
             # state size. (ngf*4) x 8 x 8
             nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 1, (1, 1), 0, bias=False)),
@@ -187,20 +185,15 @@ class Discriminator(nn.Module):
             nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            nn.Conv2d(nc, ndf, 3, padding=1, bias=False),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-            nn.Conv2d(ndf, ndf, 3, padding=1, bias=False),
-            nn.BatchNorm2d(ndf),
+            nn.utils.weight_norm(nn.Conv2d(nc, ndf, 3, padding=1, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.Conv2d(ndf, ndf *2, (1, 3), padding=1, stride=2, bias=False),
-            nn.BatchNorm2d(ndf * 2),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf *2, (1, 3), padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5)
         )
