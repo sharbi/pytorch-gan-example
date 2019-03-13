@@ -370,6 +370,9 @@ for epoch in range(num_epochs):
         m1 = torch.mean(layer_real, dim=0).squeeze()
         m2 = torch.mean(layer_fake, dim=0).squeeze()
 
+        print(m1)
+        print(m2)
+
 
         loss_g = torch.mean(torch.abs(m1 - m2))
 
