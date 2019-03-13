@@ -221,7 +221,7 @@ class Discriminator(nn.Module):
 
         out = self.softmax(class_logits)
 
-        return class_logits, features out
+        return class_logits, features, out
 
 
 netG = Generator(ngpu).to(device)
