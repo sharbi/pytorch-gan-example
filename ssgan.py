@@ -28,7 +28,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 64
+batch_size = 256
 image_size = 60
 num_classes = 2
 nc = 1
@@ -337,9 +337,8 @@ for epoch in range(num_epochs):
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
-        one_hot_labels = _one_hot(labels)
 
-        loss_lab = d_gan_criterion(logits_lab, one_hot_labels)
+        loss_lab = d_gan_criterion(logits_lab, labels)
         loss_lab = loss_lab.squeeze()
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
@@ -431,6 +430,7 @@ for epoch in range(num_epochs):
     test_labels = torch.tensor(test_labels).float()
     test_logits, _ = netD(test_dataset)
     pred_class = torch.argmax(test_logits, 1)
+    print(pred_class)
     correct_pred = torch.eq(pred_class.float(), test_labels)
     test_accuracy = torch.mean(correct_pred.float())
     print(f"Testing accuracy for epoch# {epoch} :{test_accuracy}")
