@@ -206,7 +206,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        #self.softmax = nn.LogSoftmax(dim=0)
+        self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
 
@@ -219,9 +219,9 @@ class Discriminator(nn.Module):
 
         #gan_logits = self.gan_logits(class_logits)
 
-        #out = self.softmax(class_logits)
+        out = self.softmax(class_logits)
 
-        return class_logits, features
+        return class_logits, features out
 
 
 netG = Generator(ngpu).to(device)
@@ -287,7 +287,8 @@ for epoch in range(num_epochs):
         noise_pert = _to_var(noise_pert)
         gen_inp_pert = netG(noise_pert)
 
-
+        reals = torch.ones(labels.data.shape[0])
+        fakes = torch.zeros(labels.data.shape[0])
 
         manifold_regularisation_value = (gen_inp_pert - generator_input)
         manifold_regularisation_norm = F.normalize(manifold_regularisation_value)
@@ -303,11 +304,11 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        logits_lab, _ = netD(labeled_data)
-        logits_unl, layer_real = netD(unlabeled_data)
+        logits_lab, _, real_real_1 = netD(labeled_data)
+        logits_unl, layer_real, real_real_2 = netD(unlabeled_data)
 
-        logits_gen, _ = netD(generator_input.detach())
-        logits_gen_adv, _ = netD(gen_adv.detach())
+        logits_gen, _, fake_fake = netD(generator_input.detach())
+        logits_gen_adv, _, _ = netD(gen_adv.detach())
 
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
@@ -320,13 +321,20 @@ for epoch in range(num_epochs):
                          + 0.5 * torch.mean(F.softplus(l_gen))
 
 
+
+        labeled_is_real = d_gan_criterion(real_real_1, reals)
+        unlabeled_is_real = d_gan_criterion(real_real_2, reals)
+        fake_is_fake = d_gan_criterion(fake_fake, fakes)
+
+        combined_is_real_loss = labeled_is_real + unlabeled_is_real
+
         manifold_diff = logits_gen - logits_gen_adv
 
         manifold = torch.sum(torch.sqrt((manifold_diff ** 2) + 1e-8))
 
         j_loss = torch.mean(manifold)
 
-        loss_d = loss_unl + loss_lab + (0.001 * j_loss)
+        loss_d = combined_is_real_loss + loss_unl + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
@@ -339,7 +347,7 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, layer_fake = netD(generator_input)
+        _, layer_fake, fake_real = netD(generator_input)
 
 
         m1 = torch.mean(layer_real)
@@ -347,8 +355,11 @@ for epoch in range(num_epochs):
 
         feature_difference = m1 - m2
 
-        loss_g = torch.mean(torch.mul(feature_difference, feature_difference))
+        loss_g_1 = torch.mean(torch.mul(feature_difference, feature_difference))
 
+        loss_g_2 = d_gan_criterion(fake_real, reals)
+
+        loss_g = loss_g_1 + loss_g_2
 
         loss_g.backward()
         optimizerG.step()
