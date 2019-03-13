@@ -136,22 +136,12 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # Input is Z, going into convolution
-            nn.ConvTranspose2d(nz, ngf * 8, 2, (1, 2), 0, bias=False),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf * 8),
-            nn.Dropout(0.2),
-            # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 8, ngf * 4, 1, (1, 1), 0, bias=False),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf * 4),
-            nn.Dropout(0.2),
-
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 2, (1, 3), 1, bias=False),
+            nn.ConvTranspose2d(nz, ngf * 2, 2, (1, 3), 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 2),
             nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 2), 0, bias=False),
+            nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 3), 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf),
             nn.Dropout(0.2),
@@ -204,16 +194,8 @@ class Discriminator(nn.Module):
             nn.BatchNorm2d(ndf),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
-            nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False),
-            nn.BatchNorm2d(ndf),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
             # (ndf) x 30 x 2
             nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False),
-            nn.BatchNorm2d(ndf * 2),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-            nn.Conv2d(ndf*2, ndf*2, (1, 3), padding=1, stride=2, bias=False),
             nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
