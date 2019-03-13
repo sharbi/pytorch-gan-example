@@ -328,7 +328,7 @@ for epoch in range(num_epochs):
         tmp_log = torch.log(prob_real_be_real)
         unsupervised_loss_1 = -1 * torch.mean(tmp_log)
 
-        prob_fake_be_fake = 1 - fake_fake[:, -1] + epsilon
+        prob_fake_be_fake = fake_fake[:, -1] + epsilon
         tmp_log = torch.log(prob_fake_be_fake)
         unsupervised_loss_2 = -1 * torch.mean(tmp_log)
 
@@ -363,7 +363,10 @@ for epoch in range(num_epochs):
 
         loss_g_1 = torch.mean(torch.mul(feature_difference, feature_difference))
 
-        loss_g_2 = d_gan_criterion(fake_real, reals)
+
+        prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
+        tmp_log = torch.log(prob_fake_be_real)
+        loss_g_2 = -1 * torch.mean(tmp_log)
 
         loss_g = loss_g_1 + loss_g_2
 
