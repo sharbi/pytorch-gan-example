@@ -326,9 +326,13 @@ for epoch in range(num_epochs):
         tmp_log = torch.log(prob_real_be_real)
         unsupervised_loss_1 = -1 * torch.mean(tmp_log)
 
+        print(unsupervised_loss_1)
+
         prob_fake_be_fake = fake_fake[:, -1] + epsilon
         tmp_log = torch.log(prob_fake_be_fake)
         unsupervised_loss_2 = -1 * torch.mean(tmp_log)
+
+        print(unsupervised_loss_2)
 
         total_unsupervised_loss = unsupervised_loss_1 + unsupervised_loss_2
 
