@@ -80,9 +80,9 @@ class DiabetesDataset(Dataset):
 def get_loader(batch_size):
     num_workers = 2
 
-    labeled_data_train = DiabetesDataset('../diabetes_data/', 'labeled_train_dataset.csv', split='train')
-    unlabeled_data_train = DiabetesDataset('../diabetes_data/', 'unlabeled_train_dataset.csv', split='train')
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_test_dataset.csv', split='test')
+    labeled_data_train = DiabetesDataset('../diabetes_data/', 'labeled_train_dataset.csv', split='train', labeled=True)
+    unlabeled_data_train = DiabetesDataset('../diabetes_data/', 'unlabeled_train_dataset.csv', split='train', labeled=False)
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_test_dataset.csv', split='test', labeled=False)
 
     labeled_loader_train = DataLoader(
         dataset=labeled_data_train,
