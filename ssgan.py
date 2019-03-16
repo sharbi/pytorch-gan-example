@@ -310,27 +310,27 @@ for epoch in range(num_epochs):
         logits_gen, _, fake_fake = netD(generator_input.detach())
         logits_gen_adv, _, _ = netD(gen_adv.detach())
 
-        #l_unl = torch.logsumexp(logits_unl, 1)
-        #l_gen = torch.logsumexp(logits_gen, 1)
+        l_unl = torch.logsumexp(logits_unl, 1)
+        l_gen = torch.logsumexp(logits_gen, 1)
 
         loss_lab = d_gan_criterion(logits_lab, extended_labels)
         loss_lab = loss_lab.squeeze()
 
-        #loss_unl = - 0.5 * torch.mean(l_unl) \
-        #                 + 0.5 * torch.mean(F.softplus(l_unl)) \
-        #                 + 0.5 * torch.mean(F.softplus(l_gen))
+        loss_unl = - 0.5 * torch.mean(l_unl) \
+                         + 0.5 * torch.mean(F.softplus(l_unl)) \
+                         + 0.5 * torch.mean(F.softplus(l_gen))
 
-        epsilon = 1e-8
+        #epsilon = 1e-8
 
-        prob_real_be_real = 1 - real_real_1[:, -1] + epsilon
-        tmp_log = torch.log(prob_real_be_real)
-        unsupervised_loss_1 = -1 * torch.mean(tmp_log)
+        #prob_real_be_real = 1 - real_real_1[:, -1] + epsilon
+        #tmp_log = torch.log(prob_real_be_real)
+        #unsupervised_loss_1 = -1 * torch.mean(tmp_log)
 
-        prob_fake_be_fake = fake_fake[:, -1] + epsilon
-        tmp_log = torch.log(prob_fake_be_fake)
-        unsupervised_loss_2 = -1 * torch.mean(tmp_log)
+        #prob_fake_be_fake = fake_fake[:, -1] + epsilon
+        #tmp_log = torch.log(prob_fake_be_fake)
+        #unsupervised_loss_2 = -1 * torch.mean(tmp_log)
 
-        total_unsupervised_loss = unsupervised_loss_1 + unsupervised_loss_2
+        #total_unsupervised_loss = unsupervised_loss_1 + unsupervised_loss_2
 
         manifold_diff = logits_gen - logits_gen_adv
 
@@ -338,7 +338,7 @@ for epoch in range(num_epochs):
 
         j_loss = torch.mean(manifold)
 
-        loss_d = total_unsupervised_loss + loss_lab + (0.001 * j_loss)
+        loss_d = loss_unl + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
@@ -359,14 +359,14 @@ for epoch in range(num_epochs):
 
         feature_difference = m1 - m2
 
-        loss_g_1 = torch.mean(torch.mul(feature_difference, feature_difference))
+        loss_g = torch.mean(torch.mul(feature_difference, feature_difference))
 
 
-        prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
-        tmp_log = torch.log(prob_fake_be_real)
-        loss_g_2 = -1 * torch.mean(tmp_log)
+        #prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
+        #tmp_log = torch.log(prob_fake_be_real)
+        #loss_g_2 = -1 * torch.mean(tmp_log)
 
-        loss_g = loss_g_1 + loss_g_2
+        #loss_g = loss_g_1 + loss_g_2
 
         loss_g.backward()
         optimizerG.step()
@@ -379,7 +379,7 @@ for epoch in range(num_epochs):
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         total_unsupervised_loss.item(), loss_lab.item(),
+                         loss_unl.item(), loss_lab.item(),
                          loss_g.item(), i + 1,
                          len(diabetes_loader_train)))
             real_cpu, _, _ = data
