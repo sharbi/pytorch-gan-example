@@ -359,6 +359,8 @@ for epoch in range(num_epochs):
 
         feature_difference = m1 - m2
 
+        print(feature_difference)
+
         loss_g = torch.mean(torch.mul(feature_difference, feature_difference))
 
 
