@@ -328,7 +328,7 @@ for epoch in range(num_epochs):
         gen_adv = generator_input + 20. * manifold_regularisation_norm
 
         mask = get_label_mask(labeled_rate, batch_size)
-        mask = _to_var(mask),float()
+        mask = _to_var(torch.FloatTensor(mask))
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
