@@ -51,8 +51,6 @@ class DiabetesDataset(Dataset):
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.values
 
-        if self.labeled:
-            self.labels = pd.read_csv('../diabetes_data/labels.csv')
 
 
     def _is_train_dataset(self):
@@ -65,9 +63,15 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         data = self.diabetes_dataset.__getitem__(idx)
 
+        labels = []
+
         if not self._is_train_dataset:
             labels = data[:, 6]
             data = data[:, 0:5]
+
+
+        if self.labeled:
+            self.labels = pd.read_csv('../diabetes_data/labels.csv')
 
         data = np.expand_dims(data, axis=0)
         data = np.expand_dims(data, axis=0)
