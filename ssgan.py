@@ -39,6 +39,7 @@ num_epochs = 5000
 lr = 0.0003
 beta = 0.5
 ngpu = 0
+labeled_rate = 0.1
 # Create dataset
 
 class DiabetesDataset(Dataset):
@@ -128,6 +129,12 @@ def _one_hot(x):
         label_onehot = _to_var(torch.FloatTensor(label_onehot))
         return label_onehot
 
+def get_label_mask(labeled_rate, batch_size):
+    label_mask = np.zeros([batch_size], dtype=np.float32)
+    label_count = np.int(batch_size * labeled_rate)
+    label_mask[range(label_count)] = 1.0
+    np.random.shuffle(label_mask)
+    return label_mask
 
 class Generator(nn.Module):
 
@@ -320,7 +327,7 @@ for epoch in range(num_epochs):
 
         gen_adv = generator_input + 20. * manifold_regularisation_norm
 
-
+        mask = get_label_mask(labeled_rate, batch_size)
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
@@ -338,7 +345,8 @@ for epoch in range(num_epochs):
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
-        loss_lab = torch.mean(d_gan_criterion(logits_lab, extended_labels))
+        loss_lab = d_gan_criterion(logits_lab, extended_labels)
+        loss_lab = torch.sum(mask * tmp) / torch.sum(mask)
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
