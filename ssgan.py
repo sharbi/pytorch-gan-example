@@ -308,8 +308,6 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         generator_input = netG(noise_var)
 
-        print(generator_input.shape)
-
         pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
         pert_n = F.normalize(pert_input)
 
@@ -383,11 +381,10 @@ for epoch in range(num_epochs):
         m1 = torch.mean(layer_real, dim=0).squeeze()
         m2 = torch.mean(layer_fake, dim=0).squeeze()
 
-        print(m1)
-        print(m2)
+        feature_difference = m1 - m2
 
 
-        loss_g = torch.mean(torch.abs(m1 - m2))
+        loss_g = torch.mean(torch.mul(feature_difference, feature_difference))
 
 
         #prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
