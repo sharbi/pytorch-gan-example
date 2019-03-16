@@ -381,10 +381,8 @@ for epoch in range(num_epochs):
         m1 = torch.mean(layer_real, dim=0).squeeze()
         m2 = torch.mean(layer_fake, dim=0).squeeze()
 
-        feature_difference = m1 - m2
 
-
-        loss_g = torch.mean(torch.mul(feature_difference, feature_difference))
+        loss_g = torch.mean(torch.abs(m1 - m2))
 
 
         #prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
