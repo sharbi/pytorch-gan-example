@@ -43,14 +43,15 @@ labeled_rate = 0.03
 # Create dataset
 
 class DiabetesDataset(Dataset):
-    def __init__(self, root_dir, data_file, split):
+    def __init__(self, root_dir, data_file, split, labeled):
         self.split = split
         self.root_dir = root_dir
         self.use_gpu = True if torch.cuda.is_available() else False
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.values
 
-
+        if self.labeled:
+            self.labels = pd.read_csv('diabetes_data/labels.csv')
 
 
     def _is_train_dataset(self):
@@ -63,15 +64,16 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         data = self.diabetes_dataset.__getitem__(idx)
 
-        labels = data[6]
-        data = data[1:6]
+        if not _is_train_dataset:
+            labels = data[:, 6]
+            data = data[:, 0:5]
 
         data = np.expand_dims(data, axis=0)
         data = np.expand_dims(data, axis=0)
 
 
-        if self._is_train_dataset():
-            return data, data, labels
+        if self.labeled():
+            return data, labels
         return data, labels
 
 
