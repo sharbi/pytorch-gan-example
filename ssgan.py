@@ -108,8 +108,8 @@ def get_loader(batch_size):
     return labeled_loader_train, unlabeled_loader_train, diabetes_loader_test
 
 labeled_loader_train, unlabeled_loader_train, diabetes_loader_test = get_loader(batch_size=batch_size)
-labeled_patient_iter = iter(labeled_data_train)
-unlabeled_patient_iter = iter(unlabeled_data_train)
+labeled_patient_iter = iter(labeled_loader_train)
+unlabeled_patient_iter = iter(unlabeled_loader_train)
 labeled_patient, _, _ = labeled_patient_iter.next()
 unlabeled_patient, _, _ = unlabeled_patient_iter.next()
 
