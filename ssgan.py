@@ -78,11 +78,18 @@ class DiabetesDataset(Dataset):
 def get_loader(batch_size):
     num_workers = 2
 
-    diabetes_train = DiabetesDataset('../diabetes_data/', 'normalised_train_dataset.csv', split='train')
+    labeled_data_train = DiabetesDataset('../diabetes_data/', 'labeled_train_dataset.csv', split='train')
+    unlabeled_data_train = DiabetesDataset('../diabetes_data/', 'unlabeled_train_dataset.csv', split='train')
     diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_test_dataset.csv', split='test')
 
-    diabetes_loader_train = DataLoader(
-        dataset=diabetes_train,
+    labeled_loader_train = DataLoader(
+        dataset=labeled_data_train,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers
+    )
+    unlabeled_loader_train = DataLoader(
+        dataset=unlabeled_data_train,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers
@@ -95,11 +102,13 @@ def get_loader(batch_size):
         num_workers=num_workers
     )
 
-    return diabetes_loader_train, diabetes_loader_test
+    return labeled_loader_train, unlabeled_loader_train, diabetes_loader_test
 
-diabetes_loader_train, diabetes_loader_test = get_loader(batch_size=batch_size)
-patient_iter = iter(diabetes_loader_train)
-patient, _, _ = patient_iter.next()
+labeled_loader_train, unlabeled_loader_train, diabetes_loader_test = get_loader(batch_size=batch_size)
+labeled_patient_iter = iter(labeled_data_train)
+unlabeled_patient_iter = iter(unlabeled_data_train)
+labeled_patient, _, _ = labeled_patient_iter.next()
+unlabeled_patient, _, _ = unlabeled_patient_iter.next()
 
 test_iter = iter(diabetes_loader_test)
 test_patient, _ = test_iter.next()
@@ -297,16 +306,19 @@ for epoch in range(num_epochs):
     masked_correct = 0
     num_samples = 0
     # For each batch in the dataloader
-    for i, data in enumerate(diabetes_loader_train):
 
-
-        labeled_data, unlabeled_data, labels = data
+    for i, data in enumerate(labeled_loader_train):
+        labeled_data, labels = data
         labeled_data = _to_var(labeled_data).float()
-        unlabeled_data = _to_var(unlabeled_data).float()
         labels = _to_var(labels).long().squeeze()
 
-        fakes = torch.zeros((0,0), dtype=torch.long)
-        extended_labels = torch.cat((labels, fakes))
+        logits_lab, _ = netD(labeled_data)
+        loss_lab = torch.mean(d_gan_criterion(logits_lab, extended_labels))
+
+
+    for i, data in enumerate(diabetes_unlabeled_train):
+
+        unlabeled_data = _to_var(unlabeled_data).float()
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
@@ -337,7 +349,6 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        logits_lab, _ = netD(labeled_data)
         logits_unl, layer_real = netD(unlabeled_data)
 
         logits_gen, _ = netD(generator_input.detach())
@@ -346,8 +357,6 @@ for epoch in range(num_epochs):
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
-        loss_lab = d_gan_criterion(logits_lab, extended_labels)
-        loss_lab = torch.sum(mask * loss_lab) / torch.sum(mask)
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
