@@ -206,7 +206,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax(dim=0)
+        #self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
 
@@ -219,9 +219,9 @@ class Discriminator(nn.Module):
 
         #gan_logits = self.gan_logits(class_logits)
 
-        out = self.softmax(class_logits)
+        #out = self.softmax(class_logits)
 
-        return class_logits, features, out
+        return class_logits, features
 
 
 netG = Generator(ngpu).to(device)
@@ -304,11 +304,11 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        logits_lab, _, real_real_1 = netD(labeled_data)
-        logits_unl, layer_real, real_real_2 = netD(unlabeled_data)
+        logits_lab, _ = netD(labeled_data)
+        logits_unl, layer_real = netD(unlabeled_data)
 
-        logits_gen, _, fake_fake = netD(generator_input.detach())
-        logits_gen_adv, _, _ = netD(gen_adv.detach())
+        logits_gen, _ = netD(generator_input.detach())
+        logits_gen_adv, _ = netD(gen_adv.detach())
 
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
@@ -351,7 +351,7 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, layer_fake, fake_real = netD(generator_input)
+        _, layer_fake = netD(generator_input)
 
 
         m1 = torch.mean(layer_real)
