@@ -353,8 +353,8 @@ for epoch in range(num_epochs):
         _, layer_fake = netD(generator_input)
 
 
-        m1 = torch.mean(layer_real, 0).squeeze()
-        m2 = torch.mean(layer_fake, 0).squeeze()
+        m1 = torch.mean(layer_real, 1).squeeze()
+        m2 = torch.mean(layer_fake, 1).squeeze()
 
         print(m1)
         print(m2)
