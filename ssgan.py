@@ -425,7 +425,6 @@ for epoch in range(num_epochs):
     test_labels = torch.tensor(test_labels).float()
     test_logits, _, _ = netD(test_dataset)
     pred_class = torch.argmax(test_logits, 1)
-    print(pred_class)
     correct_pred = torch.eq(pred_class.float(), test_labels)
     test_accuracy = torch.mean(correct_pred.float())
     print(f"Testing accuracy for epoch# {epoch} :{test_accuracy}")
