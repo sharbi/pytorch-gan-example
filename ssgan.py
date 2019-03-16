@@ -136,15 +136,27 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # Input is Z, going into convolution
-            nn.utils.weight_norm(nn.ConvTranspose2d(nz, ngf * 2, (1, 2), (1, 3), 0, bias=False)),
+            nn.ConvTranspose2d(nz, ngf * 8, 2, (1, 2), 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
+            nn.BatchNorm2d(ngf * 8),
             nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
-            nn.utils.weight_norm(nn.ConvTranspose2d(ngf * 2, ngf, (1, 2), (1, 3), 0, bias=False)),
+            nn.ConvTranspose2d(ngf * 8, ngf * 4, 1, (1, 1), 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
+            nn.BatchNorm2d(ngf * 4),
+            nn.Dropout(0.2),
+
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 2, (1, 3), 1, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.BatchNorm2d(ngf * 2),
+            nn.Dropout(0.2),
+            # state size. (ngf*8) x 4 x 4
+            nn.ConvTranspose2d(ngf * 2, ngf, 1, (1, 2), 0, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.BatchNorm2d(ngf),
             nn.Dropout(0.2),
             # state size. (ngf*4) x 8 x 8
-            nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 1, 1, 0, bias=False)),
+            nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 1, (1, 1), 0, bias=False)),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Tanh()
@@ -185,17 +197,30 @@ class Discriminator(nn.Module):
             nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            nn.Conv2d(nc, ndf, 3, padding=1, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(nc, ndf, 3, padding=1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.Conv2d(ndf, ndf *2, (1, 3), padding=1, stride=2, bias=False),
-            nn.BatchNorm2d(ndf*2),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf *2, 3, padding=1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, (1, 2), padding=1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 3, padding=1, stride=2, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False),
+            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 1, padding=0, bias=False)),
             nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
+
         )
 
         self.features = nn.AvgPool2d(kernel_size=2)
@@ -283,6 +308,8 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         generator_input = netG(noise_var)
 
+        print(generator_input.shape)
+
         pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
         pert_n = F.normalize(pert_input)
 
@@ -353,8 +380,8 @@ for epoch in range(num_epochs):
         _, layer_fake = netD(generator_input)
 
 
-        m1 = torch.mean(layer_real)
-        m2 = torch.mean(layer_fake)
+        m1 = torch.mean(layer_real, dim=0).squeeze()
+        m2 = torch.mean(layer_fake, dim=0).squeeze()
 
         print(m1)
         print(m2)
