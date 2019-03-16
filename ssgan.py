@@ -65,7 +65,7 @@ class DiabetesDataset(Dataset):
     def __getitem__(self, idx):
         data = self.diabetes_dataset.__getitem__(idx)
 
-        if not _is_train_dataset:
+        if not self._is_train_dataset:
             labels = data[:, 6]
             data = data[:, 0:5]
 
