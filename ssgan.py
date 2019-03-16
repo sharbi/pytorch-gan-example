@@ -313,8 +313,7 @@ for epoch in range(num_epochs):
         l_unl = torch.logsumexp(logits_unl, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
 
-        loss_lab = d_gan_criterion(logits_lab, extended_labels)
-        loss_lab = loss_lab.squeeze()
+        loss_lab = torch.mean(d_gan_criterion(logits_lab, extended_labels))
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
@@ -356,6 +355,9 @@ for epoch in range(num_epochs):
 
         m1 = torch.mean(layer_real, 0).squeeze()
         m2 = torch.mean(layer_fake, 0).squeeze()
+
+        print(m1)
+        print(m2)
 
 
         loss_g = torch.mean(torch.abs(m1 - m2))
