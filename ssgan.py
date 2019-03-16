@@ -73,9 +73,9 @@ class DiabetesDataset(Dataset):
         data = np.expand_dims(data, axis=0)
 
 
-        if self.labeled():
+        if self.labeled or self._is_train_dataset:
             return data, labels
-        return data, labels
+        else data, labels
 
 
 def get_loader(batch_size):
