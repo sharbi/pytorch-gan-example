@@ -354,14 +354,11 @@ for epoch in range(num_epochs):
         _, layer_fake = netD(generator_input)
 
 
-        m1 = torch.mean(layer_real, 0)
-        m2 = torch.mean(layer_fake, 0)
+        m1 = torch.mean(layer_real, 0).squeeze()
+        m2 = torch.mean(layer_fake, 0).squeeze()
 
-        feature_difference = m1 - m2
 
-        print(feature_difference)
-
-        loss_g = torch.mean(torch.mul(feature_difference, feature_difference))
+        loss_g = torch.mean(torch.abs(m1 - m2))
 
 
         #prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
