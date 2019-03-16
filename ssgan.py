@@ -346,7 +346,7 @@ for epoch in range(num_epochs):
         l_gen = torch.logsumexp(logits_gen, 1)
 
         loss_lab = d_gan_criterion(logits_lab, extended_labels)
-        loss_lab = torch.sum(mask * tmp) / torch.sum(mask)
+        loss_lab = torch.sum(mask * loss_lab) / torch.sum(mask)
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
