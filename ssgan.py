@@ -75,7 +75,7 @@ class DiabetesDataset(Dataset):
 
         if self.labeled or self._is_train_dataset:
             return data, labels
-        else: data, labels
+        else: data
 
 
 def get_loader(batch_size):
