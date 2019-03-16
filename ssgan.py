@@ -321,7 +321,7 @@ for epoch in range(num_epochs):
         labels = _to_var(labels).long().squeeze()
 
         logits_lab, _ = netD(labeled_data)
-        loss_lab = torch.mean(d_gan_criterion(logits_lab, extended_labels))
+        loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
 
 
     for i, data in enumerate(diabetes_unlabeled_train):
