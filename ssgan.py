@@ -132,7 +132,6 @@ def _one_hot(x):
 def get_label_mask(labeled_rate, batch_size):
     label_mask = np.zeros([batch_size], dtype=np.float32)
     label_count = np.int(batch_size * labeled_rate)
-    label_count = _to_var(torch.Tensor(label_count))
     label_mask[range(label_count)] = 1.0
     np.random.shuffle(label_mask)
     return label_mask
@@ -329,6 +328,7 @@ for epoch in range(num_epochs):
         gen_adv = generator_input + 20. * manifold_regularisation_norm
 
         mask = get_label_mask(labeled_rate, batch_size)
+        mask = _to_var(mask),float()
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
