@@ -52,7 +52,7 @@ class DiabetesDataset(Dataset):
         self.diabetes_dataset = self.diabetes_dataset.values
 
         if self.labeled:
-            self.labels = pd.read_csv('diabetes_data/labels.csv')
+            self.labels = pd.read_csv('../diabetes_data/labels.csv')
 
 
     def _is_train_dataset(self):
