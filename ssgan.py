@@ -43,9 +43,10 @@ labeled_rate = 0.03
 # Create dataset
 
 class DiabetesDataset(Dataset):
-    def __init__(self, root_dir, data_file, split, labels):
+    def __init__(self, root_dir, data_file, split, labeled):
         self.split = split
         self.root_dir = root_dir
+        self.labeled = labeled
         self.use_gpu = True if torch.cuda.is_available() else False
         self.diabetes_dataset = pd.read_csv(root_dir + data_file)
         self.diabetes_dataset = self.diabetes_dataset.values
@@ -80,9 +81,9 @@ class DiabetesDataset(Dataset):
 def get_loader(batch_size):
     num_workers = 2
 
-    labeled_data_train = DiabetesDataset('../diabetes_data/', 'labeled_train_dataset.csv', split='train', labels=True)
-    unlabeled_data_train = DiabetesDataset('../diabetes_data/', 'unlabeled_train_dataset.csv', split='train', labels=False)
-    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_test_dataset.csv', split='test', labels=False)
+    labeled_data_train = DiabetesDataset('../diabetes_data/', 'labeled_train_dataset.csv', split='train', labeled=True)
+    unlabeled_data_train = DiabetesDataset('../diabetes_data/', 'unlabeled_train_dataset.csv', split='train', labeled=False)
+    diabetes_test = DiabetesDataset('../diabetes_data/', 'normalised_test_dataset.csv', split='test', labeled=False)
 
     labeled_loader_train = DataLoader(
         dataset=labeled_data_train,
