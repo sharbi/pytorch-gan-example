@@ -39,7 +39,7 @@ num_epochs = 5000
 lr = 0.0003
 beta = 0.5
 ngpu = 0
-labeled_rate = 0.1
+labeled_rate = 0.03
 # Create dataset
 
 class DiabetesDataset(Dataset):
@@ -405,6 +405,7 @@ for epoch in range(num_epochs):
 
 
         pred_class = torch.argmax(logits_lab, 1)
+        print(pred_class)
         correct_pred = torch.eq(pred_class, labels)
         train_accuracy = torch.mean(correct_pred.float())
 
