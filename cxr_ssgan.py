@@ -83,8 +83,8 @@ class CXRDataset(Dataset):
 
 
         if self._is_train_dataset():
-            return data, labels, self.label_mask[idx]
-        else: data, labels
+            return image, labels, self.label_mask[idx]
+        else: image, labels
 
 
 def get_loader(batch_size):
