@@ -90,8 +90,8 @@ class CXRDataset(Dataset):
 def get_loader(batch_size):
     num_workers = 2
 
-    data_train = DiabetesDataset('../NIH_Images/', 'train_dataset/', split='train', transform=transform)
-    data_test = DiabetesDataset('../NIH_Images/', 'test_dataset', split='test', transform=transform)
+    data_train = CXRDataset('../NIH_Images/', 'train_dataset.csv', split='train', transform=transform)
+    data_test = CXRDataset('../NIH_Images/', 'test_dataset.csv', split='test', transform=transform)
 
     normalise = transforms.Normalize(
         mean=[0.5, 0.5, 0.5],
