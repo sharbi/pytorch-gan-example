@@ -79,8 +79,7 @@ class CXRDataset(Dataset):
         gender = self.labels.iloc[idx, 6]
         view_position = self.labels.iloc[idx, 7]
 
-
-
+        image = self.transform(image)
 
         if self._is_train_dataset():
             return image, labels, self.label_mask[idx]
