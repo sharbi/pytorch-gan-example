@@ -16,7 +16,7 @@ import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
-from skimage import io
+from PIL import Image
 
 import pickle as pkl
 
@@ -73,7 +73,7 @@ class CXRDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.labels.iloc[idx, 1])
-        image = io.imread(img_name)
+        image = Image.open(img_name)
         print(image.shape)
         labels = self.labels.iloc[idx, 2]
         age = self.labels.iloc[idx, 5]
