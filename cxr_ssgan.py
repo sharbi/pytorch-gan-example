@@ -16,7 +16,7 @@ import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
-import io
+from skimage import io
 
 import pickle as pkl
 
