@@ -74,7 +74,6 @@ class CXRDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.labels.iloc[idx, 1])
         image = Image.open(img_name)
-        print(image.shape)
         labels = self.labels.iloc[idx, 2]
         age = self.labels.iloc[idx, 5]
         gender = self.labels.iloc[idx, 6]
