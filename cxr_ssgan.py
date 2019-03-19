@@ -72,7 +72,7 @@ class CXRDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        img_name = os.path.join(self.root_dir, self.labels.iloc[idx, 0])
+        img_name = os.path.join(self.root_dir, str(self.labels.iloc[idx, 0]))
         image = io.imread(img_name)
         labels = self.labels.iloc[idx, 1]
         age = self.labels.iloc[idx, 4]
