@@ -124,11 +124,11 @@ def get_loader(batch_size):
 
 loader_train, loader_test = get_loader(batch_size=batch_size)
 image_iter = iter(loader_train)
-patient, _ = patient_iter.next()
+image, _ = image_iter.next()
 
 
-test_iter = iter(diabetes_loader_test)
-test_patient, _ = test_iter.next()
+test_iter = iter(loader_test)
+test_image, _ = test_iter.next()
 
 
 
