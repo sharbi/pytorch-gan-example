@@ -124,7 +124,7 @@ def get_loader(batch_size):
 
 loader_train, loader_test = get_loader(batch_size=batch_size)
 image_iter = iter(loader_train)
-image, _ = image_iter.next()
+image, _, _ = image_iter.next()
 
 
 test_iter = iter(loader_test)
