@@ -74,6 +74,7 @@ class CXRDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.labels.iloc[idx, 1])
         image = io.imread(img_name)
+        print(image.shape)
         labels = self.labels.iloc[idx, 2]
         age = self.labels.iloc[idx, 5]
         gender = self.labels.iloc[idx, 6]
@@ -95,7 +96,7 @@ def get_loader(batch_size):
     )
 
     transform = transforms.Compose([
-        transforms.Scale(image_size),
+        transforms.Rescale(image_size),
         transforms.ToTensor(),
         normalise
     ])
