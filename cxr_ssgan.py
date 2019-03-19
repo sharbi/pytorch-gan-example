@@ -73,6 +73,7 @@ class CXRDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.labels.iloc[idx, 1])
+        print(self.split)
         print(img_name)
         image = Image.open(img_name)
         labels = self.labels.iloc[idx, 2]
