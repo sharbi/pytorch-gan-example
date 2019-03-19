@@ -95,7 +95,7 @@ def get_loader(batch_size):
     )
 
     transform = transforms.Compose([
-        transforms.Resize(image_size),
+        transforms.Rescale(image_size),
         transforms.ToTensor(),
         normalise
     ])
