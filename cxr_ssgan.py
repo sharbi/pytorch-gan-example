@@ -232,7 +232,7 @@ class Discriminator(nn.Module):
             # input is (number_channels) x 60 x 4
             nn.utils.weight_norm(nn.Conv2d(nc, ndf, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, 2, 0, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, 1, 2, bias=False)),
             nn.LeakyReLU(0.2),
@@ -250,7 +250,7 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 3, 1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, padding=0, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, 1, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
