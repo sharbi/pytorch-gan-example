@@ -266,7 +266,7 @@ class Discriminator(nn.Module):
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 4) * 1 * 1,
-            out_features=num_classes - 1)
+            out_features=num_classes)
 
         #self.gan_logits = _ganLogits()
 
@@ -339,6 +339,8 @@ for epoch in range(num_epochs):
         labeled_data = _to_var(labeled_data).float()
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).long().squeeze()
+
+        print(labels.shape)
 
         logits_lab, _ = netD(labeled_data)
         loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
