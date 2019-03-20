@@ -72,7 +72,7 @@ class CXRDataset(Dataset):
         Creates a mask array to use only a limited number of labels during the training
         '''
         if self._is_train_dataset():
-            label_mask = np.zeros(len(self.labels))
+            label_mask = np.zeros(len(self.info))
             label_mask[0:1000] = 1
             np.random.shuffle(label_mask)
             label_mask = torch.LongTensor(label_mask)
