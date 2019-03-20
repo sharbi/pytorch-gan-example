@@ -88,8 +88,6 @@ class CXRDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
-        print(self.split)
-        print(img_name)
         image = Image.open(img_name)
         labels = self.one_hot_labels[idx]
 
@@ -100,7 +98,6 @@ class CXRDataset(Dataset):
 
         image = self.transform(image)
 
-        print(image)
 
         if self._is_train_dataset():
             return image, labels, self.label_mask[idx]
@@ -326,7 +323,7 @@ for epoch in range(num_epochs):
     num_samples = 0
     # For each batch in the dataloader
 
-    for i, data in enumerate(labeled_loader_train):
+    for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
         labels = torch.FloatTensor(labels)
@@ -334,9 +331,6 @@ for epoch in range(num_epochs):
 
         logits_lab, _ = netD(labeled_data)
         loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
-
-
-    for i, data in enumerate(diabetes_unlabeled_train):
 
         unlabeled_data = _to_var(unlabeled_data).float()
 
