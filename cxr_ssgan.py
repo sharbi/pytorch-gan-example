@@ -53,6 +53,9 @@ class CXRDataset(Dataset):
         self.info = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
 
+        self.one_hot = MultiLabelBinarizer()
+        self.one_hot_labels = one_hot.fit_transform(self.info.iloc[:, 2])
+
 
     def _create_label_mask(self):
         '''
@@ -76,11 +79,8 @@ class CXRDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
         image = Image.open(img_name)
-        labels = self.info.iloc[idx, 2]
-        if "|" in labels:
-            labels = labels.split("|")
-        else:
-            labels = [labels]
+        labels = self.labels[idx]
+        print(labels)
 
         age = self.info.iloc[idx, 5]
         gender = self.info.iloc[idx, 6]
@@ -331,8 +331,6 @@ for epoch in range(num_epochs):
 
 
 
-        one_hot = MultiLabelBinarizer()
-        one_hot_labels = one_hot.fit_transform(labels)
 
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).long().squeeze()
