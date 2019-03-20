@@ -40,7 +40,6 @@ num_epochs = 5000
 lr = 0.0003
 beta = 0.5
 ngpu = 1
-labeled_rate = 0.03
 
 
 # Create dataset
@@ -266,6 +265,8 @@ class Discriminator(nn.Module):
         #self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
+
+        print(inputs.shape)
 
         out = self.main(inputs)
 
