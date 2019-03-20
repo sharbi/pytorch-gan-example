@@ -347,7 +347,7 @@ for epoch in range(num_epochs):
 
 
         labels = torch.LongTensor(labels)
-        labels = _to_var(labels).long().squeeze()
+        labels = _to_var(labels).long()
 
         print(labels.shape)
 
