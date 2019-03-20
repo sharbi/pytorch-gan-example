@@ -58,14 +58,12 @@ class CXRDataset(Dataset):
 
 
     def _separate_labels(self, labels):
-        new_labels = [len(labels)]
-        print(len(new_labels))
-        print(len(labels))
+        new_labels = []
         for i, label in enumerate(labels):
             if "|" in label:
-                new_labels[i] = label.split('|')
+                new_labels.append(label.split('|'))
             else:
-                new_labels[i] = [label]
+                new_labels.append(label)
         return new_labels
 
     def _create_label_mask(self):
