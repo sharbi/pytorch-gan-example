@@ -29,7 +29,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 100
+batch_size = 512
 image_size = 256
 num_classes = 15
 nc = 1
@@ -328,6 +328,12 @@ for epoch in range(num_epochs):
     for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
+
+
+
+        one_hot = MultiLabelBinarizer()
+        one_hot_labels = one_hot.fit_transform(labels)
+
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).long().squeeze()
 
