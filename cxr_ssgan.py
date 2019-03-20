@@ -265,7 +265,7 @@ class Discriminator(nn.Module):
         self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
-            in_features=(ndf * 2) * 1 * 1,
+            in_features=(ndf * 4) * 1 * 1,
             out_features=num_classes)
 
         #self.gan_logits = _ganLogits()
