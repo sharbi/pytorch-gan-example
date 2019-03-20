@@ -61,9 +61,9 @@ class CXRDataset(Dataset):
         new_labels = []
         for i, label in enumerate(labels):
             if "|" in label:
-                new_labels.append(label.split('|'))
+                new_labels.append(tuple(label.split('|')))
             else:
-                new_labels.append(label)
+                new_labels.append(tuple(label))
         print(new_labels)
         return new_labels
 
