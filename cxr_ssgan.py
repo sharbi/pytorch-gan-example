@@ -57,7 +57,7 @@ class CXRDataset(Dataset):
         self.one_hot_labels = self.one_hot.fit_transform(self._separate_labels(self.info.iloc[:, 2]))
 
 
-    def _separate_labels(labels):
+    def _separate_labels(self, labels):
         for label in labels:
             if "|" in label:
                 return label.split('|')
