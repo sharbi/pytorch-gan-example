@@ -92,8 +92,6 @@ class CXRDataset(Dataset):
         image = Image.open(img_name)
         labels = self.one_hot_labels[idx]
 
-        print(labels.shape)
-
         age = self.info.iloc[idx, 5]
         gender = self.info.iloc[idx, 6]
         view_position = self.info.iloc[idx, 7]
