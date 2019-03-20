@@ -232,34 +232,33 @@ class Discriminator(nn.Module):
             # input is (number_channels) x 60 x 4
             nn.utils.weight_norm(nn.Conv2d(nc, ndf, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)),
-            nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 3, 1, 2, bias=False)),
-            nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 30 x 2
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf *2, 4, 2, 1, bias=False)),
-            nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 4, 2, 1, bias=False)),
-            nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 3, 1, 2, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
             # (ndf) x 15 x 1
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 3, 1, bias=False)),
-            nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 3, 1, bias=False)),
-            nn.LeakyReLU(0.2),
-            nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 1, 1, bias=False)),
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
+
+            nn.utils.weight_norm(nn.Conv2d(ndf, ndf*2, 3, 1, 1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
+
+            nn.utils.weight_norm(nn.Conv2d(ndf *2, ndf*2, 3, 1, 1, bias=False)),
+            nn.LeakyReLU(0.2),
+            nn.Dropout(0.5),
+
+            nn.utils.weight_norm(nn.Conv2d(ndf *2, ndf*2, 3, 1, 0, bias=False)),
+            nn.LeakyReLU(0.2),
 
         )
 
         self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
-            in_features=(ndf * 4) * 1 * 1,
+            in_features=(ndf * 2) * 1 * 1,
             out_features=num_classes)
 
         #self.gan_logits = _ganLogits()
