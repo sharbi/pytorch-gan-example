@@ -17,6 +17,7 @@ import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
 from PIL import Image
+from sklearn.preprocessing import MultiLabelBinarizer
 
 import pickle as pkl
 
@@ -40,6 +41,8 @@ lr = 0.0003
 beta = 0.5
 ngpu = 1
 labeled_rate = 0.03
+
+
 # Create dataset
 
 class CXRDataset(Dataset):
@@ -48,8 +51,20 @@ class CXRDataset(Dataset):
         self.root_dir = root_dir
         self.transform = transform
         self.use_gpu = True if torch.cuda.is_available() else False
-        self.labels = pd.read_csv(root_dir + data_file)
+        self.info = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
+        self.labels = self._extract_labels(self.info[iloc[:, 2]])
+        self.one_hot = MultiLabelBinarizer()
+        self.one_hot_labels = self.one_hot.fit_transform(self.labels)
+
+
+    def _extract_one_hot_labels(self, labels):
+        for label in labels:
+            if "|" in label:
+                new_labels = label.split("|")
+                return new_labels
+            else:
+                return [label]
 
 
     def _create_label_mask(self):
@@ -72,14 +87,16 @@ class CXRDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        img_name = os.path.join(self.root_dir, self.labels.iloc[idx, 1])
+        img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
         print(self.split)
         print(img_name)
         image = Image.open(img_name)
-        labels = self.labels.iloc[idx, 2]
-        age = self.labels.iloc[idx, 5]
-        gender = self.labels.iloc[idx, 6]
-        view_position = self.labels.iloc[idx, 7]
+        labels = self.one_hot_labels[idx]
+
+
+        age = self.info.iloc[idx, 5]
+        gender = self.info.iloc[idx, 6]
+        view_position = self.info.iloc[idx, 7]
 
         image = self.transform(image)
 
