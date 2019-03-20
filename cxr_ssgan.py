@@ -100,6 +100,8 @@ class CXRDataset(Dataset):
 
         image = self.transform(image)
 
+        print(image)
+
         if self._is_train_dataset():
             return image, labels, self.label_mask[idx]
         else: image, labels
