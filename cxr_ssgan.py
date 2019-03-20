@@ -344,9 +344,7 @@ for epoch in range(num_epochs):
 
 
         labels = torch.LongTensor(labels)
-        labels = _to_var(labels).long()
-
-        print(labels.shape)
+        labels = _to_var(labels).float()
 
         logits_lab, _ = netD(labeled_data)
         loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
