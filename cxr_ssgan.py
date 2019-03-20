@@ -326,7 +326,7 @@ for epoch in range(num_epochs):
     for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
-        labels = torch.FloatTensor(labels)
+        labels = torch.LongTensor(labels)
         labels = _to_var(labels).long().squeeze()
 
         logits_lab, _ = netD(labeled_data)
