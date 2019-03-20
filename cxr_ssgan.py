@@ -76,7 +76,7 @@ class CXRDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
         image = Image.open(img_name)
-        labels = self._extract_labels = self.info.iloc[idx, 2]
+        labels = self.info.iloc[idx, 2]
         if "|" in labels:
             labels = labels.split("|")
         else:
