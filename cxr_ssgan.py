@@ -54,8 +54,15 @@ class CXRDataset(Dataset):
         self.label_mask = self._create_label_mask()
 
         self.one_hot = MultiLabelBinarizer()
-        self.one_hot_labels = self.one_hot.fit_transform(self.info.iloc[:, 2])
+        self.one_hot_labels = self.one_hot.fit_transform(self._separate_labels(self.info.iloc[:, 2]))
 
+
+    def _separate_labels(labels):
+        for label in labels:
+            if "|" in label:
+                return label.split('|')
+            else:
+                return [label]
 
     def _create_label_mask(self):
         '''
