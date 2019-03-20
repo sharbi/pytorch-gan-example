@@ -39,6 +39,7 @@ num_epochs = 5000
 lr = 0.0003
 beta = 0.5
 ngpu = 1
+labeled_rate = 0.03
 
 list_of_labels = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltrate", "Mass", "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema", "Pleural_Thickening", "Fibrosis", "Emphysema", "Hernia", "No Findings"]
 
@@ -348,8 +349,6 @@ for epoch in range(num_epochs):
 
         logits_lab, _ = netD(labeled_data)
         loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
-
-        unlabeled_data = _to_var(unlabeled_data).float()
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
