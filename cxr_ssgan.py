@@ -58,7 +58,7 @@ class CXRDataset(Dataset):
         self.one_hot_labels = self.one_hot.fit_transform(self._separate_labels(self.info.iloc[:, 2]))
 
 
-    def _generate_one_hot(label):
+    def _generate_one_hot(self, label):
         output = [15]
         for i, x in enumerate(list_of_labels):
             if x in label:
