@@ -92,7 +92,7 @@ class CXRDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
-        image = Image.open(img_name)
+        image = Image.open(img_name).convert('LA')
         labels = self.one_hot_labels[idx]
 
         age = self.info.iloc[idx, 5]
@@ -117,6 +117,7 @@ def get_loader(batch_size):
 
     transform = transforms.Compose([
         transforms.Resize((image_size, image_size)),
+        transfomrs.Random
         transforms.ToTensor(),
         normalise
     ])
