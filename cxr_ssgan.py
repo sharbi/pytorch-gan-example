@@ -306,7 +306,7 @@ netD.apply(weights_init)
 print(netD)
 
 d_unsupervised_criterion = nn.BCEWithLogitsLoss()
-d_gan_criterion = nn.CrossEntropyLoss()
+d_gan_criterion = nn.BCEWithLogitsLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
