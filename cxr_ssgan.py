@@ -54,7 +54,7 @@ class CXRDataset(Dataset):
         self.label_mask = self._create_label_mask()
 
         self.one_hot = MultiLabelBinarizer()
-        self.one_hot_labels = one_hot.fit_transform(self.info.iloc[:, 2])
+        self.one_hot_labels = self.one_hot.fit_transform(self.info.iloc[:, 2])
 
 
     def _create_label_mask(self):
