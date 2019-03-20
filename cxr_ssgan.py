@@ -71,7 +71,7 @@ class CXRDataset(Dataset):
 
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.info)
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
