@@ -111,8 +111,8 @@ def get_loader(batch_size):
     num_workers = 2
 
     normalise = transforms.Normalize(
-        mean=[0.5, 0.5],
-        std=[0.5, 0.5]
+        mean=[0.5],
+        std=[0.5]
     )
 
     transform = transforms.Compose([
