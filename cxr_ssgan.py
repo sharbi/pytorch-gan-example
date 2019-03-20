@@ -89,6 +89,7 @@ class CXRDataset(Dataset):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
         image = Image.open(img_name)
         labels = self.one_hot_labels[idx]
+        print(labels)
 
         age = self.info.iloc[idx, 5]
         gender = self.info.iloc[idx, 6]
