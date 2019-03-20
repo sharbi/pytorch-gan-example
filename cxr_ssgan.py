@@ -41,6 +41,7 @@ lr = 0.0003
 beta = 0.5
 ngpu = 1
 
+list_of_labels = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltrate", "Mass", "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema", "Pleural_Thickening", "Fibrosis", "Emphysema", "Hernia", "No Findings"]
 
 # Create dataset
 
@@ -57,13 +58,17 @@ class CXRDataset(Dataset):
         self.one_hot_labels = self.one_hot.fit_transform(self._separate_labels(self.info.iloc[:, 2]))
 
 
+    def _generate_one_hot(label):
+        output = [15]
+        for i, x in enumerate(list_of_labels):
+            if x in label:
+                output[i] = 1
+        return output
+
     def _separate_labels(self, labels):
         new_labels = []
-        for i, label in enumerate(labels):
-            if "|" in label:
-                new_labels.append(tuple(label.split('|')))
-            else:
-                new_labels.append(label)
+        for label in labels:
+            new_labels.append(self._generate_one_hot(label))
         return new_labels
 
     def _create_label_mask(self):
