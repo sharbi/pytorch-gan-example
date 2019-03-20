@@ -52,18 +52,6 @@ class CXRDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
         self.info = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
-        self.labels = self._extract_labels(self.info.iloc[:, 2])
-        self.one_hot = MultiLabelBinarizer()
-        self.one_hot_labels = self.one_hot.fit_transform(self.labels)
-
-
-    def _extract_labels(self, labels):
-        for label in labels:
-            if "|" in label:
-                new_labels = label.split("|")
-                return new_labels
-            else:
-                return [label]
 
 
     def _create_label_mask(self):
@@ -88,8 +76,11 @@ class CXRDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
         image = Image.open(img_name)
-        labels = self.one_hot_labels[idx]
-
+        labels = self._extract_labels = self.info.iloc[idx, 2]
+        if "|" in labels:
+            labels = labels.split("|")
+        else:
+            labels = [labels]
 
         age = self.info.iloc[idx, 5]
         gender = self.info.iloc[idx, 6]
