@@ -454,7 +454,7 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        pred_class = apply_threshold(logits_lab)
+        pred_class = apply_threshold(F.sigmoid(logits_lab))
         print(pred_class)
         correct_pred = torch.eq(pred_class, labels)
         train_accuracy = torch.mean(correct_pred.float())
