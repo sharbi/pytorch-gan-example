@@ -105,7 +105,7 @@ class CXRDataset(Dataset):
         else: return image, labels
 
 def apply_threshold(predictions):
-    final_output
+    final_output = []
     for predictions in all_predictions:
         output = []
         print(prediction)
