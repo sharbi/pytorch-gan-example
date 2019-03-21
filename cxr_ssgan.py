@@ -17,6 +17,7 @@ import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
 from PIL import Image
+from sklearn.metrics import hamming_loss
 
 import pickle as pkl
 
@@ -455,10 +456,8 @@ for epoch in range(num_epochs):
 
 
         thresholder_predictions = F.sigmoid(logits_lab)
-        pred_class = map(apply_threshold, logits_lab)
-        print(pred_class)
-        correct_pred = torch.eq(pred_class, labels)
-        train_accuracy = torch.mean(correct_pred.float())
+        preds = map(apply_threshold, thresholder_predictions)
+        other_loss = hamming_loss(labels, preds)
 
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
