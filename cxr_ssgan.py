@@ -107,6 +107,7 @@ class CXRDataset(Dataset):
 def apply_threshold(predictions):
     output = []
     for prediction in predictions:
+        print(prediction)
         if prediction > 0.5:
             output.append(1)
         else:
