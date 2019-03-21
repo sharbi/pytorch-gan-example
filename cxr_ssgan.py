@@ -28,7 +28,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 16
+batch_size = 64
 image_size = 256
 num_classes = 15
 nc = 1
@@ -352,6 +352,7 @@ for epoch in range(num_epochs):
         noise.resize_(labels.data.shape[0], nz, 1, 1).uniform_(0, 100)
         noise_var = _to_var(noise)
         generator_input = netG(noise_var)
+        print(generator_input.shape)
 
         pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
         pert_n = F.normalize(pert_input)
