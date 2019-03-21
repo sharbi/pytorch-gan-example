@@ -188,37 +188,27 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # Input is Z, going into convolution
-            nn.ConvTranspose2d(nz, ngf * 8, 4, 3, 1, bias=False),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf * 8),
-            nn.Dropout(0.2),
-
-            nn.ConvTranspose2d(ngf*8, ngf * 8, 4, 3, 1, bias=False),
+            nn.ConvTranspose2d(nz, ngf * 8, 4, 4, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 8),
             nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 8, ngf * 4, 3, 1, bias=False),
+            nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 4),
             nn.Dropout(0.2),
 
-            nn.ConvTranspose2d(ngf * 4, ngf * 4, 3, 1, bias=False),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.BatchNorm2d(ngf * 4),
-            nn.Dropout(0.2),
-
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 3, 1, bias=False),
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 4, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf * 2),
             nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 2, ngf, 4, 3, 1, bias=False),
+            nn.ConvTranspose2d(ngf * 2, ngf, 4, 4, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf),
             nn.Dropout(0.2),
             # state size. (ngf*4) x 8 x 8
-            nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 4, 3, 1, bias=False)),
+            nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 4, 2, 0, bias=False)),
 
             nn.Tanh()
         # state size. (nc) x 32 x 32
