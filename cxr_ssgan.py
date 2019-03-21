@@ -348,7 +348,7 @@ for epoch in range(num_epochs):
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).float()
 
-        logits_lab, _, prob_real_be_real = netD(labeled_data)
+        logits_lab, _, real_real = netD(labeled_data)
         loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
 
 
@@ -383,7 +383,7 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         #logits_unl, layer_real = netD(unlabeled_data)
 
-        logits_gen, _, prob_fake_be_fake = netD(generator_input.detach())
+        logits_gen, _, fake_fake = netD(generator_input.detach())
         logits_gen_adv, _, _ = netD(gen_adv.detach())
 
         #l_unl = torch.logsumexp(logits_unl, 1)
@@ -396,7 +396,7 @@ for epoch in range(num_epochs):
 
         epsilon = 1e-8
 
-        prob_real_be_real = 1 - real_real_1[:, -1] + epsilon
+        prob_real_be_real = 1 - real_real[:, -1] + epsilon
         tmp_log = torch.log(prob_real_be_real)
         unsupervised_loss_1 = -1 * torch.mean(tmp_log)
 
@@ -425,7 +425,7 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, layer_fake, prob_fake_be_real = netD(generator_input)
+        _, layer_fake, fake_real = netD(generator_input)
 
 
         m1 = torch.mean(layer_real, dim=0).squeeze()
