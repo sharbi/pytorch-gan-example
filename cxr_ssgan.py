@@ -108,7 +108,7 @@ def apply_threshold(all_predictions):
     final_output = []
     for predictions in all_predictions:
         output = []
-        print(prediction)
+        print(predictions)
         for prediction in predictions:
             if prediction > 0.5:
                 output.append(1)
