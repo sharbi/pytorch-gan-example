@@ -104,6 +104,15 @@ class CXRDataset(Dataset):
             return image, labels, self.label_mask[idx]
         else: return image, labels
 
+def apply_threshold(predictions):
+    output = []
+    for prediction in predictions:
+        if prediction > 0.5:
+            output.append(1)
+        else:
+            output.append(0)
+    return output
+
 
 def get_loader(batch_size):
     num_workers = 2
@@ -445,7 +454,7 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        pred_class = torch.argmax(logits_lab, 1)
+        pred_class = apply_threshold(logits_lab)
         print(pred_class)
         correct_pred = torch.eq(pred_class, labels)
         train_accuracy = torch.mean(correct_pred.float())
