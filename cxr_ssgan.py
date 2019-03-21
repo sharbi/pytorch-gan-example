@@ -457,7 +457,7 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = F.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
-        other_loss = hamming_loss(labels, np.array(preds))
+        other_loss = hamming_loss(labels, np.fromiter(preds))
 
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
