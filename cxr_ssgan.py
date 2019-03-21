@@ -104,17 +104,13 @@ class CXRDataset(Dataset):
             return image, labels, self.label_mask[idx]
         else: return image, labels
 
-def apply_threshold(all_predictions):
-    final_output = []
-    for predictions in all_predictions:
-        output = []
-        print(predictions)
-        for prediction in predictions:
-            if prediction > 0.5:
-                output.append(1)
-            else:
-                output.append(0)
-        final_output.append(output)
+def apply_threshold(predictions):
+    output = []
+    for prediction in predictions:
+        if prediction > 0.5:
+            output.append(1)
+        else:
+            output.append(0)
     return output
 
 
@@ -458,7 +454,8 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        pred_class = apply_threshold(F.sigmoid(logits_lab))
+        thresholder_predictions = F.sigmoid(logits_lab)
+        pred_class = map(apply_threshold, logits_lab)
         print(pred_class)
         correct_pred = torch.eq(pred_class, labels)
         train_accuracy = torch.mean(correct_pred.float())
