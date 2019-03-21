@@ -105,13 +105,16 @@ class CXRDataset(Dataset):
         else: return image, labels
 
 def apply_threshold(predictions):
-    output = []
-    for prediction in predictions:
+    final_output
+    for predictions in all_predictions:
+        output = []
         print(prediction)
-        if prediction > 0.5:
-            output.append(1)
-        else:
-            output.append(0)
+        for prediction in predictions:
+            if prediction > 0.5:
+                output.append(1)
+            else:
+                output.append(0)
+        final_output.append(output)
     return output
 
 
