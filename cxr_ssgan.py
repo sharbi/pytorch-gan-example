@@ -208,7 +208,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(ngf * 2),
             nn.Dropout(0.2),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 2, ngf, 4, 2, 0, bias=False),
+            nn.ConvTranspose2d(ngf * 2, ngf, 4, 3, 0, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
             nn.BatchNorm2d(ngf),
             nn.Dropout(0.2),
