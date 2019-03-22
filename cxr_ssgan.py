@@ -457,7 +457,9 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = F.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
-        accuracy =  accuracy_score(labels, np.array(list(preds)))
+        total = len(labels) * num_classes
+        correct = (preds == labels.numpy().astype(int)).sum()
+        train_accuracy = 100 * correct / total
 
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
@@ -489,7 +491,7 @@ for epoch in range(num_epochs):
 
     #        print(f'Testing:\tepoch {epoch}/{num_epochs}\taccuracy {test_accuracy}')
 
-    if test_accuracy > best_accuracy:
+    if train_accuracy > best_accuracy:
         best_accuracy = test_accuracy
         best_epoch_number = epoch
         disc_state = {
