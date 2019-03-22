@@ -445,7 +445,7 @@ for epoch in range(num_epochs):
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         total_unsupervised_loss.item(), loss_lab.item(),
+                         loss_unl.item(), loss_lab.item(),
                          loss_g.item(), i + 1,
                          len(loader_train)))
             real_cpu, _, _ = data
