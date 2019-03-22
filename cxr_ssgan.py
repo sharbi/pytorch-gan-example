@@ -392,7 +392,7 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         #logits_unl, layer_real = netD(unlabeled_data)
 
-        logits_gen, _, _ = netD(generator_input.detach())
+        logits_gen, _, fake_fake = netD(generator_input.detach())
         logits_gen_adv, _, _ = netD(gen_adv.detach())
 
         #l_unl = torch.logsumexp(logits_unl, 1)
@@ -403,6 +403,22 @@ for epoch in range(num_epochs):
         #                 + 0.5 * torch.mean(F.softplus(l_unl)) \
         #                 + 0.5 * torch.mean(F.softplus(l_gen))
 
+        epsilon = 1e-8
+
+        prob_real_be_real = 1 - real_real[:, -1] + epsilon
+        tmp_log = torch.log(prob_real_be_real)
+        unsupervised_loss_1 = -1 * torch.mean(tmp_log)
+
+        print(unsupervised_loss_1)
+
+        prob_fake_be_fake = fake_fake[:, -1] + epsilon
+        print(prob_fake_be_fake)
+        tmp_log = torch.log(prob_fake_be_fake)
+        unsupervised_loss_2 = -1 * torch.mean(tmp_log)
+
+        print(unsupervised_loss_2)
+
+        total_unsupervised_loss = unsupervised_loss_1 + unsupervised_loss_2
 
         manifold_diff = logits_gen - logits_gen_adv
 
@@ -410,6 +426,7 @@ for epoch in range(num_epochs):
 
         j_loss = torch.mean(manifold)
 
+        loss_d = total_unsupervised_loss + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
@@ -422,26 +439,7 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, layer_fake, fake_fake = netD(generator_input)
-
-        epsilon = 1e-8
-
-        prob_real_be_real = 1 - real_real[:, -1] + epsilon
-        tmp_log = torch.log(prob_real_be_real)
-        unsupervised_loss_1 = -1 * torch.mean(tmp_log)
-
-        print(unsupervised_loss_1)
-
-        prob_fake_be_fake = fake_fake[:, -1] + epsilon
-        tmp_log = torch.log(prob_fake_be_fake)
-        unsupervised_loss_2 = -1 * torch.mean(tmp_log)
-
-        print(unsupervised_loss_2)
-
-        total_unsupervised_loss = unsupervised_loss_1 + unsupervised_loss_2
-
-
-        loss_d = total_unsupervised_loss + loss_lab + (0.001 * j_loss)
+        _, layer_fake, fake_real = netD(generator_input)
 
 
         m1 = torch.mean(layer_real, dim=0).squeeze()
@@ -451,7 +449,7 @@ for epoch in range(num_epochs):
         loss_g_1 = torch.mean(torch.abs(m1 - m2))
 
 
-        prob_fake_be_real = 1 - fake_fake[:, -1] + epsilon
+        prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
         tmp_log = torch.log(prob_fake_be_real)
         loss_g_2 = -1 * torch.mean(tmp_log)
 
