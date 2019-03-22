@@ -438,6 +438,7 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = F.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
+        print(preds)
         total = len(labels) * num_classes
         correct = (preds == labels.cpu().numpy().astype(int)).sum()
         train_accuracy = 100 * correct / total
