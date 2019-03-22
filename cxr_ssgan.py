@@ -466,7 +466,7 @@ for epoch in range(num_epochs):
                   format(epoch, num_epochs,
                          total_unsupervised_loss.item(), loss_lab.item(),
                          loss_g.item(), i + 1,
-                         len(diabetes_loader_train)))
+                         len(loader_train)))
             real_cpu, _, _ = data
             vutils.save_image(real_cpu,
                     './.gitignore/output/SS_GAN_TEST/real_samples.png',
