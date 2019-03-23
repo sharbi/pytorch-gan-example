@@ -370,7 +370,7 @@ for epoch in range(num_epochs):
 
 
         labels = torch.LongTensor(labels)
-        labels = _to_var(labels).float()
+        labels = _to_var(labels).float().squeeze()
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
@@ -400,7 +400,7 @@ for epoch in range(num_epochs):
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
-        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 1)
         noise_var = _to_var(noise)
         fake = netG(noise_var)
 
