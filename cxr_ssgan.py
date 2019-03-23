@@ -357,7 +357,7 @@ for epoch in range(num_epochs):
         print(labels.shape)
 
 
-        labels = torch.LongTensor(labels)
+        #labels = torch.LongTensor(labels)
         labels = _to_var(labels)
 
         logits_lab, layer_real, real_real = netD(labeled_data)
