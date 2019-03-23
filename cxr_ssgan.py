@@ -299,8 +299,6 @@ class Discriminator(nn.Module):
 
         class_logits = self.class_logits(features)
 
-        print(class_logits.shape)
-
         #gan_logits = self.gan_logits(class_logits)
 
         out = self.softmax(class_logits)
@@ -364,7 +362,7 @@ for epoch in range(num_epochs):
 
         labels = labels.float()
 
-        loss_lab = -torch.mean(loss_lab) + torch.mean(torch.mean(torch.logsumexp(loss_lab, 0)))
+        loss_lab = -torch.mean(loss_lab) + torch.mean(torch.mean(torch.logsumexp(logits_lab, 1)))
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
