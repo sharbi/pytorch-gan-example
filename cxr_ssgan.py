@@ -406,7 +406,7 @@ for epoch in range(num_epochs):
 
         epsilon = 1e-8
 
-        prob_real_be_real = 1 - real_real_1[:, -1] + epsilon
+        prob_real_be_real = 1 - real_real[:, -1] + epsilon
         tmp_log = torch.log(prob_real_be_real)
         unsupervised_loss_1 = -1 * torch.mean(tmp_log)
 
