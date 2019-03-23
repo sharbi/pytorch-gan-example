@@ -384,7 +384,7 @@ for epoch in range(num_epochs):
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(labeled_data)
 
         d_gan_loss_real = d_gan_criterion(
-                    d_gan_logits_real,
+                    gan_logits_real,
                     d_gan_labels_real_var)
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
@@ -410,7 +410,7 @@ for epoch in range(num_epochs):
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
         d_gan_loss_fake = d_gan_criterion(
-                d_gan_logits_fake,
+                gan_logits_fake,
                 d_gan_labels_fake_var)
 
         d_gan_loss = d_gan_loss_real + d_gan_loss_fake
