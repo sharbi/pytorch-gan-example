@@ -303,7 +303,7 @@ class Discriminator(nn.Module):
 
         self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax(dim=0)
+        self.softmax = nn.Softmax(dim=0)
 
     def forward(self, inputs):
 
@@ -330,7 +330,7 @@ netD.apply(weights_init)
 print(netD)
 
 d_unsupervised_criterion = nn.BCEWithLogitsLoss()
-d_gan_criterion = nn.BCELoss()
+d_gan_criterion = nn.CrossEntropyLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
