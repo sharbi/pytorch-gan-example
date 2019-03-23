@@ -354,11 +354,12 @@ for epoch in range(num_epochs):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
 
-        print(labels.shape)
-
 
         #labels = torch.LongTensor(labels)
         labels = _to_var(labels)
+
+        print(labels.shape)
+
 
         logits_lab, layer_real, real_real = netD(labeled_data)
         loss_lab = logits_lab[torch.arange(batch_size), labels]
