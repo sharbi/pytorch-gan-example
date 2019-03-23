@@ -370,7 +370,7 @@ for epoch in range(num_epochs):
 
 
         labels = _to_var(labels).long().squeeze()
-        label_mask = _to_var(lable_mask).float().squeeze()
+        label_mask = _to_var(label_mask).float().squeeze()
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
