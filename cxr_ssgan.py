@@ -422,7 +422,7 @@ for epoch in range(num_epochs):
 
         j_loss = torch.mean(manifold)
 
-        loss_d = loss_unl + loss_lab + (0.001 * j_loss)
+        loss_d = total_unsupervised_loss + loss_lab + (0.001 * j_loss)
 
 
         loss_d.backward(retain_graph=True)
