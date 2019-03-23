@@ -369,8 +369,8 @@ for epoch in range(num_epochs):
         labeled_data = _to_var(labeled_data).float()
 
 
-        labels = torch.LongTensor(labels)
-        labels = _to_var(labels).float().squeeze()
+        labels = _to_var(labels).long().squeeze()
+        label_mask = _to_var(lable_mask).float().squeeze()
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
@@ -383,10 +383,9 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(labeled_data)
 
-        print(labels.shape)
-        print(gan_logits_real.shape)
-
-        supervised_loss = torch.mean(torch.abs(labels - gan_logits_real))
+        d_gan_loss_real = d_gan_criterion(
+                    d_gan_logits_real,
+                    d_gan_labels_real_var)
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
         #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
@@ -410,19 +409,18 @@ for epoch in range(num_epochs):
         d_gan_labels_fake = d_gan_labels_fake.resize_as_(labels.data.cpu().float()).uniform_(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
+        d_gan_loss_fake = d_gan_criterion(
+                d_gan_logits_fake,
+                d_gan_labels_fake_var)
+
+        d_gan_loss = d_gan_loss_real + d_gan_loss_fake
 
 
-        log_sum_real = torch.logsumexp(d_class_logits_on_data, 1)
-        log_sum_fake = torch.logsumexp(d_fake_logits_on_data, 1)
+        d_class_loss = d_unsupervised_criterion(d_class_logits_on_data, labels)
 
 
-        unsupervised_loss = 0.5 * (
-            -torch.mean(log_sum_real) +
-            torch.mean(F.softplus(log_sum_real)) +
-            torch.mean(F.softplus(log_sum_fake))
-        )
 
-        loss_d = supervised_loss + unsupervised_loss
+        loss_d = d_gan_loss + d_class_loss
 
         loss_d.backward(retain_graph=True)
         optimizerD.step()
