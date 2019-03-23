@@ -355,7 +355,7 @@ for epoch in range(num_epochs):
         labeled_data = _to_var(labeled_data).float()
 
 
-        labels = torch.LongTensor(labels)
+        labels = torch.FloatTensor(labels)
         labels = _to_var(labels)
 
 
