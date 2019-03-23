@@ -233,7 +233,22 @@ class Generator(nn.Module):
         out = self.main(input)
         return out
 
+class _ganLogits(nn.Module):
 
+    def __init__(self):
+        super(_ganLogits, self).__init__()
+
+
+    def forward(self, class_logits):
+        real_class_logits, fake_class_logits = torch.split(class_logits, num_classes, dim=1)
+        fake_class_logits = torch.squeeze(fake_class_logits)
+
+        max_val, _ = torch.max(real_class_logits, 1, keepdim=True)
+        stable_class_logits = real_class_logits - max_val
+        max_val = torch.squeeze(max_val)
+        gan_logits = torch.log(torch.sum(torch.exp(stable_class_logits), 1)) + max_val - fake_class_logits
+
+        return gan_logits
 
 
 class Discriminator(nn.Module):
@@ -286,7 +301,7 @@ class Discriminator(nn.Module):
             in_features=(ndf * 4) * 1 * 1,
             out_features=num_classes + 1)
 
-        #self.gan_logits = _ganLogits()
+        self.gan_logits = _ganLogits()
 
         self.softmax = nn.LogSoftmax(dim=0)
 
@@ -299,7 +314,7 @@ class Discriminator(nn.Module):
 
         class_logits = self.class_logits(features)
 
-        #gan_logits = self.gan_logits(class_logits)
+        gan_logits = self.gan_logits(class_logits)
 
         out = self.softmax(class_logits)
 
