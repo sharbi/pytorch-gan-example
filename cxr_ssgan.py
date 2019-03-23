@@ -284,7 +284,7 @@ class Discriminator(nn.Module):
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 4) * 1 * 1,
-            out_features=num_classes + 1)
+            out_features=num_classes)
 
         #self.gan_logits = _ganLogits()
 
@@ -353,6 +353,8 @@ for epoch in range(num_epochs):
     for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
+
+        print(labels.shape)
 
 
         labels = torch.LongTensor(labels)
