@@ -383,6 +383,9 @@ for epoch in range(num_epochs):
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(labeled_data)
 
+        print(labels.shape)
+        print(gan_logits_real.shape)
+
         supervised_loss = torch.mean(torch.abs(labels - gan_logits_real))
 
         #d_class_loss_entropy = d_class_loss_entropy.squeeze()
