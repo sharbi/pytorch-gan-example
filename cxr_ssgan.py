@@ -299,6 +299,8 @@ class Discriminator(nn.Module):
 
         class_logits = self.class_logits(features)
 
+        print(class_logits.shape)
+
         #gan_logits = self.gan_logits(class_logits)
 
         out = self.softmax(class_logits)
