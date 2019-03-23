@@ -315,7 +315,7 @@ netD.apply(weights_init)
 print(netD)
 
 d_unsupervised_criterion = nn.BCEWithLogitsLoss()
-d_gan_criterion = nn.BCEWithLogitsLoss()
+d_gan_criterion = nn.CrossEntropyLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
@@ -327,7 +327,7 @@ real_label = 1
 fake_label = 0
 
 
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999), weight_decay=1)
+optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta, 0.999))
 
 #schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=[500, 1000, 1500, 2000, 2500], gamma=0.1)
@@ -349,39 +349,13 @@ for epoch in range(num_epochs):
     # For each batch in the dataloader
 
     for i, data in enumerate(loader_train):
+
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
 
 
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).float()
-
-        labels = torch.cat((labels, _to_var(torch.zeros([labels.shape[0], 1]))), 1)
-
-        logits_lab, layer_real, real_real = netD(labeled_data)
-        loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
-
-
-        noise = torch.FloatTensor(batch_size, nz, 1, 1)
-
-        noise.resize_(labels.data.shape[0], nz, 1, 1).uniform_(0, 100)
-        noise_var = _to_var(noise)
-        generator_input = netG(noise_var)
-
-        pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
-        pert_n = F.normalize(pert_input)
-
-        noise_pert = noise + 1. * pert_n
-        noise_pert = _to_var(noise_pert)
-        gen_inp_pert = netG(noise_pert)
-
-        manifold_regularisation_value = (gen_inp_pert - generator_input)
-        manifold_regularisation_norm = F.normalize(manifold_regularisation_value)
-
-        gen_adv = generator_input + 20. * manifold_regularisation_norm
-
-        mask = get_label_mask(labeled_rate, batch_size)
-        mask = _to_var(torch.FloatTensor(mask))
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
@@ -390,40 +364,47 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        #logits_unl, layer_real = netD(unlabeled_data)
+        d_gan_labels_real = d_gan_labels_real.resize_as_(labels.data.cpu().float()).uniform_(0, 0.3)
+        d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
+        output, d_class_logits_on_data, gan_logits_real, d_sample_features = netD(labeled_data)
 
-        logits_gen, _, fake_fake = netD(generator_input.detach())
-        logits_gen_adv, _, _ = netD(gen_adv.detach())
+        supervised_loss = torch.mean(torch.abs(labels - gan_logits_real))
 
-        #l_unl = torch.logsumexp(logits_lab, 1)
-        #l_gen = torch.logsumexp(logits_gen, 1)
+        #d_class_loss_entropy = d_class_loss_entropy.squeeze()
+        #delim = torch.max(torch.Tensor([1.0, torch.sum(label_mask.data)]))
+        #delim = _to_var(delim)
+        #supervised_loss = torch.sum(label_mask * d_class_loss_entropy) / delim
+
+        ##########################
+        # NEXT UNSUPERVISED LOSS:
+        # This checks the discriminator's ability to determine real and fake data
+        ##########################
+
+        # Get the fake logits, real are obtained from above
 
 
-        #loss_unl = - 0.5 * torch.mean(l_unl) \
-        #                 + 0.5 * torch.mean(F.softplus(l_unl)) \
-        #                 + 0.5 * torch.mean(F.softplus(l_gen))
+        noise = torch.FloatTensor(batch_size, nz, 1, 1)
+
+        noise.resize_(svhn_labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise_var = _to_var(noise)
+        fake = netG(noise_var)
+
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(labels.data.cpu().float()).uniform_(0.9, 1.2)
+        d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
+        _, d_fake_logits_on_data, gan_logits_fake, _ = netD(fake.detach())
 
 
-        epsilon = 1e-8
+        log_sum_real = torch.logsumexp(d_class_logits_on_data, 1)
+        log_sum_fake = torch.logsumexp(d_fake_logits_on_data, 1)
 
-        prob_real_be_real = 1 - real_real[:, -1] + epsilon
-        tmp_log = torch.log(prob_real_be_real)
-        unsupervised_loss_1 = -1 * torch.mean(tmp_log)
 
-        prob_fake_be_fake = fake_fake[:, -1] + epsilon
-        tmp_log = torch.log(prob_fake_be_fake)
-        unsupervised_loss_2 = -1 * torch.mean(tmp_log)
+        unsupervised_loss = 0.5 * (
+            -torch.mean(log_sum_real) +
+            torch.mean(F.softplus(log_sum_real)) +
+            torch.mean(F.softplus(log_sum_fake))
+        )
 
-        total_unsupervised_loss = unsupervised_loss_1 + unsupervised_loss_2
-
-        manifold_diff = logits_gen - logits_gen_adv
-
-        manifold = torch.sum(torch.sqrt((manifold_diff ** 2) + 1e-8))
-
-        j_loss = torch.mean(manifold)
-
-        loss_d = total_unsupervised_loss + loss_lab + (0.001 * j_loss)
-
+        loss_d = supervised_loss + unsupervised_loss
 
         loss_d.backward(retain_graph=True)
         optimizerD.step()
@@ -435,37 +416,34 @@ for epoch in range(num_epochs):
 
         netG.zero_grad()
 
-        _, layer_fake, fake_real = netD(generator_input)
 
+        noise = torch.FloatTensor(batch_size, nz, 1, 1)
+        noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 1)
+        noise_var = _to_var(noise)
+        # Generate fake images
+        fake = netG(noise_var)
 
-        m1 = torch.mean(layer_real, dim=0).squeeze()
-        m2 = torch.mean(layer_fake, dim=0).squeeze()
+        _, _, _, d_data_features = netD(fake)
 
+        data_features_mean = torch.mean(d_data_features, dim=0).squeeze()
+        sample_features_mean = torch.mean(d_sample_features, dim=0).squeeze()
 
-        loss_g_1 = torch.mean(torch.abs(m1 - m2))
+        g_loss = torch.mean(torch.abs(data_features_mean - sample_features_mean))
 
-        prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
-        tmp_log = torch.log(prob_fake_be_real)
-        loss_g_2 = -1 * torch.mean(tmp_log)
-
-        loss_g = loss_g_1 + loss_g_2
-
-
-        loss_g.backward()
+        g_loss.backward()
         optimizerG.step()
 
+        _, pred_class = torch.max(d_class_logits_on_data, 1)
+        eq = torch.eq(labels, pred_class.float())
+        correct = torch.sum(eq.float())
+        masked_correct += torch.sum(label_mask * eq.float())
+        num_samples += torch.sum(label_mask)
 
-        thresholder_predictions = F.sigmoid(logits_lab)
-        preds = map(apply_threshold, thresholder_predictions)
-        print(preds)
-        total = len(labels) * num_classes
-        correct = (preds == labels.cpu().numpy().astype(int)).sum()
-        train_accuracy = 100 * correct / total
 
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
                   format(epoch, num_epochs,
-                         total_unsupervised_loss.item(), loss_lab.item(),
+                         unsupervised_loss.item(), supervised_loss.item(),
                          loss_g.item(), i + 1,
                          len(loader_train)))
             real_cpu, _, _ = data
