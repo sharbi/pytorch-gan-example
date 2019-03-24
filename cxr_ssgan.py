@@ -362,7 +362,7 @@ for epoch in range(num_epochs):
 
         labels = labels.float()
 
-        loss_lab = -torch.mean(loss_lab) + torch.mean(torch.mean(torch.logsumexp(logits_lab, 1)))
+        loss_lab = -torch.mean(loss_lab) + torch.mean(torch.mean(torch.logsumexp(logits_lab, 0)))
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
@@ -370,17 +370,17 @@ for epoch in range(num_epochs):
         noise_var = _to_var(noise)
         generator_input = netG(noise_var)
 
-        pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
-        pert_n = F.normalize(pert_input)
+        #pert_input = noise.resize_(labels.data.shape[0], nz, 1, 1).normal_(0, 100)
+        #pert_n = F.normalize(pert_input)
 
-        noise_pert = noise + 1. * pert_n
-        noise_pert = _to_var(noise_pert)
-        gen_inp_pert = netG(noise_pert)
+        #noise_pert = noise + 1. * pert_n
+        #noise_pert = _to_var(noise_pert)
+        #gen_inp_pert = netG(noise_pert)
 
-        manifold_regularisation_value = (gen_inp_pert - generator_input)
-        manifold_regularisation_norm = F.normalize(manifold_regularisation_value)
+        #manifold_regularisation_value = (gen_inp_pert - generator_input)
+        #manifold_regularisation_norm = F.normalize(manifold_regularisation_value)
 
-        gen_adv = generator_input + 20. * manifold_regularisation_norm
+        #gen_adv = generator_input + 20. * manifold_regularisation_norm
 
         mask = get_label_mask(labeled_rate, batch_size)
         mask = _to_var(torch.FloatTensor(mask))
@@ -395,7 +395,7 @@ for epoch in range(num_epochs):
         #logits_unl, layer_real = netD(unlabeled_data)
 
         logits_gen, _, fake_fake = netD(generator_input.detach())
-        logits_gen_adv, _, _ = netD(gen_adv.detach())
+        #logits_gen_adv, _, _ = netD(gen_adv.detach())
 
         l_unl = torch.logsumexp(logits_lab, 1)
         l_gen = torch.logsumexp(logits_gen, 1)
@@ -408,13 +408,13 @@ for epoch in range(num_epochs):
 
 
 
-        manifold_diff = logits_gen - logits_gen_adv
+        #manifold_diff = logits_gen - logits_gen_adv
 
-        manifold = torch.sum(torch.sqrt((manifold_diff ** 2) + 1e-8))
+        #manifold = torch.sum(torch.sqrt((manifold_diff ** 2) + 1e-8))
 
-        j_loss = torch.mean(manifold)
+        #j_loss = torch.mean(manifold)
 
-        loss_d = loss_unl + loss_lab + (0.001 * j_loss)
+        loss_d = loss_unl + loss_lab
 
 
         loss_d.backward(retain_graph=True)
@@ -445,7 +445,7 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = F.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
-        print(preds)
+        print(list(preds))
         total = len(labels) * num_classes
         correct = (preds == labels.cpu().numpy().astype(int)).sum()
         train_accuracy = 100 * correct / total
