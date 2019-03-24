@@ -443,7 +443,7 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        thresholder_predictions = F.sigmoid(logits_lab)
+        thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
         total = len(labels) * num_classes
         correct = (list(preds) == labels.cpu().numpy().astype(int)).sum()
@@ -480,7 +480,7 @@ for epoch in range(num_epochs):
     #        print(f'Testing:\tepoch {epoch}/{num_epochs}\taccuracy {test_accuracy}')
 
     if train_accuracy > best_accuracy:
-        best_accuracy = test_accuracy
+        best_accuracy = train_accuracy
         best_epoch_number = epoch
         disc_state = {
             'epoch': epoch,
