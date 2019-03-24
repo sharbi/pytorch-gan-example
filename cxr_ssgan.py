@@ -487,7 +487,7 @@ for epoch in range(num_epochs):
             'state_dict_disc': netD.state_dict(),
             'optimizerD': optimizerD.state_dict(),
             'loss': loss_d,
-            'accuracy': test_accuracy
+            'accuracy': train_accuracy
         }
         torch.save(disc_state, "best_disc_model.pkl")
     if loss_g < best_gen_loss:
