@@ -284,7 +284,7 @@ class Discriminator(nn.Module):
 
         self.class_logits = nn.Linear(
             in_features=(ndf * 4) * 1 * 1,
-            out_features=num_classes)
+            out_features=num_classes + 1)
 
         #self.gan_logits = _ganLogits()
 
