@@ -363,7 +363,7 @@ for epoch in range(num_epochs):
 
         labels = labels.float()
 
-        loss_lab = -torch.mean(loss_lab) + torch.mean(torch.mean(torch.logsumexp(logits_lab, 0)))
+        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp(logits_lab, 0)))
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
