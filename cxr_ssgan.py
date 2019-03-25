@@ -29,7 +29,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 32
+batch_size = 64
 image_size = 256
 num_classes = 15
 nc = 1
@@ -363,7 +363,9 @@ for epoch in range(num_epochs):
 
         labels = labels.float()
 
-        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab + 1e-8), 0)))
+        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
+
+        print(logits_lab)
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
@@ -406,7 +408,8 @@ for epoch in range(num_epochs):
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
                          + 0.5 * torch.mean(F.softplus(l_gen))
 
-
+        print(l_unl)
+        print(l_gen)
 
 
         #manifold_diff = logits_gen - logits_gen_adv
@@ -434,6 +437,8 @@ for epoch in range(num_epochs):
         m1 = torch.mean(layer_real, dim=0).squeeze()
         m2 = torch.mean(layer_fake, dim=0).squeeze()
 
+        print(m1)
+        print(m2)
 
         loss_g = torch.mean(torch.abs(m1 - m2))
 
