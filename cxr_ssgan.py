@@ -352,9 +352,10 @@ for epoch in range(num_epochs):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
 
-
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).float()
+
+        labels = torch.cat((labels, torch.zeros(labels.shape[0], 1)))
 
 
         logits_lab, layer_real, real_real = netD(labeled_data)
