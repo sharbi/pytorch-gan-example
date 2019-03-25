@@ -29,7 +29,7 @@ torch.manual_seed(manual_seed)
 
 # Set initial paramaters
 workers = 2
-batch_size = 64
+batch_size = 128
 image_size = 256
 num_classes = 15
 nc = 1
@@ -365,6 +365,7 @@ for epoch in range(num_epochs):
 
         loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
+        print("Testing logits_lab")
         print(logits_lab)
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
@@ -408,6 +409,7 @@ for epoch in range(num_epochs):
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
                          + 0.5 * torch.mean(F.softplus(l_gen))
 
+        print("Testing unlabeled loss")
         print(l_unl)
         print(l_gen)
 
@@ -437,6 +439,7 @@ for epoch in range(num_epochs):
         m1 = torch.mean(layer_real, dim=0).squeeze()
         m2 = torch.mean(layer_fake, dim=0).squeeze()
 
+        print("Testing generator loss")
         print(m1)
         print(m2)
 
