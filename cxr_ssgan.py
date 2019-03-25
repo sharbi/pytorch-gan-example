@@ -361,6 +361,10 @@ for epoch in range(num_epochs):
         logits_lab, layer_real, real_real = netD(labeled_data)
         loss_lab = d_gan_criterion(logits_lab, labels)
 
+        labels = labels.float()
+
+        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
+
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
         noise.resize_(labels.data.shape[0], nz, 1, 1).uniform_(0, 100)
@@ -402,8 +406,6 @@ for epoch in range(num_epochs):
                          + 0.5 * torch.mean(F.softplus(l_unl)) \
                          + 0.5 * torch.mean(F.softplus(l_gen))
 
-
-
         #manifold_diff = logits_gen - logits_gen_adv
 
         #manifold = torch.sum(torch.sqrt((manifold_diff ** 2) + 1e-8))
@@ -429,8 +431,9 @@ for epoch in range(num_epochs):
         m1 = torch.mean(layer_real, dim=0).squeeze()
         m2 = torch.mean(layer_fake, dim=0).squeeze()
 
+        feature_distance = m1 - m2
 
-        loss_g = torch.mean(torch.abs(m1 - m2))
+        loss_g = torch.mean(torch.mul(feature_distance, feature_distance))
 
 
 
