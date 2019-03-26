@@ -73,6 +73,8 @@ class CXRDataset(Dataset):
         else:
             labels = [labels]
         new_labels = (self._generate_one_hot(labels))
+        if new_labels == list(np.zeros(15, dtype=int)):
+            print(labels)
         return new_labels
 
     def _create_label_mask(self):
@@ -356,10 +358,9 @@ for epoch in range(num_epochs):
     for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
+
         labels = torch.LongTensor(labels)
         labels = _to_var(labels)
-        label_mask = _to_var(label_mask).float().squeeze()
-
 
         epsilon = 1e-8
 
@@ -446,15 +447,9 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
-        eq = torch.eq(labels, _to_var(torch.tensor(list(preds))))
-        print(eq)
-        masked_correct += torch.sum(label_mask * eq.float())
-        # correct = torch.sum(eq.float())
-        # masked_correct += correct
-        num_samples += torch.sum(label_mask)
-
-        accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
-
+        total = len(labels) * num_classes
+        correct = (list(preds) == labels.cpu().numpy().astype(int))
+        train_accuracy = 100 * correct / total
 
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
