@@ -70,7 +70,7 @@ class CXRDataset(Dataset):
     def _separate_labels(self, labels):
         new_labels = []
         for label in labels:
-            new_labels.append(self._generate_one_hot(label))
+            new_labels.append(label)
         return new_labels
 
     def _create_label_mask(self):
