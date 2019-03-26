@@ -63,6 +63,7 @@ class CXRDataset(Dataset):
         for i, x in enumerate(list_of_labels):
             for label in labels:
                 if x in label:
+                    print(label)
                     output[i] = 1
         return list(output)
 
