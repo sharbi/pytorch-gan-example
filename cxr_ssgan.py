@@ -355,7 +355,7 @@ for epoch in range(num_epochs):
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).float()
 
-        labels = torch.cat((labels, _to_var(torch.zeros(labels.shape[0], 1))), 1)
+        labels = torch.cat((labels, _to_var(torch.ones(labels.shape[0], 1))), 1)
 
         epsilon = 1e-8
 
