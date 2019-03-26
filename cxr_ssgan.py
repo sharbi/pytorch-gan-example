@@ -444,7 +444,7 @@ for epoch in range(num_epochs):
         thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
         total = len(labels) * num_classes
-        correct = (list(preds) == labels).sum()
+        correct = (list(preds) == labels.numpy().astype(int)).sum()
         train_accuracy = 100 * correct / total
 
         if i % 50 == 0:
