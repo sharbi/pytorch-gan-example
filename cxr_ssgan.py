@@ -64,12 +64,12 @@ class CXRDataset(Dataset):
         for i, x in enumerate(list_of_labels):
             if x in label:
                 output[i] = 1
-        return output
+        return list(output)
 
     def _separate_labels(self, labels):
         new_labels = []
         labels = labels.split("|")
-        new_labels.append(self._generate_one_hot(labels))
+        new_labels = (self._generate_one_hot(labels))
         return new_labels
 
     def _create_label_mask(self):
