@@ -108,8 +108,8 @@ class CXRDataset(Dataset):
 
 
         if self._is_train_dataset():
-            return image, labels, self.label_mask[idx]
-        else: return image, labels
+            return image, torch.FloatTensor(labels), self.label_mask[idx]
+        else: return image, torch.FloatTensor(labels)
 
 def apply_threshold(predictions):
     output = []
@@ -444,7 +444,7 @@ for epoch in range(num_epochs):
         thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
         total = len(labels) * num_classes
-        correct = (list(preds) == np.array(labels).astype(int)).sum()
+        correct = (list(preds) == labels.cpu().numpy().astype(int)).sum()
         train_accuracy = 100 * correct / total
 
         if i % 50 == 0:
