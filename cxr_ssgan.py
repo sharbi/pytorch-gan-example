@@ -69,6 +69,7 @@ class CXRDataset(Dataset):
 
     def _separate_labels(self, labels):
         new_labels = []
+        labels = labels.split("|")
         for label in labels:
             new_labels.append(label)
         return new_labels
