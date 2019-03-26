@@ -444,12 +444,15 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        thresholder_predictions = torch.sigmoid(logits_lab)
-        preds = map(apply_threshold, thresholder_predictions)
-        total = len(labels) * num_classes
-        correct = (list(preds) == labels.cpu().numpy().astype(int))
-        print(correct)
-        train_accuracy = 100 * correct / total
+        _, pred_class = torch.max(logits_lab, 1)
+        eq = torch.eq(labels, pred_class)
+        masked_correct += torch.sum(label_mask * eq.float())
+        # correct = torch.sum(eq.float())
+        # masked_correct += correct
+        num_samples += torch.sum(label_mask)
+        accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
+
+
 
         if i % 50 == 0:
             print('Training:\tepoch {}/{}\tdiscr. gan loss {}\tdiscr. class loss {}\tgen loss {}\tsamples {}/{}'.
