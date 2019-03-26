@@ -361,6 +361,8 @@ for epoch in range(num_epochs):
         labels = torch.LongTensor(labels)
         labels = _to_var(labels)
 
+        print(labels)
+
         epsilon = 1e-8
 
 
