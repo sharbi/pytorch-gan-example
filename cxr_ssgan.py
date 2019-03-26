@@ -53,7 +53,7 @@ class CXRDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
         self.info = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
-        self.encoded_labels = self._separate_labels(self.info.iloc[:, 2][1])
+        self.encoded_labels = self._separate_labels(self.info.iloc[:, 2])
         print(self.encoded_labels)
 
 
@@ -68,7 +68,7 @@ class CXRDataset(Dataset):
 
     def _separate_labels(self, labels):
         new_labels = []
-        labels = labels.split("|")
+        labels = labels[1].split("|")
         new_labels = (self._generate_one_hot(labels))
         return new_labels
 
