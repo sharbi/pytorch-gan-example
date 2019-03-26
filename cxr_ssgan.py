@@ -62,6 +62,7 @@ class CXRDataset(Dataset):
         output = np.zeros(15, dtype=int)
         for i, x in enumerate(list_of_labels):
             for label in labels:
+                print(label)
                 if x in label:
                     print(label)
                     output[i] = 1
