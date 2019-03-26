@@ -358,6 +358,8 @@ for epoch in range(num_epochs):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
 
+        labels = _to_var(labels)
+
         epsilon = 1e-8
 
 
