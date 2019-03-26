@@ -17,7 +17,6 @@ import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
 from PIL import Image
-from sklearn.preprocessing import MultiLabelBinarizer
 
 import pickle as pkl
 
@@ -54,12 +53,9 @@ class CXRDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
         self.info = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
-        mlb = MultiLabelBinarizer()
-        self.encoded_labels = mlb.fit_transform(self._separate_labels(self.info.iloc[:, 2][1]))
-
+        self.encoded_labels = self._separate_labels(self.info.iloc[:, 2][1])
         print(self.encoded_labels)
 
-        print(mlb.classes_)
 
 
 
@@ -73,8 +69,7 @@ class CXRDataset(Dataset):
     def _separate_labels(self, labels):
         new_labels = []
         labels = labels.split("|")
-        for label in labels:
-            new_labels.append(label)
+        new_labels.append(self._generate_one_hot(labels))
         return new_labels
 
     def _create_label_mask(self):
