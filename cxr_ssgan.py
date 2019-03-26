@@ -444,8 +444,8 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        _, pred_class = torch.max(logits_lab, 1)
-        eq = torch.eq(labels, pred_class)
+        pred = apply_threshold(logits_lab)
+        eq = torch.eq(labels, pred)
         masked_correct += torch.sum(label_mask * eq.float())
         # correct = torch.sum(eq.float())
         # masked_correct += correct
