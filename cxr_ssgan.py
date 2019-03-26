@@ -69,6 +69,7 @@ class CXRDataset(Dataset):
         new_labels = []
         if "|" in labels:
             labels = labels.split("|")
+            print(labels)
         else:
             labels = [labels]
         new_labels = (self._generate_one_hot(labels))
@@ -98,7 +99,6 @@ class CXRDataset(Dataset):
         image = Image.open(img_name)
         labels = self.encoded_labels[idx]
         print(labels)
-
 
         age = self.info.iloc[idx, 5]
         gender = self.info.iloc[idx, 6]
