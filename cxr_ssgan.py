@@ -71,6 +71,7 @@ class CXRDataset(Dataset):
             labels = labels[1].split("|")
         else:
             labels = [labels]
+        print(labels)
         new_labels = (self._generate_one_hot(labels))
         return new_labels
 
