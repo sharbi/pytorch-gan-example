@@ -444,14 +444,15 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
 
-        pred = apply_threshold(logits_lab)
-        eq = torch.eq(labels, pred)
+        thresholder_predictions = torch.sigmoid(logits_lab)
+        preds = map(apply_threshold, thresholder_predictions)
+        eq = torch.eq(labels, preds)
         masked_correct += torch.sum(label_mask * eq.float())
         # correct = torch.sum(eq.float())
         # masked_correct += correct
         num_samples += torch.sum(label_mask)
-        accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
 
+        accuracy = masked_correct.data[0]/max(1.0, num_samples.data[0])
 
 
         if i % 50 == 0:
