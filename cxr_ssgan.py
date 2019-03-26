@@ -352,6 +352,7 @@ for epoch in range(num_epochs):
     for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
+        print(labels)
         for i, label in enumerate(labels):
             labels[i] = torch.LongTensor(label)
 
