@@ -67,8 +67,8 @@ class CXRDataset(Dataset):
 
     def _separate_labels(self, labels):
         new_labels = []
-        labels = labels[1].split("|")
         print(labels)
+        labels = labels[1].split("|")
         new_labels = (self._generate_one_hot(labels))
         return new_labels
 
