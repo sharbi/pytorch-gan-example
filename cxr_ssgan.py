@@ -364,8 +364,6 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         logits_lab, layer_real, real_real = netD(labeled_data)
 
-        labels = labels.float()
-
         loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
