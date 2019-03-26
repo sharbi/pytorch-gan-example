@@ -17,7 +17,7 @@ import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
 from PIL import Image
-from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MultiLabelBinarizer
 
 import pickle as pkl
 
@@ -54,7 +54,8 @@ class CXRDataset(Dataset):
         self.use_gpu = True if torch.cuda.is_available() else False
         self.info = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
-        self.one_hot_labels = self._separate_labels(self.info.iloc[:, 2])
+        mlb = MultiLabelBinarizer()
+        self.encoded_labels = mlb.fit(self.info.iloc[:, 2])
 
 
     def _generate_one_hot(self, label):
@@ -92,7 +93,7 @@ class CXRDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
         image = Image.open(img_name)
-        labels = self.one_hot_labels[idx]
+        labels = self.encoded_labels[idx]
 
         age = self.info.iloc[idx, 5]
         gender = self.info.iloc[idx, 6]
@@ -439,6 +440,7 @@ for epoch in range(num_epochs):
 
         prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
         tmp_log = torch.log(prob_fake_be_real)
+        print(tmp_log)
         loss_g_2 = -1 * torch.mean(tmp_log)
 
         loss_g = loss_g_1 + loss_g_2
