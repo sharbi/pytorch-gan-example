@@ -62,13 +62,13 @@ class CXRDataset(Dataset):
         output = np.zeros(15, dtype=int)
         for i, x in enumerate(list_of_labels):
             if x in label:
-                print(label)
                 output[i] = 1
         return list(output)
 
     def _separate_labels(self, labels):
         new_labels = []
         labels = labels[1].split("|")
+        print(labels)
         new_labels = (self._generate_one_hot(labels))
         return new_labels
 
