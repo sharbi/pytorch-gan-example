@@ -68,7 +68,7 @@ class CXRDataset(Dataset):
     def _separate_labels(self, labels):
         new_labels = []
         if "|" in labels:
-            labels = labels[1].split("|")
+            labels = labels.split("|")
         else:
             labels = [labels]
         print(labels)
