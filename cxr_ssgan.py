@@ -41,7 +41,7 @@ beta = 0.5
 ngpu = 1
 labeled_rate = 0.03
 
-list_of_labels = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltrate", "Mass", "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema", "Pleural_Thickening", "Fibrosis", "Emphysema", "Hernia", "No Findings"]
+list_of_labels = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltrate", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema", "Pleural_Thickening", "Fibrosis", "Emphysema", "Hernia", "No Finding"]
 
 # Create dataset
 
