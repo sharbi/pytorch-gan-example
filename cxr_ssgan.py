@@ -434,8 +434,13 @@ for epoch in range(num_epochs):
 
         feature_distance = m1 - m2
 
-        loss_g = torch.mean(torch.mul(feature_distance, feature_distance)) + epsilon
+        loss_g_1 = torch.mean(torch.mul(feature_distance, feature_distance)) + epsilon
 
+        prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
+        tmp_log = torch.log(prob_fake_be_real)
+        loss_g_2 = -1 * torch.mean(tmp_log)
+
+        #loss_g = loss_g_1 + loss_g_2
 
 
 
