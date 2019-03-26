@@ -58,11 +58,12 @@ class CXRDataset(Dataset):
 
 
 
-    def _generate_one_hot(self, label):
+    def _generate_one_hot(self, labels):
         output = np.zeros(15, dtype=int)
         for i, x in enumerate(list_of_labels):
-            if x in label:
-                output[i] = 1
+            for label in labels:
+                if x in label:
+                    output[i] = 1
         return list(output)
 
     def _separate_labels(self, labels):
