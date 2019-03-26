@@ -108,8 +108,8 @@ class CXRDataset(Dataset):
 
 
         if self._is_train_dataset():
-            return image, torch.FloatTensor(labels), self.label_mask[idx]
-        else: return image, torch.FloatTensor(labels)
+            return image, torch.LongTensor(labels), self.label_mask[idx]
+        else: return image, torch.LongTensor(labels)
 
 def apply_threshold(predictions):
     output = []
