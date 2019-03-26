@@ -368,7 +368,7 @@ for epoch in range(num_epochs):
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
-        noise.resize_(labels.data.shape[0], nz, 1, 1).uniform_(0, 100)
+        noise.resize_(batch_size, nz, 1, 1).uniform_(0, 100)
         noise_var = _to_var(noise)
         generator_input = netG(noise_var)
 
