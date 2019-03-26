@@ -369,7 +369,7 @@ for epoch in range(num_epochs):
 
         labels = labels.float()
 
-        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.logsumexp((logits_lab), 0))
+        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
@@ -403,8 +403,8 @@ for epoch in range(num_epochs):
         logits_gen, _, fake_fake = netD(generator_input.detach())
         #logits_gen_adv, _, _ = netD(gen_adv.detach())
 
-        l_unl = torch.logsumexp(logits_lab, 1)
-        l_gen = torch.logsumexp(logits_gen, 1)
+        l_unl = torch.logsumexp(logits_lab, 0)
+        l_gen = torch.logsumexp(logits_gen, 0)
 
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
@@ -438,14 +438,7 @@ for epoch in range(num_epochs):
 
         feature_distance = m1 - m2
 
-        loss_g_1 = torch.mean(torch.mul(feature_distance, feature_distance)) + epsilon
-
-        prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
-        tmp_log = torch.log(prob_fake_be_real)
-        print(tmp_log)
-        loss_g_2 = -1 * torch.mean(tmp_log)
-
-        loss_g = loss_g_1 + loss_g_2
+        loss_g = torch.mean(torch.mul(feature_distance, feature_distance))
 
 
 
