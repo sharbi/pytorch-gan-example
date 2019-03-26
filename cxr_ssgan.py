@@ -58,14 +58,12 @@ class CXRDataset(Dataset):
 
 
 
-    def _generate_one_hot(self, labels):
+    def _generate_one_hot(self, label):
         output = np.zeros(15, dtype=int)
         for i, x in enumerate(list_of_labels):
-            for label in labels:
+            if x in label:
                 print(label)
-                if x in label:
-                    print(label)
-                    output[i] = 1
+                output[i] = 1
         return list(output)
 
     def _separate_labels(self, labels):
@@ -97,7 +95,7 @@ class CXRDataset(Dataset):
         img_name = os.path.join(self.root_dir, self.info.iloc[idx, 1])
         image = Image.open(img_name)
         labels = self.encoded_labels[idx]
-
+        print(labels)
 
         age = self.info.iloc[idx, 5]
         gender = self.info.iloc[idx, 6]
@@ -356,7 +354,6 @@ for epoch in range(num_epochs):
     for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
-        print(labels)
 
         labels = _to_var(labels)
 
