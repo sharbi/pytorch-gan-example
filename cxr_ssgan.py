@@ -435,7 +435,7 @@ for epoch in range(num_epochs):
 
         feature_distance = m1 - m2
 
-        loss_g = torch.mean(torch.mul(feature_distance, feature_distance))
+        loss_g = torch.mean(torch.abs(m1 - m2))
 
 
 
