@@ -359,6 +359,8 @@ for epoch in range(num_epochs):
 
         epsilon = 1e-8
 
+
+        netD.zero_grad()
         logits_lab, layer_real, real_real = netD(labeled_data)
         loss_lab = d_gan_criterion(logits_lab, labels)
 
@@ -393,7 +395,6 @@ for epoch in range(num_epochs):
         ##########################
 
 
-        netD.zero_grad()
         #logits_unl, layer_real = netD(unlabeled_data)
 
         logits_gen, _, fake_fake = netD(generator_input.detach())
@@ -440,7 +441,7 @@ for epoch in range(num_epochs):
         tmp_log = torch.log(prob_fake_be_real)
         loss_g_2 = -1 * torch.mean(tmp_log)
 
-        loss_g = torch.abs(loss_g_1 + loss_g_2)
+        #loss_g = loss_g_1 + loss_g_2
 
 
 
