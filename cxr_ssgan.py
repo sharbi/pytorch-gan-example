@@ -57,7 +57,7 @@ class CXRDataset(Dataset):
         mlb = MultiLabelBinarizer()
         self.encoded_labels = mlb.fit_transform(self.info.iloc[:, 2])
 
-        print(self.encoded_labels.shape)
+        print(self.encoded_labels)
 
 
     def _generate_one_hot(self, label):
