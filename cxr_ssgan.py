@@ -60,7 +60,7 @@ class CXRDataset(Dataset):
 
     def _generate_one_hot(self, label):
         output = np.zeros(15, dtype=int)
-        output = np.concat(output, np.array([1]))
+        output = np.concatenate(output, np.array([1]))
         for i, x in enumerate(list_of_labels):
             if x in label:
                 output[i] = 1
