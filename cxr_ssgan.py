@@ -56,7 +56,7 @@ class CXRDataset(Dataset):
         self.label_mask = self._create_label_mask()
         mlb = MultiLabelBinarizer()
         print(self.info.iloc[:, 2][1])
-        self.encoded_labels = mlb.fit_transform(self.info.iloc[:, 2][1])
+        self.encoded_labels = mlb.fit_transform(list(self.info.iloc[:, 2][1]))
 
         print(list(mlb.classes_))
 
