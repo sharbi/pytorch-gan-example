@@ -357,13 +357,14 @@ for epoch in range(num_epochs):
 
         labels = torch.cat((labels, _to_var(torch.zeros(labels.shape[0], 1))), 1)
 
+        epsilon = 1e-8
 
         logits_lab, layer_real, real_real = netD(labeled_data)
         loss_lab = d_gan_criterion(logits_lab, labels)
 
         labels = labels.float()
 
-        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 1)))
+        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.logsumexp((logits_lab), 0))
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
@@ -433,7 +434,7 @@ for epoch in range(num_epochs):
 
         feature_distance = m1 - m2
 
-        loss_g = torch.mean(torch.mul(feature_distance, feature_distance))
+        loss_g = torch.mean(torch.mul(feature_distance, feature_distance)) + epsilon
 
 
 
