@@ -352,7 +352,8 @@ for epoch in range(num_epochs):
     for i, data in enumerate(loader_train):
         labeled_data, labels, label_mask = data
         labeled_data = _to_var(labeled_data).float()
-        labels = torch.tensor(labels)
+        for i, label in enumerate(labels):
+            labels[i] = torch.FloatTensor(label)
         labels = _to_var(labels)
 
         labels = torch.cat((labels, _to_var(torch.ones(labels.shape[0], 1))), 1)
