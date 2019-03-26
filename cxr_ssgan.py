@@ -55,8 +55,9 @@ class CXRDataset(Dataset):
         self.info = pd.read_csv(root_dir + data_file)
         self.label_mask = self._create_label_mask()
         mlb = MultiLabelBinarizer()
-        print(self._separate_labels(self.info.iloc[:, 2][1]))
         self.encoded_labels = mlb.fit_transform(self._separate_labels(self.info.iloc[:, 2][1]))
+
+        print(self.encoded_labels)
 
         print(mlb.classes_)
 
