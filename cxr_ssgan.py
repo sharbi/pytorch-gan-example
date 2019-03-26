@@ -73,7 +73,6 @@ class CXRDataset(Dataset):
         else:
             labels = [labels]
         new_labels = (self._generate_one_hot(labels))
-        if new_labels == list(np.zeros(15, dtype=int)):
         return new_labels
 
     def _create_label_mask(self):
