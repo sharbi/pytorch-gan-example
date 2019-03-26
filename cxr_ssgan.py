@@ -446,6 +446,7 @@ for epoch in range(num_epochs):
         thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
         eq = torch.eq(labels, _to_var(torch.tensor(list(preds))))
+        print(eq)
         masked_correct += torch.sum(label_mask * eq.float())
         # correct = torch.sum(eq.float())
         # masked_correct += correct
