@@ -345,8 +345,8 @@ for epoch in range(num_epochs):
 
         loss_lab = -torch.sum(labels * torch.log(torch.sigmoid(logits_lab)), dim=1)
         print(loss_lab)
-        #loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
-        #print(loss_lab)
+        loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
+        print(loss_lab)
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
