@@ -331,7 +331,7 @@ for epoch in range(num_epochs):
         labeled_data = _to_var(labeled_data).float()
 
         labels = torch.LongTensor(labels)
-        labels = _to_var(labels).float()
+        labels = _to_var(labels)
 
         mask = get_label_mask(labeled_rate, batch_size)
         print(mask)
