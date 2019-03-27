@@ -52,7 +52,6 @@ class CXRDataset(Dataset):
         self.transform = transform
         self.use_gpu = True if torch.cuda.is_available() else False
         self.info = pd.read_csv(root_dir + data_file)
-        self.label_mask = self._create_label_mask()
         self.encoded_labels = list(map(self._separate_labels, self.info.iloc[:, 2]))
 
 
