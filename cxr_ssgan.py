@@ -233,45 +233,6 @@ class Discriminator(nn.Module):
         self.conv7 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 1, bias=False)
         self.conv8 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 0, bias=False)
 
-
-        self.main = nn.Sequential(
-
-            nn.Dropout(0.2),
-
-            # input is (number_channels) x 60 x 4
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.5),
-
-            nn.utils.weight_norm(),
-            nn.LeakyReLU(0.2),
-
-        )
-
         self.features = nn.AvgPool2d(kernel_size=2)
 
         self.class_logits = nn.Linear(
