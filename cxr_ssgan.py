@@ -342,12 +342,12 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         logits_lab, layer_real, real_real = netD(labeled_data)
 
-        #loss_lab = d_gan_criterion(logits_lab, labels)
+        loss_lab = d_gan_criterion(logits_lab, labels)
 
-        loss_lab = -torch.sum(labels * torch.log(logits_lab), dim=1)
-        print(loss_lab)
-        loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
-        print(loss_lab)
+        #loss_lab = -torch.sum(labels * torch.log(logits_lab), dim=1)
+        #print(loss_lab)
+        #loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
+        #print(loss_lab)
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
