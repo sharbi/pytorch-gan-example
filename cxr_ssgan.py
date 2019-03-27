@@ -231,23 +231,7 @@ class _ganLogits(nn.Module):
         self.num_classes = num_classes
 
     def forward(self, class_logits):
-        '''
-        :param class_logits: Unscaled log probabilities of house numbers
-        '''
 
-        # Set gan_logits such that P(input is real | input) = sigmoid(gan_logits).
-        # Keep in mind that class_logits gives you the probability distribution over all the real
-        # classes and the fake class. You need to work out how to transform this multiclass softmax
-        # distribution into a binary real-vs-fake decision that can be described with a sigmoid.
-        # Numerical stability is very important.
-        # You'll probably need to use this numerical stability trick:
-        # log sum_i exp a_i = m + log sum_i exp(a_i - m).
-        # This is numerically stable when m = max_i a_i.
-        # (It helps to think about what goes wrong when...
-        #   1. One value of a_i is very large
-        #   2. All the values of a_i are very negative
-        # This trick and this value of m fix both those cases, but the naive implementation and
-        # other values of m encounter various problems)
         real_class_logits, fake_class_logits = torch.split(class_logits, self.num_classes, dim=1)
         fake_class_logits = torch.squeeze(fake_class_logits)
 
@@ -282,7 +266,7 @@ class Discriminator(nn.Module):
             in_features=(ndf * 4) * 1 * 1,
             out_features=num_classes + 1)
 
-        self.gan_logits = _ganLogits(class_logits)
+        self.gan_logits = _ganLogits(self.class_logits)
 
         self.softmax = nn.LogSoftmax(dim=0)
 
