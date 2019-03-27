@@ -315,8 +315,8 @@ for epoch in range(num_epochs):
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).float()
 
-        labeled_mask = get_label_mask()
-
+        mask = get_label_mask(labeled_rate, batch_size)
+        mask = _to_var(torch.FloatTensor(mask))
         epsilon = 1e-8
 
 
@@ -324,7 +324,7 @@ for epoch in range(num_epochs):
         logits_lab, layer_real, real_real = netD(labeled_data)
 
         loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
-        loss_lab = (loss_lab * labeled_mask) / torch.sum(labeled_mask)
+        loss_lab = (loss_lab * mask) / torch.sum(mask)
 
         #loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
@@ -346,8 +346,6 @@ for epoch in range(num_epochs):
 
         #gen_adv = generator_input + 20. * manifold_regularisation_norm
 
-        mask = get_label_mask(labeled_rate, batch_size)
-        mask = _to_var(torch.FloatTensor(mask))
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
