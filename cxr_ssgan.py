@@ -245,13 +245,13 @@ class Discriminator(nn.Module):
 
     def forward(self, inputs):
 
-        layer1 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv1(inputs), 0.2), 0.5))
-        layer2 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv2(layer1), 0.2), 0.5))
-        layer3 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv3(layer2), 0.2), 0.5))
-        layer4 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv4(layer3), 0.2), 0.5))
-        layer5 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv5(layer4), 0.2), 0.5))
-        layer6 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv6(layer5), 0.2), 0.5))
-        layer7 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv7(layer6), 0.2), 0.5))
+        layer1 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv1(inputs)), 0.2), 0.5)
+        layer2 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv2(layer1)), 0.2), 0.5)
+        layer3 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv3(layer2)), 0.2), 0.5)
+        layer4 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv4(layer3)), 0.2), 0.5)
+        layer5 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv5(layer4)), 0.2), 0.5)
+        layer6 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv6(layer5)), 0.2), 0.5)
+        layer7 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv7(layer6)), 0.2), 0.5)
         layer8 = F.leaky_relu(nn.utils.weight_norm(self.conv8(layer7), 0.2))
 
         avg_pool = self.features(layer8)
