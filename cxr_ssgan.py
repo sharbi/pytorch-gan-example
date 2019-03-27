@@ -343,7 +343,8 @@ for epoch in range(num_epochs):
         logits_lab, layer_real, real_real = netD(labeled_data)
 
         loss_lab = d_gan_criterion(logits_lab, labels)
-        loss_lab = (loss_lab * mask) / torch.sum(mask)
+        print(loss_lab)
+        loss_lab = (loss_lab * mask) / torch.max(1.0, torch.sum(mask))
 
         #loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
