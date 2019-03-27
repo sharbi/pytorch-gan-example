@@ -39,7 +39,7 @@ num_epochs = 5000
 lr = 0.0003
 beta = 0.5
 ngpu = 1
-labeled_rate = 0.03
+labeled_rate = 0.1
 
 list_of_labels = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema", "Pleural_Thickening", "Fibrosis", "Emphysema", "Hernia", "No Finding"]
 
@@ -335,7 +335,6 @@ for epoch in range(num_epochs):
 
         mask = get_label_mask(labeled_rate, batch_size)
         print(mask)
-        print(torch.sum(mask))
         mask = _to_var(torch.FloatTensor(mask))
         epsilon = 1e-8
 
