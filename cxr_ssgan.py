@@ -244,7 +244,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax(dim=0)
+        self.sigmoid = nn.LogSigmoid(dim=0)
 
     def forward(self, inputs):
 
@@ -279,7 +279,7 @@ class Discriminator(nn.Module):
 
         #gan_logits = self.gan_logits(class_logits)
 
-        out = self.softmax(class_logits)
+        out = self.sigmoid(class_logits)
 
         return class_logits, torch.flatten(layer7), out
 
