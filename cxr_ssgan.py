@@ -243,7 +243,7 @@ class Discriminator(nn.Module):
             nn.Dropout2d(0.5),
         )
         self.conv4 = nn.Sequential(
-            Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False),
+            nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2),
             nn.BatchNorm2d(ndf*4),
             nn.Dropout2d(0.5),
