@@ -293,7 +293,7 @@ netD.apply(weights_init)
 print(netD)
 
 d_unsupervised_criterion = nn.BCEWithLogitsLoss()
-d_gan_criterion = nn.CrossEntropyLoss()
+d_gan_criterion = nn.BCEWithLogitsLoss()
 fixed_noise = torch.FloatTensor(batch_size, nz, 1, 1).normal_(0, 1)
 fixed_noise = _to_var(fixed_noise)
 
@@ -331,7 +331,7 @@ for epoch in range(num_epochs):
         labeled_data = _to_var(labeled_data).float()
 
         labels = torch.LongTensor(labels)
-        labels = _to_var(labels)
+        labels = _to_var(labels).float()
 
         mask = get_label_mask(labeled_rate, batch_size)
         print(mask)
@@ -342,11 +342,12 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         logits_lab, layer_real, real_real = netD(labeled_data)
 
-        loss_lab = d_gan_criterion(logits_lab, labels)
-        print(loss_lab)
-        loss_lab = (loss_lab * mask) / torch.max(1.0, torch.sum(mask))
+        #loss_lab = d_gan_criterion(logits_lab, labels)
 
-        #loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
+        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
+        print(loss_lab)
+        loss_lab = (loss_lab * mask) / torch.argmax(1.0, torch.sum(mask))
+
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
 
