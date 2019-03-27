@@ -217,6 +217,46 @@ class Generator(nn.Module):
 
 
 
+class _ganLogits(nn.Module):
+    '''
+    Layer of the GAN logits of the discriminator
+    The layer gets class logits as inputs and calculates GAN logits to
+    differentiate real and fake images in a numerical stable way
+    '''
+    def __init__(self, num_classes):
+        '''
+        :param num_classes: Number of real data classes (10 for SVHN)
+        '''
+        super(_ganLogits, self).__init__()
+        self.num_classes = num_classes
+
+    def forward(self, class_logits):
+        '''
+        :param class_logits: Unscaled log probabilities of house numbers
+        '''
+
+        # Set gan_logits such that P(input is real | input) = sigmoid(gan_logits).
+        # Keep in mind that class_logits gives you the probability distribution over all the real
+        # classes and the fake class. You need to work out how to transform this multiclass softmax
+        # distribution into a binary real-vs-fake decision that can be described with a sigmoid.
+        # Numerical stability is very important.
+        # You'll probably need to use this numerical stability trick:
+        # log sum_i exp a_i = m + log sum_i exp(a_i - m).
+        # This is numerically stable when m = max_i a_i.
+        # (It helps to think about what goes wrong when...
+        #   1. One value of a_i is very large
+        #   2. All the values of a_i are very negative
+        # This trick and this value of m fix both those cases, but the naive implementation and
+        # other values of m encounter various problems)
+        real_class_logits, fake_class_logits = torch.split(class_logits, self.num_classes, dim=1)
+        fake_class_logits = torch.squeeze(fake_class_logits)
+
+        max_val, _ = torch.max(real_class_logits, 1, keepdim=True)
+        stable_class_logits = real_class_logits - max_val
+        max_val = torch.squeeze(max_val)
+        gan_logits = torch.log(torch.sum(torch.exp(stable_class_logits), 1)) + max_val - fake_class_logits
+
+        return gan_logits
 
 class Discriminator(nn.Module):
 
@@ -242,9 +282,9 @@ class Discriminator(nn.Module):
             in_features=(ndf * 4) * 1 * 1,
             out_features=num_classes + 1)
 
-        #self.gan_logits = _ganLogits()
+        self.gan_logits = _ganLogits(class_logits)
 
-        self.sigmoid = nn.LogSigmoid()
+        self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, inputs):
 
@@ -277,11 +317,11 @@ class Discriminator(nn.Module):
 
         class_logits = self.class_logits(avg_pool)
 
-        #gan_logits = self.gan_logits(class_logits)
+        gan_logits = self.gan_logits(class_logits)
 
-        out = self.sigmoid(class_logits)
+        out = self.softmax(class_logits)
 
-        return class_logits, torch.flatten(layer7), out
+        return class_logits, torch.flatten(layer7), gan_logits
 
 
 netG = Generator(ngpu).to(device)
@@ -339,11 +379,9 @@ for epoch in range(num_epochs):
 
 
         netD.zero_grad()
-        logits_lab, layer_real, real_real = netD(labeled_data)
+        logits_lab, layer_real, gan_logits_real = netD(labeled_data)
 
-        #loss_lab = d_gan_criterion(logits_lab, labels)
-
-        loss_lab = -torch.sum(labels * torch.log(real_real), dim=1)
+        loss_lab = -torch.sum(labels * torch.log(F.softplus(logits_lab)), dim=1)
         loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
         loss_lab = torch.mean(loss_lab)
 
@@ -366,6 +404,9 @@ for epoch in range(num_epochs):
 
         #gen_adv = generator_input + 20. * manifold_regularisation_norm
 
+        d_gan_labels_real = d_gan_labels_real.resize_as_(svhn_labels.data.cpu().float()).uniform_(0, 0.3)
+        d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
+        d_gan_real_loss = d_gan_criterion(gan_logits_real, d_gan_labels_real_var)
 
         ##########################
         # FIRST SORT OUT SUPERVISED LOSS:
@@ -375,17 +416,14 @@ for epoch in range(num_epochs):
 
         #logits_unl, layer_real = netD(unlabeled_data)
 
-        logits_gen, _, fake_fake = netD(generator_input.detach())
+        logits_gen, _, gan_logits_fake = netD(generator_input.detach())
         #logits_gen_adv, _, _ = netD(gen_adv.detach())
 
-        l_unl = torch.logsumexp(logits_lab, 0)
-        l_gen = torch.logsumexp(logits_gen, 0)
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(svhn_labels.data.cpu().float()).uniform_(0.9, 1.2)
+        d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
+        d_gan_fake_loss = d_gan_criterion(gan_logits_fake, d_gan_labels_fake_var)
 
-
-        loss_unl = - 0.5 * torch.mean(l_unl) \
-                         + 0.5 * torch.mean(F.softplus(l_unl)) \
-                         + 0.5 * torch.mean(F.softplus(l_gen))
-
+        loss_unl = d_gan_real_loss + d_gan_fake_loss
 
         #manifold_diff = logits_gen - logits_gen_adv
 
