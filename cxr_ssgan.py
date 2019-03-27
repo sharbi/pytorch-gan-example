@@ -245,14 +245,14 @@ class Discriminator(nn.Module):
 
     def forward(self, inputs):
 
-        layer1 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(inputs), 0.2), 0.5))
-        layer2 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer1), 0.2), 0.5))
-        layer3 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer2), 0.2), 0.5))
-        layer4 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer3), 0.2), 0.5))
-        layer5 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer4), 0.2), 0.5))
-        layer6 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer5), 0.2), 0.5))
-        layer7 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer6), 0.2), 0.5))
-        layer8 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer7), 0.2), 0.5))
+        layer1 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(inputs), 0.2)), 0.5)
+        layer2 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer1), 0.2)), 0.5)
+        layer3 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer2), 0.2)), 0.5)
+        layer4 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer3), 0.2)), 0.5)
+        layer5 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer4), 0.2)), 0.5)
+        layer6 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer5), 0.2)), 0.5)
+        layer7 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer6), 0.2)), 0.5)
+        layer8 = F.dropout(F.batch_norm(F.leaky_relu(self.conv1(layer7), 0.2)), 0.5)
 
         avg_pool = self.features(layer8)
         avg_pool = avg_pool.squeeze()
