@@ -449,7 +449,7 @@ for epoch in range(num_epochs):
 
 
     with torch.no_grad():
-        for i, data in enumerate(diabetes_loader_test):
+        for i, data in enumerate(loader_test):
             test_values, test_labels = data
             test_values = _to_var(test_values).float()
             test_labels = _to_var(test_labels).float()
