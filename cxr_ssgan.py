@@ -448,17 +448,19 @@ for epoch in range(num_epochs):
             print('Training:\tepoch {}/{}\taccuracy {}'.format(epoch, num_epochs, train_accuracy))
 
 
-    #with torch.no_grad():
-    #    for i, data in enumerate(diabetes_loader_test):
-    #        test_values, test_labels = data
-    #        test_values = _to_var(test_values).float()
-    #        test_labels = _to_var(test_labels).float()
-    #        test_logits, _ = netD(test_values)
-    #        pred_class = torch.argmax(test_logits, 1)
-    #        correct_pred = torch.eq(pred_class.float(), test_labels)
-    #        test_accuracy = torch.mean(correct_pred.float())
+    with torch.no_grad():
+        for i, data in enumerate(diabetes_loader_test):
+            test_values, test_labels = data
+            test_values = _to_var(test_values).float()
+            test_labels = _to_var(test_labels).float()
+            test_logits, _ = netD(test_values)
+            test_thresholder_predictions = torch.sigmoid(test_logits)
+            test_preds = map(apply_threshold, test_thresholder_predictions)
+            total = len(labels) * num_classes
+            correct = (list(test_preds) == test_labels.cpu().numpy().astype(int)).sum()
+            test_accuracy = 100 * correct / total
 
-    #        print(f'Testing:\tepoch {epoch}/{num_epochs}\taccuracy {test_accuracy}')
+            print(f'Testing:\tepoch {epoch}/{num_epochs}\taccuracy {test_accuracy}')
 
     if train_accuracy > best_accuracy:
         best_accuracy = train_accuracy
