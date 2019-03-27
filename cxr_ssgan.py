@@ -270,7 +270,6 @@ class Discriminator(nn.Module):
         layer7 = F.dropout(self.batch5(layer7), 0.5)
 
         layer8 = F.leaky_relu(self.conv6(layer7), 0.2)
-        layer8 = F.dropout(self.batch6(layer8), 0.5)
 
 
         avg_pool = self.features(layer8)
