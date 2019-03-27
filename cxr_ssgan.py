@@ -378,8 +378,8 @@ for epoch in range(num_epochs):
         logits_gen, _, fake_fake = netD(generator_input.detach())
         #logits_gen_adv, _, _ = netD(gen_adv.detach())
 
-        l_unl = torch.logsumexp(logits_lab, 0)
-        l_gen = torch.logsumexp(logits_gen, 0)
+        l_unl = torch.logsumexp(logits_lab, 1)
+        l_gen = torch.logsumexp(logits_gen, 1)
 
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
