@@ -343,7 +343,7 @@ for epoch in range(num_epochs):
 
         loss_lab = d_gan_criterion(logits_lab, labels)
         loss_lab = (loss_lab * mask) / torch.sum(mask)
-        loss_lab = torch.mean(loss_lab)
+        print(loss_lab)
 
         #loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
