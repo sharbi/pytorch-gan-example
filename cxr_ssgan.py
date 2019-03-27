@@ -344,9 +344,10 @@ for epoch in range(num_epochs):
 
         #loss_lab = d_gan_criterion(logits_lab, labels)
 
-        loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
+        loss_lab = -torch.sum(labels * torch.log(real_real), dim=1)
         print(loss_lab)
-        loss_lab = (loss_lab * mask) / torch.max(torch.Tensor([_to_var(1.0), torch.sum(mask)]))
+        loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
+        print(loss_lab)
 
 
         noise = torch.FloatTensor(batch_size, nz, 1, 1)
