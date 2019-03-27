@@ -388,7 +388,7 @@ for epoch in range(num_epochs):
 
         #gen_adv = generator_input + 20. * manifold_regularisation_norm
 
-        d_gan_labels_real = d_gan_labels_real.resize_as_(torch.tensor(batch_size)).uniform_(0.9, 1.2)
+        d_gan_labels_real = d_gan_labels_real.resize_as_(torch.FloatTensor(batch_size)).uniform_(0.9, 1.2)
         d_gan_labels_real_var = _to_var(d_gan_labels_real).float()
         d_gan_real_loss = d_gan_criterion(gan_logits_real, d_gan_labels_real_var)
 
@@ -403,7 +403,7 @@ for epoch in range(num_epochs):
         logits_gen, _, gan_logits_fake = netD(generator_input.detach())
         #logits_gen_adv, _, _ = netD(gen_adv.detach())
 
-        d_gan_labels_fake = d_gan_labels_fake.resize_as_(torch.tensor(batch_size)).uniform_(0.9, 1.2)
+        d_gan_labels_fake = d_gan_labels_fake.resize_as_(torch.FloatTensor(batch_size)).uniform_(0.9, 1.2)
         d_gan_labels_fake_var = _to_var(d_gan_labels_fake).float()
         d_gan_fake_loss = d_gan_criterion(gan_logits_fake, d_gan_labels_fake_var)
 
