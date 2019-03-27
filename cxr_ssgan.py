@@ -453,7 +453,7 @@ for epoch in range(num_epochs):
             test_values, test_labels = data
             test_values = _to_var(test_values).float()
             test_labels = _to_var(test_labels).float()
-            test_logits, _ = netD(test_values)
+            test_logits, _, _ = netD(test_values)
             test_thresholder_predictions = torch.sigmoid(test_logits)
             test_preds = map(apply_threshold, test_thresholder_predictions)
             total = len(labels) * num_classes
