@@ -224,40 +224,17 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
 
-        self.conv1 = nn.Sequential(
-            nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(ndf),
-            nn.Dropout2d(0.5),
-        )
-        self.conv2 = nn.Sequential(
-            nn.Conv2d(ndf, ndf*2, 4, 2, 1, bias=False),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(ndf*2),
-            nn.Dropout2d(0.5),
-        )
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(ndf*2, ndf*2, 4, 2, 1, bias=False),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(ndf*2),
-            nn.Dropout2d(0.5),
-        )
-        self.conv4 = nn.Sequential(
-            nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(ndf*4),
-            nn.Dropout2d(0.5),
-        )
-        self.conv5 = nn.Sequential(
-            nn.Conv2d(ndf*4, ndf*4, 3, 1, 1, bias=False),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(ndf*4),
-            nn.Dropout2d(0.5),
-        )
-        self.conv6 = nn.Sequential(
-            nn.Conv2d(ndf*4, ndf*4, 3, 1, 0, bias=False),
-            nn.LeakyReLU(0.2)
-        )
+        self.conv1 = nn.Conv2d(nc, ndf, 4, 2, 1, bias=False)
+        self.batch1 = nn.BatchNorm2d(ndf)
+        self.conv2 = nn.Conv2d(ndf, ndf*2, 4, 2, 1, bias=False)
+        self.batch2 = nn.BatchNorm2d(ndf*2)
+        self.conv3 = nn.Conv2d(ndf*2, ndf*2, 4, 2, 1, bias=False)
+        self.batch3 = nn.BatchNorm2d(ndf*2)
+        self.conv4 = nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False)
+        self.batch4 = nn.BatchNorm2d(ndf*4)
+        self.conv5 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 1, bias=False)
+        self.batch5 = nn.BatchNorm2d(ndf*4)
+        self.conv6 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 0, bias=False)
 
         self.features = nn.AvgPool2d(kernel_size=2)
 
@@ -271,14 +248,30 @@ class Discriminator(nn.Module):
 
     def forward(self, inputs):
 
-        layer1 = self.conv1(inputs)
-        layer2 = self.conv2(layer1)
-        layer3 = self.conv3(layer2)
-        layer4 = self.conv3(layer3)
-        layer5 = self.conv3(layer4)
-        layer6 = self.conv4(layer5)
-        layer7 = self.conv5(layer6)
-        layer8 = self.conv6(layer7)
+        layer1 = F.LeakyReLU(self.conv1(inputs), 0.2)
+        layer1 = F.Dropout(self.batch1(layer1), 0.5)
+
+        layer2 = F.LeakyReLU(self.conv2(layer1), 0.2)
+        layer2 = F.Dropout(self.batch2(layer2), 0.5)
+
+        layer3 = F.LeakyReLU(self.conv3(layer2), 0.2)
+        layer3 = F.Dropout(self.batch3(layer3), 0.5)
+
+        layer4 = F.LeakyReLU(self.conv3(layer3), 0.2)
+        layer4 = F.Dropout(self.batch3(layer4), 0.5)
+
+        layer5 = F.LeakyReLU(self.conv3(layer4), 0.2)
+        layer5 = F.Dropout(self.batch3(layer5), 0.5)
+
+        layer6 = F.LeakyReLU(self.conv4(layer5), 0.2)
+        layer6 = F.Dropout(self.batch4(layer6), 0.5)
+
+        layer7 = F.LeakyReLU(self.conv5(layer6), 0.2)
+        layer7 = F.Dropout(self.batch5(layer7), 0.5)
+
+        layer8 = F.LeakyReLU(self.conv6(layer7), 0.2)
+        layer8 = F.Dropout(self.batch6(layer8), 0.5)
+    
 
         avg_pool = self.features(layer8)
         avg_pool = avg_pool.squeeze()
