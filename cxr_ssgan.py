@@ -334,7 +334,6 @@ for epoch in range(num_epochs):
         labels = _to_var(labels).float()
 
         mask = get_label_mask(labeled_rate, batch_size)
-        print(mask)
         mask = _to_var(torch.FloatTensor(mask))
         epsilon = 1e-8
 
