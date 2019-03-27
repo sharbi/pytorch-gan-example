@@ -283,7 +283,7 @@ class Discriminator(nn.Module):
         avg_pool = self.features(layer8)
         avg_pool = avg_pool.squeeze()
 
-        class_logits = self.class_logits(features)
+        class_logits = self.class_logits(avg_pool)
 
         #gan_logits = self.gan_logits(class_logits)
 
