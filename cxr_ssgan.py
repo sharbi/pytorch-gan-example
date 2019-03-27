@@ -334,6 +334,8 @@ for epoch in range(num_epochs):
         labels = _to_var(labels).float()
 
         mask = get_label_mask(labeled_rate, batch_size)
+        print(mask)
+        print(torch.sum(mask))
         mask = _to_var(torch.FloatTensor(mask))
         epsilon = 1e-8
 
@@ -343,7 +345,6 @@ for epoch in range(num_epochs):
 
         loss_lab = d_gan_criterion(logits_lab, labels)
         loss_lab = (loss_lab * mask) / torch.sum(mask)
-        print(loss_lab)
 
         #loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
