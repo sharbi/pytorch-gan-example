@@ -244,7 +244,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        self.sigmoid = nn.LogSigmoid(dim=0)
+        self.sigmoid = nn.LogSigmoid()
 
     def forward(self, inputs):
 
