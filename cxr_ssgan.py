@@ -56,8 +56,6 @@ class CXRDataset(Dataset):
         self.encoded_labels = list(map(self._separate_labels, self.info.iloc[:, 2]))
 
 
-
-
     def _generate_one_hot(self, label):
         output = np.zeros(15, dtype=int)
         output = np.concatenate((output, np.array([1])))
@@ -75,17 +73,6 @@ class CXRDataset(Dataset):
         new_labels = (self._generate_one_hot(labels))
         return new_labels
 
-    def _create_label_mask(self):
-        '''
-        Creates a mask array to use only a limited number of labels during the training
-        '''
-        if self._is_train_dataset():
-            label_mask = np.zeros(len(self.info))
-            label_mask[0:1000] = 1
-            np.random.shuffle(label_mask)
-            label_mask = torch.LongTensor(label_mask)
-            return label_mask
-        return None
 
     def _is_train_dataset(self):
         return True if self.split == 'train' else False
@@ -105,10 +92,7 @@ class CXRDataset(Dataset):
 
         image = self.transform(image)
 
-
-        if self._is_train_dataset():
-            return image, torch.LongTensor(labels), self.label_mask[idx]
-        else: return image, torch.LongTensor(labels)
+        return image, torch.LongTensor(labels)
 
 def apply_threshold(predictions):
     output = []
@@ -158,7 +142,7 @@ def get_loader(batch_size):
 
 loader_train, loader_test = get_loader(batch_size=batch_size)
 image_iter = iter(loader_train)
-image, _, _ = image_iter.next()
+image, _ = image_iter.next()
 
 
 test_iter = iter(loader_test)
@@ -182,12 +166,6 @@ def _to_var(x):
         x = x.cuda()
     return Variable(x)
 
-def _one_hot(x):
-        label_numpy = x.data.cpu().numpy()
-        label_onehot = np.zeros((label_numpy.shape[0], num_classes))
-        label_onehot[np.arange(label_numpy.shape[0]), label_numpy] = 1
-        label_onehot = _to_var(torch.FloatTensor(label_onehot))
-        return label_onehot
 
 def get_label_mask(labeled_rate, batch_size):
     label_mask = np.zeros([batch_size], dtype=np.float32)
@@ -247,40 +225,50 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
 
+        self.conv1 = nn.Conv2d(nc, ndf, 4, 2, 1, bias=False)
+        self.conv2 = nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)
+        self.conv3 = nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)
+        self.conv4 = nn.Conv2d(ndf, ndf*2, 4, 2, 1, bias=False)
+        self.conv5 = nn.Conv2d(ndf*2, ndf*2, 4, 2, 1, bias=False)
+        self.conv6 = nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False)
+        self.conv7 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 1, bias=False)
+        self.conv8 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 0, bias=False)
+
+
         self.main = nn.Sequential(
 
             nn.Dropout(0.2),
 
             # input is (number_channels) x 60 x 4
-            nn.utils.weight_norm(nn.Conv2d(nc, ndf, 4, 2, 1, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf, 4, 2, 1, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
-            nn.utils.weight_norm(nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
-            nn.utils.weight_norm(nn.Conv2d(ndf * 2, ndf * 2, 4, 2, 1, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
-            nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
-            nn.utils.weight_norm(nn.Conv2d(ndf * 4, ndf*4, 3, 1, 1, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.5),
 
-            nn.utils.weight_norm(nn.Conv2d(ndf *4, ndf*4, 3, 1, 0, bias=False)),
+            nn.utils.weight_norm(),
             nn.LeakyReLU(0.2),
 
         )
@@ -297,10 +285,17 @@ class Discriminator(nn.Module):
 
     def forward(self, inputs):
 
-        out = self.main(inputs)
+        layer1 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv1(inputs), 0.2), 0.5))
+        layer2 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv2(layer1), 0.2), 0.5))
+        layer3 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv3(layer2), 0.2), 0.5))
+        layer4 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv4(layer3), 0.2), 0.5))
+        layer5 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv5(layer4), 0.2), 0.5))
+        layer6 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv6(layer5), 0.2), 0.5))
+        layer7 = F.dropout(F.leaky_relu(nn.utils.weight_norm(self.conv7(layer6), 0.2), 0.5))
+        layer8 = F.leaky_relu(nn.utils.weight_norm(self.conv8(layer7), 0.2))
 
-        features = self.features(out)
-        features = features.squeeze()
+        avg_pool = self.features(layer8)
+        avg_pool = avg_pool.squeeze()
 
         class_logits = self.class_logits(features)
 
@@ -308,7 +303,7 @@ class Discriminator(nn.Module):
 
         out = self.softmax(class_logits)
 
-        return class_logits, features, out
+        return class_logits, layer7, out
 
 
 netG = Generator(ngpu).to(device)
@@ -354,11 +349,13 @@ for epoch in range(num_epochs):
     # For each batch in the dataloader
 
     for i, data in enumerate(loader_train):
-        labeled_data, labels, label_mask = data
+        labeled_data, labels = data
         labeled_data = _to_var(labeled_data).float()
 
         labels = torch.LongTensor(labels)
         labels = _to_var(labels).float()
+
+        labeled_mask = get_label_mask()
 
         epsilon = 1e-8
 
@@ -367,6 +364,7 @@ for epoch in range(num_epochs):
         logits_lab, layer_real, real_real = netD(labeled_data)
 
         loss_lab = torch.mean(d_gan_criterion(logits_lab, labels))
+        loss_lab = (loss_lab * labeled_mask) / torch.sum(labeled_mask)
 
         #loss_lab = -torch.mean(logits_lab) + torch.mean(torch.mean(torch.logsumexp((logits_lab), 0)))
 
