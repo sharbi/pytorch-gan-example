@@ -397,7 +397,7 @@ for epoch in range(num_epochs):
 
         feature_distance = m1 - m2
 
-        print(torch.log(fake_real))
+        #print(torch.log(fake_real))
 
         loss_g = torch.mean(torch.matmul(feature_distance, feature_distance))
 
@@ -408,6 +408,7 @@ for epoch in range(num_epochs):
 
 
         thresholder_predictions = torch.sigmoid(logits_lab)
+        print(thresholder_predictions)
         preds = map(apply_threshold, thresholder_predictions)
         #f1 = f1_score(labels, list(preds))
         #print(f1)
