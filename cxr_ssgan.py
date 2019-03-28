@@ -427,7 +427,7 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
-        f1 = f1_score(preds, list(preds))
+        f1 = f1_score(labels, list(preds))
         print(f1)
         total = len(labels) * num_classes
         correct = (list(preds) == labels.cpu().numpy().astype(int)).sum()
