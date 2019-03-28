@@ -240,7 +240,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        self.softplus = nn.Softplus()
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, inputs):
 
@@ -261,7 +261,7 @@ class Discriminator(nn.Module):
 
         #gan_logits = self.gan_logits(class_logits)
 
-        out = self.softplus(class_logits)
+        out = self.sigmoid(class_logits)
 
         return class_logits, features, out
 
@@ -325,7 +325,7 @@ for epoch in range(num_epochs):
 
         #loss_lab = d_gan_criterion(logits_lab, labels)
 
-        loss_lab = -torch.sum(labels * torch.log(F.softplus(logits_lab)), dim=1)
+        loss_lab = -torch.sum(labels * F.sigmoid(logits_lab), dim=1)
         loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
         loss_lab = torch.mean(loss_lab)
 
