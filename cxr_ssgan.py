@@ -365,8 +365,8 @@ for epoch in range(num_epochs):
 
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
-                         + 0.5 * torch.mean(F.softplus(l_unl)) \
-                         + 0.5 * torch.mean(F.softplus(l_gen))
+                         + 0.5 * torch.mean(F.sigmoid(l_unl)) \
+                         + 0.5 * torch.mean(F.sigmoid(l_gen))
 
 
 
