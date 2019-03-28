@@ -365,8 +365,8 @@ for epoch in range(num_epochs):
 
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
-                         + 0.5 * torch.mean(torch.softplus(l_unl)) \
-                         + 0.5 * torch.mean(torch.softplus(l_gen))
+                         + 0.5 * torch.mean(F.softplus(l_unl)) \
+                         + 0.5 * torch.mean(F.softplus(l_gen))
 
 
         #manifold_diff = logits_gen - logits_gen_adv
