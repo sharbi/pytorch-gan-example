@@ -17,6 +17,7 @@ import torchvision.utils as vutils
 import numpy as np
 import pandas as pd
 from PIL import Image
+from sklearn.metrics import f1_score
 
 import pickle as pkl
 
@@ -426,6 +427,8 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
+        f1 = f1_score(preds, list(preds))
+        print(f1)
         total = len(labels) * num_classes
         correct = (list(preds) == labels.cpu().numpy().astype(int)).sum()
         train_accuracy = 100 * correct / total
