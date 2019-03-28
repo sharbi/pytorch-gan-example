@@ -240,7 +240,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        self.softmax = nn.LogSoftmax(dim=0)
+        self.softplus = nn.LogSoftplus(dim=0)
 
     def forward(self, inputs):
 
@@ -261,7 +261,7 @@ class Discriminator(nn.Module):
 
         #gan_logits = self.gan_logits(class_logits)
 
-        out = self.softmax(class_logits)
+        out = self.softplus(class_logits)
 
         return class_logits, features, out
 
