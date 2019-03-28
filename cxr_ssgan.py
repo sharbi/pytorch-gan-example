@@ -325,7 +325,7 @@ for epoch in range(num_epochs):
 
         #loss_lab = d_gan_criterion(logits_lab, labels)
 
-        loss_lab = -torch.sum(labels * F.sigmoid(logits_lab), dim=1)
+        loss_lab = -torch.sum(labels * torch.sigmoid(logits_lab), dim=1)
         loss_lab = (loss_lab * mask) / torch.max(_to_var(torch.Tensor([(1.0), torch.sum(mask)])))
         loss_lab = torch.mean(loss_lab)
 
@@ -365,8 +365,8 @@ for epoch in range(num_epochs):
 
 
         loss_unl = - 0.5 * torch.mean(l_unl) \
-                         + 0.5 * torch.mean(torch.sigmoid(l_unl)) \
-                         + 0.5 * torch.mean(torch.sigmoid(l_gen))
+                         + 0.5 * torch.mean(torch.softplus(l_unl)) \
+                         + 0.5 * torch.mean(torch.softplus(l_gen))
 
 
         #manifold_diff = logits_gen - logits_gen_adv
