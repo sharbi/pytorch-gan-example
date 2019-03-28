@@ -397,11 +397,17 @@ for epoch in range(num_epochs):
 
         feature_distance = m1 - m2
 
-        print((fake_real))
+        loss_g_1 = torch.mean(torch.matmul(feature_distance, feature_distance))
 
-        loss_g = torch.mean(torch.matmul(feature_distance, feature_distance))
+        fake_reals = torch.FloatTensor([batch_size, 1]).uniform_(0.9, 1.2)
+        fake_reals = _to_var(fake_reals).float()
+
+        prob_fake_be_real = 1 - fake_real[:, -1] + epsilon
+        tmp_log = torch.log(prob_fake_be_real)
+        loss_g_2 = -1 * torch.mean(tmp_log)
 
 
+        loss_g = loss_g_1 + loss_g_2
 
         loss_g.backward()
         optimizerG.step()
