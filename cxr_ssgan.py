@@ -240,7 +240,7 @@ class Discriminator(nn.Module):
 
         #self.gan_logits = _ganLogits()
 
-        self.softplus = nn.Softplus(dim=0)
+        self.softplus = nn.Softplus()
 
     def forward(self, inputs):
 
