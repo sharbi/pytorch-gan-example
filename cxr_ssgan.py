@@ -206,7 +206,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(ngf),
             nn.Dropout(0.2),
             # state size. (ngf*4) x 8 x 8
-            nn.utils.weight_norm(nn.ConvTranspose2d(ngf, nc, 4, 2, 0, bias=False)),
+            nn.ConvTranspose2d(ngf, nc, 4, 2, 0, bias=False),
 
             nn.Tanh()
         # state size. (nc) x 32 x 32
@@ -225,17 +225,12 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
 
-        self.conv1 = nn.Conv2d(nc, ndf, 4, 2, 1, bias=False)
-        self.batch1 = nn.BatchNorm2d(ndf)
-        self.conv2 = nn.Conv2d(ndf, ndf*2, 4, 2, 1, bias=False)
-        self.batch2 = nn.BatchNorm2d(ndf*2)
-        self.conv3 = nn.Conv2d(ndf*2, ndf*2, 4, 2, 1, bias=False)
-        self.batch3 = nn.BatchNorm2d(ndf*2)
-        self.conv4 = nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False)
-        self.batch4 = nn.BatchNorm2d(ndf*4)
-        self.conv5 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 1, bias=False)
-        self.batch5 = nn.BatchNorm2d(ndf*4)
-        self.conv6 = nn.Conv2d(ndf*4, ndf*4, 3, 1, 0, bias=False)
+        self.conv1 = nn.utils.weight_norm(nn.Conv2d(nc, ndf, 4, 2, 1, bias=False))
+        self.conv2 = nn.utils.weight_norm(nn.Conv2d(ndf, ndf*2, 4, 2, 1, bias=False))
+        self.conv3 = nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*2, 4, 2, 1, bias=False))
+        self.conv4 = nn.utils.weight_norm(nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False))
+        self.conv5 = nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 3, 1, 1, bias=False))
+        self.conv6 = nn.utils.weight_norm(nn.Conv2d(ndf*4, ndf*4, 3, 1, 0, bias=False))
 
         self.features = nn.AvgPool2d(kernel_size=2)
 
@@ -249,27 +244,13 @@ class Discriminator(nn.Module):
 
     def forward(self, inputs):
 
-        layer1 = F.leaky_relu(self.conv1(inputs), 0.2)
-        layer1 = F.dropout(self.batch1(layer1), 0.5)
-
-        layer2 = F.leaky_relu(self.conv2(layer1), 0.2)
-        layer2 = F.dropout(self.batch2(layer2), 0.5)
-
-        layer3 = F.leaky_relu(self.conv3(layer2), 0.2)
-        layer3 = F.dropout(self.batch3(layer3), 0.5)
-
-        layer4 = F.leaky_relu(self.conv3(layer3), 0.2)
-        layer4 = F.dropout(self.batch3(layer4), 0.5)
-
-        layer5 = F.leaky_relu(self.conv3(layer4), 0.2)
-        layer5 = F.dropout(self.batch3(layer5), 0.5)
-
-        layer6 = F.leaky_relu(self.conv4(layer5), 0.2)
-        layer6 = F.dropout(self.batch4(layer6), 0.5)
-
-        layer7 = F.leaky_relu(self.conv5(layer6), 0.2)
-        layer7 = F.dropout(self.batch5(layer7), 0.5)
-
+        layer1 = F.dropout(F.leaky_relu(self.conv1(inputs), 0.2), 0.5)
+        layer2 = F.dropout(F.leaky_relu(self.conv2(layer1), 0.2), 0.5)
+        layer3 = F.dropout(F.leaky_relu(self.conv3(layer2), 0.2), 0.5)
+        layer4 = F.dropout(F.leaky_relu(self.conv3(layer3), 0.2), 0.5)
+        layer5 = F.dropout(F.leaky_relu(self.conv3(layer4), 0.2), 0.5)
+        layer6 = F.dropout(F.leaky_relu(self.conv4(layer5), 0.2), 0.5)
+        layer7 = F.dropout(F.leaky_relu(self.conv5(layer6), 0.2), 0.5)
         layer8 = F.leaky_relu(self.conv6(layer7), 0.2)
 
 
@@ -416,6 +397,7 @@ for epoch in range(num_epochs):
 
         feature_distance = m1 - m2
 
+        print(fake_real)
 
         loss_g = torch.mean(torch.matmul(feature_distance, feature_distance))
 
@@ -427,8 +409,8 @@ for epoch in range(num_epochs):
 
         thresholder_predictions = torch.sigmoid(logits_lab)
         preds = map(apply_threshold, thresholder_predictions)
-        f1 = f1_score(labels, list(preds))
-        print(f1)
+        #f1 = f1_score(labels, list(preds))
+        #print(f1)
         total = len(labels) * num_classes
         correct = (list(preds) == labels.cpu().numpy().astype(int)).sum()
         train_accuracy = 100 * correct / total
